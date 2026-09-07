@@ -1,0 +1,50 @@
+{
+  "name": "agentgdp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:smoke": "node scripts/smoke.mjs",
+    "test:watch": "vitest",
+    "data-service": "tsx --env-file-if-exists=.env.services services/data-service.ts",
+    "broker": "tsx --env-file-if-exists=.env.broker services/broker.ts",
+    "ledger:approve": "tsx --env-file-if-exists=.env.broker scripts/ledger-approve.ts"
+  },
+  "dependencies": {
+    "@circle-fin/cli": "^1.0.0",
+    "@ledgerhq/hw-app-eth": "^7.8.17",
+    "@ledgerhq/hw-transport-node-hid": "^6.33.5",
+    "@x402/core": "2.25.0",
+    "@x402/express": "2.25.0",
+    "@x402/fetch": "2.25.0",
+    "@x402/hedera": "2.25.0",
+    "express": "^5.1.0",
+    "lucide-react": "^0.577.0",
+    "next": "16.3.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "viem": "^2.38.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "1.14.4",
+    "protobufjs": "8.8.0",
+    "axios": "1.20.0",
+    "ws": "8.21.3",
+    "toml": "4.2.0"
+  }
+}
