@@ -1,4 +1,4 @@
-# AgentGDP interface references
+# Obolos interface references
 
 ## Current direction: Foundation
 
@@ -13,7 +13,7 @@ The following Foundation screenshots were returned by the connected Mobbin tool 
 
 ## Adaptation
 
-AgentGDP uses the reference's horizontal navigation, bold typography, generous framing and pill controls for its own research economy. Every control still uses the existing session-scoped application API. The generated agent artwork takes the place of Foundation's gallery imagery. No NFT listings, fake sales figures, Foundation branding or reference screenshots are embedded in the product.
+Obolos uses the reference's horizontal navigation, bold typography, generous framing and pill controls for its own research economy. Every control still uses the existing session-scoped application API. The generated agent artwork takes the place of Foundation's gallery imagery. No NFT listings, fake sales figures, Foundation branding or reference screenshots are embedded in the product.
 
 The operator's current run and paid evidence remain the central content. HBAR and USDC allowances stay separate. Rehearsal fixture data, simulated approvals and simulated receipts remain visibly identified; onchain receipts require actual backend settlement evidence.
 

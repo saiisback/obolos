@@ -1,4 +1,4 @@
-# AgentGDP presentation outline
+# Obolos presentation outline
 
 Use this outline with the actual live artifacts after setup. Statements describing paid transactions or hardware demonstrations are demonstration targets until matching evidence is attached. The [submission matrix](submission.md) is the source of completion status.
 

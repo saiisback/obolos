@@ -40,7 +40,7 @@ describe('broker Hedera adapter', () => {
     const {join} = await import('node:path');
     const {PrivateKey} = await import('@x402/hedera');
     const {purchaseHederaData} = await import('../src/lib/integrations/hedera');
-    const directory = await mkdtemp(join(tmpdir(),'agentgdp-payment-test-'));
+    const directory = await mkdtemp(join(tmpdir(),'obolos-payment-test-'));
     vi.stubEnv('DATA_SERVICE_URL','http://127.0.0.1:4402');
     vi.stubEnv('HEDERA_PAY_TO','0.0.123');
     vi.stubEnv('BROKER_DATA_DIR',directory);
@@ -69,7 +69,7 @@ describe('public service HTTP boundary', () => {
     const {tmpdir} = await import('node:os');
     const {join} = await import('node:path');
     const {createDataService} = await import('../services/data-service');
-    const directory = await mkdtemp(join(tmpdir(),'agentgdp-service-test-'));
+    const directory = await mkdtemp(join(tmpdir(),'obolos-service-test-'));
     const localFetch = globalThis.fetch;
     vi.stubEnv('HEDERA_PAY_TO','0.0.123');
     vi.stubEnv('DATA_SERVICE_DATA_DIR',directory);
@@ -109,7 +109,7 @@ it('returns a settled receipt only for the signed transaction with exact mirror 
   const {join} = await import('node:path');
   const {PrivateKey,Transaction} = await import('@x402/hedera');
   const {purchaseHederaData} = await import('../src/lib/integrations/hedera');
-  const directory = await mkdtemp(join(tmpdir(),'agentgdp-settled-test-'));
+  const directory = await mkdtemp(join(tmpdir(),'obolos-settled-test-'));
   vi.stubEnv('DATA_SERVICE_URL','http://127.0.0.1:4402');
   vi.stubEnv('HEDERA_PAY_TO','0.0.123');
   vi.stubEnv('BROKER_DATA_DIR',directory);
@@ -149,7 +149,7 @@ it.each(['upfront', 'unpaid request', 'supported response', 'durable intent', 's
   const {join} = await import('node:path');
   const {PrivateKey} = await import('@x402/hedera');
   const {purchaseHederaData} = await import('../src/lib/integrations/hedera');
-  const directory = await mkdtemp(join(tmpdir(),'agentgdp-expiry-test-'));
+  const directory = await mkdtemp(join(tmpdir(),'obolos-expiry-test-'));
   const expiresAt = Date.now()+60_000;
   let now = phase === 'upfront' ? expiresAt : expiresAt-60_000;
   const input = {...purchase,mandateExpiresAt:new Date(expiresAt).toISOString()};

@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 export function approvalMessage(value:unknown):string {
   const input=z.object({message:z.string().min(1).max(12000)}).parse(value);
-  if(!input.message.startsWith('AgentGDP mandate authorization\n')||!input.message.includes('\nMode: live\n'))throw Error('Expected an AgentGDP live mandate approval message.');
+  if(!['Obolos mandate authorization\n','AgentGDP mandate authorization\n'].some(prefix=>input.message.startsWith(prefix))||!input.message.includes('\nMode: live\n'))throw Error('Expected an Obolos live mandate approval message.');
   return input.message; // Sign the exact UTF-8 bytes; never reconstruct or normalize the mandate.
 }
 async function main() {

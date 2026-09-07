@@ -2,8 +2,8 @@ import type { BrokerHealth, Run } from './contracts';
 import type { BrokerWallets, LiveOverview, ReadinessCheck } from './live-contracts';
 
 export const LIVE_RESOURCES = [
-  {id:'source',label:'AgentGDP public source and architecture',url:'https://github.com/saiisback/AgentGDP'},
-  {id:'setup',label:'AgentGDP credential and wallet setup guide',url:'https://github.com/saiisback/AgentGDP/blob/main/docs/live-setup.md'},
+  {id:'source',label:'Obolos public source and architecture',url:'https://github.com/saiisback/obolos'},
+  {id:'setup',label:'Obolos credential and wallet setup guide',url:'https://github.com/saiisback/obolos/blob/main/docs/live-setup.md'},
   {id:'circle',label:'Create and fund a Circle Agent Wallet',url:'https://developers.circle.com/agent-stack/agent-wallets/quickstart'},
   {id:'arc-faucet',label:'Circle testnet USDC faucet',url:'https://faucet.circle.com/'},
   {id:'hedera-faucet',label:'Hedera testnet account and HBAR faucet',url:'https://portal.hedera.com/'},

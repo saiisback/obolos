@@ -23,7 +23,7 @@ function log(run:Run,actor:AuditEvent['actor'],kind:AuditEvent['kind'],title:str
 function requestApproval(run:Run,p:Provider,reason:string){
  const proposed:Mandate={...run.mandate,version:run.mandate.version+1,maxDataUnitPriceAtomic:Math.max(run.mandate.maxDataUnitPriceAtomic,p.unitPriceAtomic),dataBudgetAtomic:Math.max(run.mandate.dataBudgetAtomic,run.dataSpentAtomic+p.unitPriceAtomic*run.repos.length),expiresAt:new Date(Date.now()+3600000).toISOString()};
  const nonce=randomUUID(),expiresAt=new Date(Date.now()+300000).toISOString();
- const message=['AgentGDP mandate authorization','Purpose: approve spending limits only; this does not sign a token transfer.',`Run: ${run.id}`,`Mode: ${run.mode}`,`Nonce: ${nonce}`,`Approval expires: ${expiresAt}`,`Previous mandate version: ${run.mandate.version}`,`New mandate: ${JSON.stringify(proposed)}`].join('\n');
+ const message=['Obolos mandate authorization','Purpose: approve spending limits only; this does not sign a token transfer.',`Run: ${run.id}`,`Mode: ${run.mode}`,`Nonce: ${nonce}`,`Approval expires: ${expiresAt}`,`Previous mandate version: ${run.mandate.version}`,`New mandate: ${JSON.stringify(proposed)}`].join('\n');
  run.approval={nonce,message,expiresAt,proposedMandate:proposed,reason};run.status='awaiting_approval';
  log(run,'planner','blocked','Human approval required',reason);
 }

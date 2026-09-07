@@ -21,7 +21,7 @@ export function createQuote(providerId: string, input: unknown, prices: PriceBoo
 export async function fetchRepoEvidence(repos: string[], githubToken?: string): Promise<RepoEvidence[]> {
   return Promise.all(validateRepos(repos).map(async repo => {
     const sourceUrl = `https://api.github.com/repos/${repo}`;
-    const response = await fetch(sourceUrl,{headers:{Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'AgentGDP-evidence-service',...(githubToken ? {Authorization:`Bearer ${githubToken}`} : {})},redirect:'error',signal:AbortSignal.timeout(15000)});
+    const response = await fetch(sourceUrl,{headers:{Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'Obolos-evidence-service',...(githubToken ? {Authorization:`Bearer ${githubToken}`} : {})},redirect:'error',signal:AbortSignal.timeout(15000)});
     if (!response.ok) throw new Error(`GitHub evidence unavailable (HTTP ${response.status}).`);
     const data = await response.json() as {private?:boolean;full_name?:string;description?:string;stargazers_count:number;forks_count:number;open_issues_count:number;pushed_at:string;language?:string;license?:{spdx_id?:string}};
     if (data.private !== false || data.full_name?.toLowerCase() !== repo.toLowerCase()) throw new Error('Only exact public repository evidence can be purchased.');
@@ -115,5 +115,5 @@ export async function createDataService() {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-  createDataService().then(app => app.listen(Number(process.env.DATA_SERVICE_PORT ?? 4402),process.env.DATA_SERVICE_HOST ?? '127.0.0.1',() => console.log('AgentGDP Hedera data service listening.'))).catch(() => { console.error('Data service startup failed. Check recipient configuration and Blocky402 connectivity.'); process.exitCode=1; });
+  createDataService().then(app => app.listen(Number(process.env.DATA_SERVICE_PORT ?? 4402),process.env.DATA_SERVICE_HOST ?? '127.0.0.1',() => console.log('Obolos Hedera data service listening.'))).catch(() => { console.error('Data service startup failed. Check recipient configuration and Blocky402 connectivity.'); process.exitCode=1; });
 }

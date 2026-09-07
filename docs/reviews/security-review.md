@@ -1,6 +1,6 @@
 # Independent security and integration review
 
-Reviewed 2026-09-07 against the approved AgentGDP design and implementation plan. Scope: policy/engine, persistence, API ownership/mutations, broker, paid evidence service, Hedera/Circle adapters, and physical approval script. UI excluded.
+Reviewed 2026-09-07 against the approved Obolos design and implementation plan. Scope: policy/engine, persistence, API ownership/mutations, broker, paid evidence service, Hedera/Circle adapters, and physical approval script. UI excluded.
 
 ## Re-review status — resolved
 

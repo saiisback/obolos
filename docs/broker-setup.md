@@ -17,7 +17,7 @@ Install project dependencies with `npm ci` in the private broker checkout. The r
 }
 ```
 
-Encrypt with `wallet-cli ring encrypt -i /private/secrets.json -o /private/agentgdp-secrets.enc --key agentgdp-broker`. Remove the plaintext provisioning file after securely recording any required recovery material. At runtime the broker uses `execFile` with `ring decrypt -i <file> --key <name>`; stdout is parsed in memory, and child errors/output are never logged or returned. Password injection, ring provisioning and device requirements follow [Ledger Wallet CLI documentation](https://developers.ledger.com/docs/ai-tools/ledger-cli).
+Encrypt with `wallet-cli ring encrypt -i /private/secrets.json -o /private/obolos-secrets.enc --key obolos-broker`. Remove the plaintext provisioning file after securely recording any required recovery material. At runtime the broker uses `execFile` with `ring decrypt -i <file> --key <name>`; stdout is parsed in memory, and child errors/output are never logged or returned. Password injection, ring provisioning and device requirements follow [Ledger Wallet CLI documentation](https://developers.ledger.com/docs/ai-tools/ledger-cli).
 
 Copy `.env.broker.example` to a private `.env.broker`. Pin the public data service URL, Hedera recipient (the adapter discovers the fee payer from the fixed Blocky402 HTTPS endpoint), plus inference HTTPS origin/model. Protect the file, Circle session directory and broker journal from other accounts. Inject the ring password only into the broker launch environment; never expose it to the Next process. Start with `npm run broker`. The listener binds `127.0.0.1:4319`; expose it remotely only through an authenticated private tunnel. `/health` also requires `Authorization: Bearer <BROKER_TOKEN>`.
 

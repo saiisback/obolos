@@ -34,5 +34,5 @@ export async function POST(req:NextRequest,context:Context){try{
 export async function GET(req:NextRequest,context:Context){try{
  const owner=requireSession(req),{id,action}=await context.params,run=await store.get(owner,id);
  if(action!=='export')return ok(run);
- return NextResponse.json({schema:'agentgdp.evidence.v1',exportedAt:new Date().toISOString(),auditChainValid:verifyAudit(run.events),disclosure:run.mode==='rehearsal'?'Illustrative data and simulated payments. Not sponsor qualification evidence.':'Live mode: inspect each settled receipt and source timestamp. Configuration alone does not establish qualification.',run},{headers:{'Content-Disposition':`attachment; filename="agentgdp-${run.id}.json"`,'Cache-Control':'no-store'}});
+ return NextResponse.json({schema:'obolos.evidence.v1',exportedAt:new Date().toISOString(),auditChainValid:verifyAudit(run.events),disclosure:run.mode==='rehearsal'?'Illustrative data and simulated payments. Not sponsor qualification evidence.':'Live mode: inspect each settled receipt and source timestamp. Configuration alone does not establish qualification.',run},{headers:{'Content-Disposition':`attachment; filename="obolos-${run.id}.json"`,'Cache-Control':'no-store'}});
 }catch(e){return fail(e);}}

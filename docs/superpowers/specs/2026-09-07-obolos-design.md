@@ -1,4 +1,4 @@
-# AgentGDP approved design
+# Obolos approved design
 
 The user approved the six-stage managed research workflow and explicitly requested full implementation using Next.js, TypeScript and subagents. This file records that scope; it does not assert sponsor eligibility or live payment completion.
 

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'AgentGDP — Work, within limits.',
+  title: 'Obolos — Work, within limits.',
   description: 'A workspace for agent research, human-defined budgets, and verifiable payment evidence.',
 };
 

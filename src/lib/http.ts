@@ -7,7 +7,7 @@ import { ZodError } from 'zod';
 function secret(){
  if(process.env.SESSION_SECRET)return process.env.SESSION_SECRET;
  // Runtime private storage is mounted separately, never bundled into server output.
- const dir=resolve(/* turbopackIgnore: true */ process.env.AGENTGDP_DATA_DIR??'data/app');mkdirSync(dir,{recursive:true,mode:0o700});const file=join(dir,'session.key');
+ const dir=resolve(/* turbopackIgnore: true */ process.env.OBOLOS_DATA_DIR??process.env.AGENTGDP_DATA_DIR??'data/app');mkdirSync(dir,{recursive:true,mode:0o700});const file=join(dir,'session.key');
  try{return readFileSync(file,'utf8');}catch(e){if((e as NodeJS.ErrnoException).code!=='ENOENT')throw e;const key=randomBytes(32).toString('hex');try{writeFileSync(file,key,{mode:0o600,flag:'wx'});return key;}catch{return readFileSync(file,'utf8');}}
 }
 function sign(value:string){return createHmac('sha256',secret()).update(value).digest('hex');}

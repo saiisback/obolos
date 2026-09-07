@@ -1,4 +1,4 @@
-# AgentGDP: independent three-track integration audit
+# Obolos: independent three-track integration audit
 
 Checked 7 September 2026 against implementation and fresh primary sources. This is an implementation/qualification audit, not proof of funded payment, physical hardware use, or organizer acceptance. Scope excludes the parent's in-progress readiness, wallet-list and UI additions until separately verified.
 
@@ -58,7 +58,7 @@ The Ledger component does not hardware-sign the native Hedera or Circle transfer
 
 Fresh official chain documentation lists `ARC-TESTNET` as supported for Agent Wallets. The implemented source-wallet lookup filters agent wallets and Arc; installed `@circle-fin/cli@1.0.0` source shows wallet resolution prefers a matching agent wallet over a local-wallet collision. Its transfer command accepts the stable idempotency flag, and formatted output includes the echoed key, blockchain, transaction hash, source and destination consumed by the adapter. [Agent Wallet supported chains](https://developers.circle.com/agent-stack/agent-wallets/supported-blockchains)
 
-Current command documentation supports the project's explicit source/address/chain/token transfer syntax. It also states custom spending-policy commands (`wallet limit`, set/reset/budget) are mainnet-only. Therefore the Arc testnet mandate and caps are enforced by AgentGDP's app/broker, not by a demonstrated Circle testnet custom policy. Do not promise that the user can configure those native Circle policies on Arc testnet. OTP login and faucet funding remain operator actions. [Circle CLI command reference](https://developers.circle.com/agent-stack/circle-cli/command-reference)
+Current command documentation supports the project's explicit source/address/chain/token transfer syntax. It also states custom spending-policy commands (`wallet limit`, set/reset/budget) are mainnet-only. Therefore the Arc testnet mandate and caps are enforced by Obolos's app/broker, not by a demonstrated Circle testnet custom policy. Do not promise that the user can configure those native Circle policies on Arc testnet. OTP login and faucet funding remain operator actions. [Circle CLI command reference](https://developers.circle.com/agent-stack/circle-cli/command-reference)
 
 This integration performs a direct transfer, not a Circle Marketplace discovery/Nanopayment flow. The deterministic job controller initiates the payment after its policy checks; the report LLM has no direct wallet tool. This is an agent orchestration architecture, not several independently autonomous onchain agents.
 

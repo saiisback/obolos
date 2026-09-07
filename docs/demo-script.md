@@ -4,7 +4,7 @@ This is a recording plan, not evidence that the live flow has occurred. Use an a
 
 | Time | Screen / action | Narration |
 |---|---|---|
-| 0:00–0:20 | Foundation-referenced overview; create a repository comparison | “AgentGDP lets agents buy research inputs and pay for source checks within a human-controlled mandate.” |
+| 0:00–0:20 | Foundation-referenced overview; create a repository comparison | “Obolos lets agents buy research inputs and pay for source checks within a human-controlled mandate.” |
 | 0:20–0:40 | Connections: public wallet addresses, separate HBAR/USDC balances, sources and readiness | “These are read-only testnet snapshots. A balance is not an allowance, and setup readiness is not payment proof.” |
 | 0:40–1:00 | Mandate editor and discovered live quotes | “The human chooses the providers, price ceiling, budgets and expiry. The worker model has no signing keys or wallet tools.” |
 | 1:00–1:20 | Change your own service's quote before purchase; advance to blocked request | “The planner reads actual service prices. Both allowed quotes now exceed this mandate, so spending stops for a human decision.” |

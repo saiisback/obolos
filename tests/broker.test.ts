@@ -31,7 +31,7 @@ describe('broker security boundary', () => {
     await expect(j.execute('receipt-b','run-b','verify',{},1,10,async()=>({receipt}))).rejects.toThrow('uncertain');
   });
   it('signs exact live approval text and refuses rehearsal labels',()=>{
-    const message='AgentGDP mandate authorization\nMode: live\nNew mandate: {"dataBudgetAtomic":100}';
+    const message='Obolos mandate authorization\nMode: live\nNew mandate: {"dataBudgetAtomic":100}';
     expect(approvalMessage({message})).toBe(message);
     expect(()=>approvalMessage({message:message.replace('live','rehearsal')})).toThrow();
   });
@@ -59,8 +59,8 @@ describe('broker security boundary', () => {
   });
   it('decrypts with an argument array and never leaks CLI failures',async()=>{
     const run=vi.fn().mockRejectedValue(new Error('private-key-must-not-leak'));
-    await expect(decryptBrokerSecrets({LEDGER_RING_FILE:'/private/bundle.enc',LEDGER_RING_KEY:'agentgdp',WALLET_PASS:'secret'},run)).rejects.toThrow('Key Ring unavailable');
-    expect(run.mock.calls[0][1]).toEqual(['ring','decrypt','-i','/private/bundle.enc','--key','agentgdp']);
+    await expect(decryptBrokerSecrets({LEDGER_RING_FILE:'/private/bundle.enc',LEDGER_RING_KEY:'obolos',WALLET_PASS:'secret'},run)).rejects.toThrow('Key Ring unavailable');
+    expect(run.mock.calls[0][1]).toEqual(['ring','decrypt','-i','/private/bundle.enc','--key','obolos']);
     expect(run.mock.calls[0][2].shell).toBe(false);
   });
 });

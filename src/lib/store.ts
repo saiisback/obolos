@@ -8,7 +8,7 @@ interface Snapshot {version:1;records:StoredRun[]}
 // A single Next.js node process owns this store. Use a durable volume in deployment.
 export class RunStore {
  private tail:Promise<unknown>=Promise.resolve();
- constructor(private directory=resolve(/* turbopackIgnore: true */ process.env.AGENTGDP_DATA_DIR??'data/app')){}
+ constructor(private directory=resolve(/* turbopackIgnore: true */ process.env.OBOLOS_DATA_DIR??process.env.AGENTGDP_DATA_DIR??'data/app')){}
  private async serial<T>(operation:()=>Promise<T>):Promise<T>{
   const next=this.tail.then(operation,operation);this.tail=next.catch(()=>{});return next;
  }

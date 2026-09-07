@@ -37,6 +37,7 @@ export async function purchaseCircleVerification(input:{runId:string;requestId:s
     if(!Number.isFinite(expiresAt)||expiresAt<=Date.now())throw Error('Mandate expired before Arc transfer submission.');
   };
   assertExpiry();
+  // Preserve the original namespace across branding changes to prevent duplicate payments.
   // Derive UUID from immutable request identity. CLI 1.0.0 accepts and echoes this key.
   const h=createHash('sha256').update(`agentgdp:arc:${input.runId}:${input.requestId}`).digest('hex');
   const key=`${h.slice(0,8)}-${h.slice(8,12)}-4${h.slice(13,16)}-a${h.slice(17,20)}-${h.slice(20,32)}`;

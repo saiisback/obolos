@@ -177,7 +177,7 @@ async function main() {
   const directory=resolve(process.env.BROKER_DATA_DIR||'data/broker');await mkdir(directory,{recursive:true,mode:0o700});
   // A stale lock is deliberately not cleared automatically: reconcile before restart after a crash.
   const lock=await open(resolve(directory,'broker.lock'),'wx',0o600);await lock.writeFile(String(process.pid));await lock.close();
-  const server=createBrokerApp().listen(Number(process.env.BROKER_PORT||4319),'127.0.0.1',()=>console.log('AgentGDP capability broker listening on loopback.'));
+  const server=createBrokerApp().listen(Number(process.env.BROKER_PORT||4319),'127.0.0.1',()=>console.log('Obolos capability broker listening on loopback.'));
   const shutdown=()=>{server.close(async()=>{const {unlink}=await import('node:fs/promises');await unlink(resolve(directory,'broker.lock'));process.exit(0);});};
   process.once('SIGINT',shutdown);process.once('SIGTERM',shutdown);
 }

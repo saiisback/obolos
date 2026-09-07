@@ -99,10 +99,10 @@ Create this JSON in a private temporary file outside the repository, replacing p
 With `WALLET_PASS` supplied privately, encrypt the file:
 
 ```sh
-wallet-cli ring encrypt -i /absolute/private/secrets.json -o /absolute/private/agentgdp-secrets.enc --key agentgdp-broker
+wallet-cli ring encrypt -i /absolute/private/secrets.json -o /absolute/private/obolos-secrets.enc --key obolos-broker
 ```
 
-Set `LEDGER_RING_FILE`, `LEDGER_RING_KEY=agentgdp-broker` and `LEDGER_WALLET_CLI=/absolute/path/to/your-private-checkout/node_modules/.bin/wallet-cli` in the broker configuration. After verifying your encrypted copy and recovery arrangements, remove the temporary plaintext file. Do not print decrypted output as a diagnostic. At runtime the broker invokes Ring decryption and parses its output in memory; neither the app nor model receives the bundle.
+Set `LEDGER_RING_FILE`, `LEDGER_RING_KEY=obolos-broker` and `LEDGER_WALLET_CLI=/absolute/path/to/your-private-checkout/node_modules/.bin/wallet-cli` in the broker configuration. After verifying your encrypted copy and recovery arrangements, remove the temporary plaintext file. Do not print decrypted output as a diagnostic. At runtime the broker invokes Ring decryption and parses its output in memory; neither the app nor model receives the bundle.
 
 ## 5. Pin the Ledger controller using Ethereum
 
@@ -178,7 +178,7 @@ A verified report means its structural/source checks passed. It does not certify
 
 ## 9. Finish the external submission package
 
-The [public repository](https://github.com/saiisback/AgentGDP) is published. The public service URL, actual paid Hedera and Arc receipts, physical device demonstration, developer-experience feedback and narrated video are still external completion gates. Follow the [submission matrix](submission.md), [demo script](demo-script.md) and [presentation outline](presentation.md). Configuration is not qualification.
+The [public repository](https://github.com/saiisback/obolos) is published. The public service URL, actual paid Hedera and Arc receipts, physical device demonstration, developer-experience feedback and narrated video are still external completion gates. Follow the [submission matrix](submission.md), [demo script](demo-script.md) and [presentation outline](presentation.md). Configuration is not qualification.
 
 Settlement occurs on Hedera and Arc. The model, deterministic orchestration, broker, facilitator, Circle infrastructure and local audit store remain off-chain/trusted dependencies. No fully decentralized agent runtime, bridge, atomic cross-chain settlement or tamper-proof local history is claimed.
 
