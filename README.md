@@ -74,6 +74,8 @@ See [architecture and trust boundaries](docs/architecture.md), [Hedera setup](do
 
 Follow the [step-by-step credential and wallet guide](docs/live-setup.md). It distinguishes public addresses from private credentials and keeps setup actions with the operator.
 
+For a fresh local setup, `npm run setup:local` creates the three ignored environment files with private permissions, matching internal tokens and installed CLI paths. It preserves existing application sessions and refuses to overwrite configuration. It does not create wallets, provision Ledger Ring, log in to Circle or move funds. The local same-user layout is for development; use a dedicated broker account for credential isolation.
+
 1. Configure and start the Hedera evidence service with its recipient, persistent journal and matching public URL.
 2. Enroll the private broker using Ledger Ring and the **Sync** device app. Encrypt the inference credential and HBAR payer key; inject the Ring password from the operator keychain.
 3. Use the **Ethereum** device app to derive and confirm the separate controller address. Pin it and its derivation path before requesting a signature.

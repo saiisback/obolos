@@ -49,6 +49,8 @@ The templates divide configuration by process:
 - `.env.services.example` → service `.env.services`.
 - `.env.broker.example` → broker's private `.env.broker`.
 
+For a local development bootstrap, run `npm run setup:local` before any of the three destination env files exist. It creates matching app/broker/service authentication tokens in mode `0600` files, preserves a valid existing application `session.key`, and fills installed CLI paths and ignored state directories under `data/local-broker`. It prints statuses only, refuses existing configuration without overwriting it, and rolls back its own files if setup fails. This same-user setup is **not OS credential isolation**. It does not create wallet keys, a Ring password, an encrypted bundle or Circle login; public addresses and provider credentials remain for you to configure locally using the steps below. Use the dedicated broker account procedure for private deployment.
+
 The npm scripts load these exact filenames from their working directory. Under a separate broker account, use a private deployment checkout or a service manager that injects the broker environment. Restrict private directories to that account and configuration/bundle files to mode `0600`. Keep application, broker and evidence-service journals on durable volumes; do not reset them between demo takes.
 
 ## 3. Set up Hedera testnet accounts

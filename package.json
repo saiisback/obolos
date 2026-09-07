@@ -13,7 +13,8 @@
     "data-service": "tsx --env-file-if-exists=.env.services services/data-service.ts",
     "broker": "tsx --env-file-if-exists=.env.broker services/broker.ts",
     "ledger:approve": "tsx --env-file-if-exists=.env.broker scripts/ledger-approve.ts",
-    "preflight": "node scripts/preflight.mjs"
+    "preflight": "node scripts/preflight.mjs",
+    "setup:local": "node scripts/setup-local.mjs"
   },
   "dependencies": {
     "@circle-fin/cli": "^1.0.0",
