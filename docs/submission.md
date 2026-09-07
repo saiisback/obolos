@@ -14,7 +14,7 @@ Targets: Ledger **AI Agents x Ledger**; Hedera **AI & Agentic Payments**; Arc **
 | Live Hedera x402-gated service | Public data service discovery/quote/evidence endpoints | Local unpaid challenge verified; public HTTPS deployment remains |
 | Blocky402 settlement | Fixed hosted testnet facilitator + native exact Hedera adapter | Supported endpoint verified; actual paid request still required |
 | Consuming agent end-to-end payment | Planner → broker → x402 service → receipt | Rehearsal and boundary tests; live funded run remains |
-| Public GitHub and setup/architecture/payment README | This repository and architecture diagram | Files provided; public remote URL remains |
+| Public GitHub and setup/architecture/payment README | This repository and architecture diagram | Published at [saiisback/AgentGDP](https://github.com/saiisback/AgentGDP) with implementation history |
 | Arc + USDC + Circle Agent Stack | Email-OTP agent-wallet CLI path, canonical USDC transfer and exact on-chain check | Code implemented; operator login/funding and actual Arc transfer remain; no Circle API key path is claimed |
 | Decisions tied to real signals | Cheapest allowed quote, price refresh, caps, expiry | Tested with controlled quotes; live price-shock demonstration remains |
 | Working frontend and backend | Foundation-referenced Next console, run controls, Connections wallet/readiness view, routes, broker and service | Current local tests/build/HTTP workflow and Connections browser check passed; live funded deployment still remains |
@@ -38,7 +38,7 @@ Not implemented/claimed: A2A/ACP negotiation, ERC-8004/HCS-14 identity, UCP, HCS
 
 ## Submission package
 
-- [ ] Public GitHub URL with incremental history, specs/plans and AI attribution.
+- [x] Public GitHub URL with incremental history, specs/plans and AI attribution: https://github.com/saiisback/AgentGDP.
 - [ ] Public HTTPS Hedera data-service URL and unpaid 402 reproduction command.
 - [ ] Export of a LIVE job containing both confirmed receipt transaction IDs and the saved authorization proof when an escalation was demonstrated.
 - [ ] HashScan and ArcScan URLs matching amount, recipient and testnet.
@@ -60,6 +60,7 @@ Deadline: September 13, 2026 at 12:00 EDT / **21:30 IST**.
 - `npm run preflight`: correctly exits 1 because the real environment files, wallet configuration and Ring password have not been supplied. This expected result is an honest incomplete setup report.
 - Local official Ledger Wallet CLI 2.1.0 version and `ring decrypt --help` succeeded. No hardware provisioning or signing command was executed.
 - Independent review resolved the authorization-proof retention, approval-download format and overstated verifier wording findings; see [track audit](reviews/track-audit.md).
+- Public repository published to `saiisback/AgentGDP` on `main` with the complete implementation history.
 - No live payment, Circle login, physical device operation, public service deployment or video is established by these checks.
 
 ## Historical local verification checkpoint
@@ -74,7 +75,7 @@ The following September 7, 2026 record predates the new live Connections/readine
 - Independent security review findings corrected and re-reviewed; see `docs/reviews/security-review.md`.
 - Dependency audit after compatible overrides: 0 high/critical, 7 moderate and 9 low advisories remain.
 
-No funded transactions, account login, physical hardware approval, public publishing or video recording are established by this documentation update. The new read-only preflight, wallet view and saved proof surfaces also do not supply those external records. These local checks do not complete the unchecked submission gates above.
+This historical checkpoint does not establish funded transactions, account login, physical hardware approval or video recording. The public repository was published in the current checkpoint. The new read-only preflight, wallet view and saved proof surfaces also do not supply those external records. These local checks do not complete the unchecked submission gates above.
 
 Use the [live setup guide](live-setup.md) to prepare credentials locally. Append a separate current verification record after running the new checks; do not mark external gates complete from a successful preflight.
 

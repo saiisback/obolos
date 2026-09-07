@@ -1,5 +1,7 @@
 # AgentGDP
 
+Public source: [saiisback/AgentGDP](https://github.com/saiisback/AgentGDP).
+
 An operator console for agents that buy evidence, pay for verification, and work within a human-defined spending mandate. Built for the **Ledger AI Agents x Ledger**, **Hedera AI & Agentic Payments**, and **Arc Best Agentic Economy Application with Circle Agent Stack** tracks at ETHOnline 2026.
 
 **Status:** runnable rehearsal, implemented live adapters, and an operator-only Connections view for real wallet snapshots, readiness and saved live evidence. Configuration, local checks and an unpaid HTTP 402 challenge do **not** establish a paid testnet request, physical Ledger approval or track qualification. See the [submission evidence checklist](docs/submission.md) before claiming qualification.

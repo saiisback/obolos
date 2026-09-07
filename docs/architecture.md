@@ -42,4 +42,4 @@ Run broker credentials under an isolated OS account or hardened container/privat
 
 ## Demonstration status
 
-Implemented integration code and read-only setup checks do not establish actual funded payment, hardware provenance or sponsor qualification. Public HTTPS service/repository, actual Hedera/Arc receipts, physical device footage, tooling feedback and narrated video remain separate evidence gates in [submission.md](submission.md). Verification remains structural/source consistency, not independent validation of every generated statement.
+Implemented integration code and read-only setup checks do not establish actual funded payment, hardware provenance or sponsor qualification. The public repository is available; public HTTPS service deployment, actual Hedera/Arc receipts, physical device footage, tooling feedback and narrated video remain separate evidence gates in [submission.md](submission.md). Verification remains structural/source consistency, not independent validation of every generated statement.

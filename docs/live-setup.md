@@ -178,7 +178,7 @@ A verified report means its structural/source checks passed. It does not certify
 
 ## 9. Finish the external submission package
 
-The public service URL, public repository, actual paid Hedera and Arc receipts, physical device demonstration, developer-experience feedback and narrated video are still external completion gates. Follow the [submission matrix](submission.md), [demo script](demo-script.md) and [presentation outline](presentation.md). Configuration is not qualification.
+The [public repository](https://github.com/saiisback/AgentGDP) is published. The public service URL, actual paid Hedera and Arc receipts, physical device demonstration, developer-experience feedback and narrated video are still external completion gates. Follow the [submission matrix](submission.md), [demo script](demo-script.md) and [presentation outline](presentation.md). Configuration is not qualification.
 
 Settlement occurs on Hedera and Arc. The model, deterministic orchestration, broker, facilitator, Circle infrastructure and local audit store remain off-chain/trusted dependencies. No fully decentralized agent runtime, bridge, atomic cross-chain settlement or tamper-proof local history is claimed.
 

@@ -26,4 +26,4 @@ Reset quotes through the authenticated service control between takes. Never dele
 
 Save the live export with `receipts`, `authorizations`, source timestamps and audit events; the public HashScan/ArcScan links; device footage of Ring enrollment and mandate approval; and actual tooling feedback. The ECDSA signature alone does not prove the hardware was used. Show missing evidence honestly if recording before these steps are complete.
 
-A public service, public repository, real paid requests, physical device demo, developer-experience feedback and narrated video remain submission gates until their artifacts exist. Preserve the September 3 prior-paper disclosure and seek the organizer's eligibility decision.
+The public repository is published. A public service, real paid requests, physical device demo, developer-experience feedback and narrated video remain submission gates until their artifacts exist. Preserve the September 3 prior-paper disclosure and seek the organizer's eligibility decision.

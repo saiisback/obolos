@@ -2,6 +2,8 @@ import type { BrokerHealth, Run } from './contracts';
 import type { BrokerWallets, LiveOverview, ReadinessCheck } from './live-contracts';
 
 export const LIVE_RESOURCES = [
+  {id:'source',label:'AgentGDP public source and architecture',url:'https://github.com/saiisback/AgentGDP'},
+  {id:'setup',label:'AgentGDP credential and wallet setup guide',url:'https://github.com/saiisback/AgentGDP/blob/main/docs/live-setup.md'},
   {id:'circle',label:'Create and fund a Circle Agent Wallet',url:'https://developers.circle.com/agent-stack/agent-wallets/quickstart'},
   {id:'arc-faucet',label:'Circle testnet USDC faucet',url:'https://faucet.circle.com/'},
   {id:'hedera-faucet',label:'Hedera testnet account and HBAR faucet',url:'https://portal.hedera.com/'},
@@ -46,7 +48,7 @@ export function buildLiveOverview(input:{
     }),
     {id:'payments',label:'Real paid request on both rails',status:evidence.hederaPayments>0&&evidence.arcPayments>0?'ready':'action',detail:`This workspace has ${evidence.hederaPayments} confirmed Hedera and ${evidence.arcPayments} confirmed Arc receipts. Rehearsals do not count.`},
     {id:'hardware',label:'Physical Ledger demo and authorization proof',status:'action',detail:`${evidence.ledgerApprovals} saved controller proofs in this workspace. A recorded physical device demonstration and Ledger tooling feedback are still required.`},
-    {id:'publish',label:'Public service, repository and demo',status:'action',detail:'Publish the x402 service over HTTPS and the repository with README/diagram; record the real paid request in a 2–4 minute video.'},
+    {id:'publish',label:'Public service and demo',status:'action',detail:'The public repository is linked below. Deploy the x402 service over HTTPS and record the real paid request in a 2–4 minute video.'},
   ];
   return {checkedAt:input.wallets?.observedAt??new Date().toISOString(),operatorAuthenticated:authenticated,liveEnabled:authenticated&&health.ready&&liveConfiguration(env),controllerAddress:authenticated?controller:null,serviceUrl:authenticated?service:null,wallets,checks,evidence,resources:LIVE_RESOURCES};
 }
