@@ -92,6 +92,6 @@ Set `APP_ORIGIN` to the actual public origin and `COOKIE_SECURE=true` behind HTT
 
 ## Attribution and eligibility
 
-The user directed the product and flow; AI subagents assisted implementation, tests, documentation and illustration. See [AI and prior-work disclosure](docs/ai-disclosure.md). UI references come only from Mobbin; the user excluded Mercury. No sponsor logos or fictional settlement evidence are used.
+The user directed the product and flow; AI subagents assisted implementation, tests, documentation and illustration. See [AI and prior-work disclosure](docs/ai-disclosure.md). The current UI follows the user-selected Foundation reference on Mobbin; exact screenshots and typography inferences are listed in `docs/ui-references.md`. No sponsor logos or fictional settlement evidence are used.
 
 The September 3 research paper predates the event. Whether it constitutes disallowed prior project-specific design for the Classic track remains an organizer decision. New implementation is dated in commit history; this repository does not represent eligibility as confirmed.

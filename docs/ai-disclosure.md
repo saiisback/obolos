@@ -1,6 +1,6 @@
 # AI assistance and prior work
 
-The human participant supplied the AgentGDP research paper, selected the three sponsor tracks, approved the six-stage managed research flow, chose Next.js/TypeScript, requested delegated coding and review, and directed a Mobbin-only black-and-white interface with colorful buttons. They explicitly excluded Mercury and requested a flat 2D illustration without shadows.
+The human participant supplied the AgentGDP research paper, selected the three sponsor tracks, approved the six-stage managed research flow, chose Next.js/TypeScript, requested delegated coding and review, and directed a Mobbin-only black-and-white interface with colorful buttons. They explicitly excluded Mercury, requested a flat 2D illustration without shadows, and subsequently selected Foundation on Mobbin as the visual reference.
 
 AI assistance includes research notes, architecture/implementation plans, TypeScript/React code, tests, integration review, documentation and a generated illustration. Subagents implemented the dashboard, Hedera data service and Ledger/Circle broker; the parent agent integrated, reviewed and tested the code. See the checked-in plans, references and incremental commit history for the work performed.
 
