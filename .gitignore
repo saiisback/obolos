@@ -1,0 +1,14 @@
+node_modules/
+.next/
+.env*
+!.env.example
+!.env.broker.example
+!.env.services.example
+data/
+*.tsbuildinfo
+playwright-report/
+test-results/
+.superpowers/
+.DS_Store
+*.enc
+secrets*.json
