@@ -1,8 +1,21 @@
 import { describe,it,expect } from 'vitest';
 import { createRun,advanceRun,applyShock,approveRun,pauseRun } from '../src/lib/engine';
-import { rehearsalGateway } from '../src/lib/gateway';
+import { rehearsalGateway, DEFAULT_PROVIDERS } from '../src/lib/gateway';
 import { verifyAudit } from '../src/lib/policy';
 describe('managed research job',()=>{
+ it('uses the actual live quote response and never substitutes rehearsal prices',async()=>{
+  const run=createRun({repos:['vercel/next.js'],mode:'live'});
+  expect(()=>applyShock(run)).toThrow('refreshed provider quotes');
+  const quotes=DEFAULT_PROVIDERS.map(p=>({...p,unitPriceAtomic:678901}));
+  applyShock(run,quotes);
+  await advanceRun(run,{...rehearsalGateway,discover:async()=>quotes});
+  await advanceRun(run,{...rehearsalGateway,discover:async()=>quotes});
+  expect(run.providers.map(p=>p.unitPriceAtomic)).toEqual([678901,678901]);
+  await advanceRun(run,{...rehearsalGateway,discover:async()=>quotes});
+  expect(run.status).toBe('awaiting_approval');
+  expect(run.approval?.proposedMandate.maxDataUnitPriceAtomic).toBe(678901);
+  expect(run.receipts).toHaveLength(0);
+ });
  it('buys evidence, commissions a checked report and pays two distinct rails',async()=>{
   const run=createRun({repos:['vercel/next.js','sveltejs/kit'],mode:'rehearsal'});
   for(let i=0;i<7;i++) await advanceRun(run,rehearsalGateway);

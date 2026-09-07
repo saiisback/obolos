@@ -24,6 +24,7 @@ export async function POST(req:NextRequest,context:Context){try{
      const response=await fetch(`${endpoint.replace(/\/$/,'')}/operator/prices`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({providerId:p.id,unitPriceAtomic:400000+i*50000}),signal:AbortSignal.timeout(10000)});
      if(!response.ok)throw new Error('The provider rejected a price update. Rediscover quotes before proceeding.');
     }
+    return applyShock(run,await liveGateway.discover());
    }
    return applyShock(run);
   }

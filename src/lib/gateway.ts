@@ -28,7 +28,7 @@ const providerSchema=z.object({id:z.string().regex(/^repo-(standard|economy)$/),
 export async function brokerRequest<T>(path:string,body?:unknown):Promise<T>{
  const url=process.env.BROKER_URL,token=process.env.BROKER_TOKEN;
  if(!url||!token)throw new Error('Live broker is not configured.');
- const response=await fetch(`${url.replace(/\/$/,'')}${path}`,{method:body===undefined?'GET':'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(path==='/health'?10000:300000),cache:'no-store'});
+ const response=await fetch(`${url.replace(/\/$/,'')}${path}`,{method:body===undefined?'GET':'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(path==='/health'?10000:path==='/wallets'?45000:300000),cache:'no-store',redirect:'error'});
  if(!response.ok)throw new Error(`Broker operation failed (${response.status}). Inspect the broker locally; no payment retry was made.`);
  return await response.json() as T;
 }

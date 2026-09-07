@@ -31,16 +31,23 @@ export interface AuditEvent {
 export interface ApprovalRequest {
   nonce: string; message: string; expiresAt: string; proposedMandate: Mandate; reason: string;
 }
+export interface AuthorizationProof {
+  mode: Mode; nonce: string; message: string; verifiedAt: string;
+  previousMandate: Mandate; approvedMandate: Mandate;
+  signer?: string; signature?: string;
+}
 export interface Run {
   id: string; mode: Mode; title: string; repos: string[]; status: RunStatus; stage: Stage;
   createdAt: string; updatedAt: string; mandate: Mandate; providers: Provider[];
   selectedProvider?: string; dataSpentAtomic: number; verificationSpentAtomic: number;
   evidence: RepoEvidence[]; receipts: Receipt[]; events: AuditEvent[]; report?: Report;
   approval?: ApprovalRequest; shockApplied: boolean; error?: string;
+  authorizations?: AuthorizationProof[];
 }
 export interface IntegrationStatus {id: string; name: string; ready: boolean; detail: string}
 export interface DashboardState {
   runs: Run[]; integrations: IntegrationStatus[]; liveEnabled: boolean; operatorAuthenticated: boolean;
+  priceControlsEnabled?: boolean;
 }
 export interface DataPurchase {
   runId: string; requestId: string; repos: string[]; providerId: string;

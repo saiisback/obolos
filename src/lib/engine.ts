@@ -41,7 +41,7 @@ export async function advanceRun(run:Run,gateway:Gateway):Promise<Run>{
    log(run,'broker','success','Mandate accepted','Only named services can receive requests. Wallet and provider credentials remain outside the agent.');run.stage='discovery';
   }else if(run.stage==='discovery'){
    const providers=await gateway.discover();
-   run.providers=run.shockApplied?shocked(providers):providers;
+   run.providers=run.mode==='rehearsal'&&run.shockApplied?shocked(providers):providers;
    const eligible=run.providers.filter(p=>run.mandate.allowedProviders.includes(p.id)).sort((a,b)=>a.unitPriceAtomic-b.unitPriceAtomic);
    if(!eligible.length)throw new Error('No discoverable provider is on the allowlist.');
    run.selectedProvider=eligible[0].id;run.stage='purchase';
@@ -64,7 +64,7 @@ export async function advanceRun(run:Run,gateway:Gateway):Promise<Run>{
   }else if(run.stage==='report'){
    const summary=await gateway.generateReport(run.evidence,run.id);
    run.report={title:run.title,summary,recommendation:'Use these observations as a starting point. Validate framework suitability against your project requirements; popularity is not a quality guarantee.',evidence:run.evidence,generatedBy:run.mode==='rehearsal'?'template':'model',createdAt:new Date().toISOString(),checks:[],verified:false};run.stage='verification';
-   log(run,'worker','success','Report drafted',`${run.mode==='rehearsal'?'Template rehearsal':'Model-generated analysis'} grounded in ${run.evidence.length} purchased records. Factual evidence checks are still pending.`);
+   log(run,'worker','success','Report drafted',`${run.mode==='rehearsal'?'Template rehearsal':'Model-generated analysis'} grounded in ${run.evidence.length} purchased records. Source-integrity and structural checks are still pending.`);
   }else if(run.stage==='verification'){
    const amount=50000;
    if(run.verificationSpentAtomic+amount>run.mandate.verificationBudgetAtomic)throw new Error('Verification would exceed the USDC allowance. No payment was made.');
@@ -82,9 +82,10 @@ export async function advanceRun(run:Run,gateway:Gateway):Promise<Run>{
  return run;
 }
 function shocked(providers:Provider[]){return providers.map((p,i)=>({...p,unitPriceAtomic:400000+i*50000}));}
-export function applyShock(run:Run){
+export function applyShock(run:Run,liveQuotes?:Provider[]){
  if(!['mandate','discovery','purchase'].includes(run.stage)||['completed','failed','awaiting_approval'].includes(run.status))throw new Error('Apply the price change before the data purchase.');
- run.providers=shocked(run.providers);run.shockApplied=true;
+ if(run.mode==='live'&&!liveQuotes?.length)throw new Error('Live price changes require refreshed provider quotes.');
+ run.providers=run.mode==='live'?liveQuotes!:shocked(run.providers);run.shockApplied=true;
  log(run,'supervisor','warning','Provider price increased',`Quotes increased to ${run.providers.map(p=>`${p.unitPriceAtomic/1e8} HBAR/repository`).join(' and ')}. The planner must evaluate the new prices before paying.`);return run;
 }
 export async function approveRun(run:Run,input:{signature?:string}){
@@ -97,6 +98,8 @@ export async function approveRun(run:Run,input:{signature?:string}){
   if(!address||!/^0x[0-9a-fA-F]{40}$/.test(address)||!input.signature||!/^0x[0-9a-fA-F]{130}$/.test(input.signature))throw new Error('A valid Ledger controller signature is required.');
   if(!await verifyMessage({address:address as `0x${string}`,message:a.message,signature:input.signature as `0x${string}`}))throw new Error('Signature does not match the configured Ledger controller.');
  }
+ run.authorizations??=[];
+ run.authorizations.push({mode:run.mode,nonce:a.nonce,message:a.message,verifiedAt:new Date().toISOString(),previousMandate:structuredClone(run.mandate),approvedMandate:structuredClone(a.proposedMandate),...(run.mode==='live'?{signer:process.env.LEDGER_CONTROLLER_ADDRESS,signature:input.signature}:{})});
  run.mandate=a.proposedMandate;run.approval=undefined;run.status='running';
  log(run,'supervisor','success',run.mode==='rehearsal'?'Rehearsal allowance approved':'Controller signature verified',`Mandate version ${run.mandate.version}; nonce ${a.nonce} consumed. ${run.mode==='rehearsal'?'This was a simulated approval, not a Ledger signature.':'Hardware provenance depends on provisioning the pinned address from the Ledger device.'}`);return run;
 }

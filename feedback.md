@@ -1,5 +1,9 @@
 # Ledger Agent Stack feedback
 
+## Local CLI validation
+
+On September 7, the official `@ledgerhq/wallet-cli` 2.1.0 package was installed from npm and pinned in the project. `wallet-cli --version` and `wallet-cli ring decrypt --help` completed successfully; the latter confirms the named-key and stdin/stdout contract used by the broker. These commands did not provision a Ring or contact a physical device.
+
 ## Integration feedback from this build
 
 - The distinction between `ring init` device provisioning and later host-side `ring decrypt` is essential. An agent-secret broker example should explicitly show that the untrusted agent cannot execute decrypt or read its output.

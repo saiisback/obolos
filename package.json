@@ -12,12 +12,14 @@
     "test:watch": "vitest",
     "data-service": "tsx --env-file-if-exists=.env.services services/data-service.ts",
     "broker": "tsx --env-file-if-exists=.env.broker services/broker.ts",
-    "ledger:approve": "tsx --env-file-if-exists=.env.broker scripts/ledger-approve.ts"
+    "ledger:approve": "tsx --env-file-if-exists=.env.broker scripts/ledger-approve.ts",
+    "preflight": "node scripts/preflight.mjs"
   },
   "dependencies": {
     "@circle-fin/cli": "^1.0.0",
     "@ledgerhq/hw-app-eth": "^7.8.17",
     "@ledgerhq/hw-transport-node-hid": "^6.33.5",
+    "@ledgerhq/wallet-cli": "2.1.0",
     "@x402/core": "2.25.0",
     "@x402/express": "2.25.0",
     "@x402/fetch": "2.25.0",

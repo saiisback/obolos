@@ -2,11 +2,11 @@
 
 An operator console for agents that buy evidence, pay for verification, and work within a human-defined spending mandate. Built for the **Ledger AI Agents x Ledger**, **Hedera AI & Agentic Payments**, and **Arc Best Agentic Economy Application with Circle Agent Stack** tracks at ETHOnline 2026.
 
-**Status:** runnable rehearsal and implemented live adapters. Local tests and an unpaid HTTP 402 challenge do **not** establish a paid testnet request or physical Ledger approval. See the [submission evidence checklist](docs/submission.md) before claiming qualification.
+**Status:** runnable rehearsal, implemented live adapters, and an operator-only Connections view for real wallet snapshots, readiness and saved live evidence. Configuration, local checks and an unpaid HTTP 402 challenge do **not** establish a paid testnet request, physical Ledger approval or track qualification. See the [submission evidence checklist](docs/submission.md) before claiming qualification.
 
 ## Run the application
 
-Use Node.js 22.12+ and npm. Native Ledger HID dependencies may need platform USB build tools.
+Use Node.js 22.12+ and npm. The project pins Wallet CLI 2.1.0 locally, so a global installation is not required. Native Ledger HID dependencies may need platform USB build tools; private broker deployments install their own dependencies.
 
 ```sh
 npm ci
@@ -20,7 +20,7 @@ Open http://127.0.0.1:3000. Rehearsal works without environment variables, walle
 3. Run the job: mandate → discovery → data purchase → report → verification.
 4. For the intervention demo, step through discovery, raise provider prices before purchase, then advance to the blocked request.
 5. Approve the larger allowance (explicitly simulated in rehearsal), then resume.
-6. Inspect the checked evidence, two payment receipts and activity history. Export the JSON evidence pack.
+6. Inspect the structural/source checks, payment receipts and activity history. Export the JSON evidence pack; saved authorizations remain available after an approval is consumed.
 
 ## Architecture and payment flow
 
@@ -28,10 +28,12 @@ Open http://127.0.0.1:3000. Rehearsal works without environment variables, walle
 flowchart LR
   Human[Human operator] --> UI[Next.js console]
   Ledger[Physical Ledger] -->|Sign expiring mandate| UI
+  UI -->|Read-only wallet snapshots and readiness| Readiness[Session-scoped live setup API]
+  Readiness --> Broker
   UI --> Policy[Policy engine + run store]
   Policy -->|Scoped authenticated requests| Broker[Isolated capability broker]
   Ring[wallet-cli ring encrypted bundle] --> Broker
-  Broker -->|Discover / challenge / sign / retry| Data[Public metered repository API]
+  Broker -->|402 challenge then one signed paid request| Data[Public metered repository API]
   Data -->|Verify and settle x402| Blocky[Blocky402]
   Blocky --> Hedera[Hedera testnet HBAR]
   Data --> GitHub[Public GitHub evidence]
@@ -42,21 +44,27 @@ flowchart LR
   Policy --> UI
 ```
 
+The on-chain part is payment settlement on Hedera and Arc. The model, planner, broker, facilitator, Circle infrastructure and local journal remain off-chain/trusted dependencies; this is not a fully decentralized agent runtime. Verification checks evidence structure, sources, timestamps and coverage, not the truth of every generated sentence.
+
 The data service charges **per repository**, so one repository costs one unit and three cost three units. The planner selects the cheapest permitted quote. Price increases can trigger rerouting or require a new mandate. Verification is a separate fixed-fee job paid in Arc USDC. Network fees are **not included** in purchase allowances.
 
 See [architecture and trust boundaries](docs/architecture.md), [Hedera setup](docs/hedera-setup.md) and [broker, Circle and Ledger setup](docs/broker-setup.md).
 
 ## Live setup
 
-1. Start the public evidence service using `.env.services.example` and `npm run data-service`. Set a distinct Hedera testnet recipient and its public HTTPS URL. It needs no payer private key.
-2. Under a separate private OS account, provision Ledger Key Ring and its encrypted inference/Hedera credential bundle. Complete Circle testnet OTP login yourself, fund the agent wallet, and pin the verifier recipient. Follow `docs/broker-setup.md`.
-3. Start the broker with `npm run broker`; do not expose its loopback port publicly. Keep its files, ring password and Circle session inaccessible to the application/model account.
-4. Copy `.env.example` to `.env.local` for Next. Configure the private broker connection, public service URL, pinned Ledger controller and strong operator/session secrets. Restart Next.
-5. Authenticate in the Connections view with your operator token. The app enables live runs only after the broker reports readiness. Configuration readiness is not settlement proof.
-6. For approval, export the exact request message, run `npm run ledger:approve -- /absolute/path/approval.json` on the Ledger-connected machine and paste the resulting signature.
-7. Complete the job and export receipts. Verify transaction IDs in HashScan and ArcScan, then capture the 2–4 minute demo.
+Follow the [step-by-step credential and wallet guide](docs/live-setup.md). It distinguishes public addresses from private credentials and keeps setup actions with the operator.
 
-LedgerJS is used for the physical personal-message signature; Key Ring uses the required Ledger Agent Stack `wallet-cli ring`. Circle signs with its own Agent Wallet infrastructure, **not Ledger**. No cross-chain bridge or atomic settlement is claimed.
+1. Configure and start the Hedera evidence service with its recipient, persistent journal and matching public URL.
+2. Enroll the private broker using Ledger Ring and the **Sync** device app. Encrypt the inference credential and HBAR payer key; inject the Ring password from the operator keychain.
+3. Use the **Ethereum** device app to derive and confirm the separate controller address. Pin it and its derivation path before requesting a signature.
+4. Complete Circle CLI **agent/testnet email OTP** login yourself under the broker account. Select and fund its Arc wallet, then pin the verification recipient. This CLI path needs no Circle API key or imported Circle private key.
+5. Start the private broker and app with their independent tokens. Run `npm run preflight`, then authenticate in **Connections** and refresh wallet/readiness details. Unknown balances remain unavailable; balances and purchase allowances are different values.
+6. Create a live run. If authority must increase, download its approval JSON, run `npm run ledger:approve -- /absolute/path/approval.json`, review the physical Ledger prompt and submit the signature. Approved messages and signatures are saved in the run export.
+7. Inspect actual settled receipt IDs in HashScan and ArcScan. Record the physical device, live paid flow and developer-experience feedback before submission.
+
+Key Ring protects stored broker secrets; only the trusted broker decrypts them in memory. LedgerJS performs physical Ethereum personal-message approval. Circle Agent Wallet uses its own MPC/session infrastructure, **not Ledger**, to sign Arc payments. No bridge or atomic cross-chain settlement is claimed.
+
+The Connections view is read-only wallet management: authenticated public addresses, recipients, exact HBAR/USDC balance strings, sources/timestamps, explorer/faucet links and session-owned receipt/authorization counts. It does not import keys, connect a replacement browser wallet, fund accounts or mark external submission requirements complete.
 
 ## Tests and build
 
@@ -68,6 +76,8 @@ npm start
 ```
 
 Tests cover budget and expiry enforcement, quote changes, approved signer/run binding and replay, receipt validation, session ownership, concurrent advances, interrupted payments, broker lifetime caps and API/payment validation. Hardware, externally paid requests and browser behavior have separate verification records in `docs/submission.md`.
+
+`npm run preflight` inspects local configuration, matching values and executable/file presence without executing CLIs, decrypting the bundle or contacting the network. Run it only from a trusted setup context already authorized to read all three environment files; do not copy private broker configuration into the app account. It does not establish login, funding, hardware use or settlement.
 
 With the app running, `npm run test:smoke` exercises the HTTP workflow in a separate rehearsal session, including blocked live access, price shock, approval, report, receipts and export. It creates one simulated run and never transfers funds.
 
@@ -87,7 +97,9 @@ Set `APP_ORIGIN` to the actual public origin and `COOKIE_SECURE=true` behind HTT
 - `services/data-service.ts`: public discovery, metered quotes, native Hedera x402 endpoint.
 - `services/broker.ts`: isolated credentials and scoped capabilities.
 - `src/lib/integrations/`: Ledger Key Ring, Circle Arc and Hedera adapters.
-- `scripts/ledger-approve.ts`: real USB hardware approval flow.
+- `scripts/ledger-approve.ts`: physical USB hardware approval flow; pending JSON messages become saved authorization proofs after validation.
+- `src/lib/live-readiness.ts`, `src/lib/integrations/wallets.ts`: readiness aggregation and authenticated, read-only testnet balance snapshots.
+- `docs/live-setup.md`: public address map, secret locations and operator setup sequence.
 - `docs/`: approved plan, submission matrix, demo script, references and limitations.
 
 ## Attribution and eligibility

@@ -4,7 +4,7 @@ The broker is a separate loopback HTTP process. Run it under a dedicated OS acco
 
 ## Operator provisioning
 
-Install project dependencies with `npm ci`. Install the official `@ledgerhq/wallet-cli` separately. The operator, not an agent, provisions a password in an OS keychain and injects `WALLET_PASS` for ring operations. Connect/unlock a physical Ledger and run `wallet-cli genuine-check` and `wallet-cli ring init`. Do not use the unprotected ring option. Prepare a private, mode-0600 bundle with this structure, substituting actual credentials only outside the model workspace:
+Install project dependencies with `npm ci` in the private broker checkout. The repository pins the official `@ledgerhq/wallet-cli` 2.1.0 locally; a global install is not required. Use `./node_modules/.bin/wallet-cli` or add that checkout's `node_modules/.bin` to the operator shell PATH, and set `LEDGER_WALLET_CLI` to its absolute executable path. The private broker deployment must have its own installed dependencies. The operator, not an agent, provisions a password in an OS keychain and injects `WALLET_PASS` for ring operations. Connect/unlock a physical Ledger and run `wallet-cli genuine-check`. Use the **Ledger Sync** app for `wallet-cli ring init`; the separate mandate-signing flow below uses **Ethereum**. See the [Ring initialization implementation](https://github.com/LedgerHQ/ledger-live/blob/develop/apps/wallet-cli/src/commands/ring/init.ts). Do not use the unprotected ring option. Prepare a private, mode-0600 bundle with this structure, substituting actual credentials only outside the model workspace:
 
 ```json
 {
@@ -21,7 +21,7 @@ Encrypt with `wallet-cli ring encrypt -i /private/secrets.json -o /private/agent
 
 Copy `.env.broker.example` to a private `.env.broker`. Pin the public data service URL, Hedera recipient (the adapter discovers the fee payer from the fixed Blocky402 HTTPS endpoint), plus inference HTTPS origin/model. Protect the file, Circle session directory and broker journal from other accounts. Inject the ring password only into the broker launch environment; never expose it to the Next process. Start with `npm run broker`. The listener binds `127.0.0.1:4319`; expose it remotely only through an authenticated private tunnel. `/health` also requires `Authorization: Bearer <BROKER_TOKEN>`.
 
-For Circle, set `CIRCLE_CLI_HOME` to the private session directory in the operator shell, then run the installed binary’s `wallet login <email> --testnet` and complete the OTP yourself. List wallets with `wallet list --type agent --chain ARC-TESTNET --output json`. Pin the chosen address and a separately controlled verifier payee. Fund testnet USDC explicitly with `wallet fund --address <address> --chain ARC-TESTNET`. No login, faucet or payment runs automatically during installation. [Agent wallet quickstart](https://developers.circle.com/agent-stack/agent-wallets/quickstart)
+For Circle, set `CIRCLE_CLI_HOME` to the private session directory in the operator shell, then run the installed binary’s `wallet login <email> --type agent --testnet` and complete the OTP yourself. This Agent Wallet CLI path uses its own authenticated session; it needs no Circle API key, developer-controlled-wallet entity secret or exported Circle signing key. List wallets with `wallet list --type agent --chain ARC-TESTNET --output json`. Pin the chosen address and a separately controlled verifier payee. Fund testnet USDC explicitly with `wallet fund --address <address> --chain ARC-TESTNET`. No login, faucet or payment runs automatically during installation. [Agent wallet quickstart](https://developers.circle.com/agent-stack/agent-wallets/quickstart)
 
 ## Payment and report behavior
 
@@ -35,13 +35,13 @@ The verifier service in this MVP is the broker’s deterministic verification ca
 
 ## Physical mandate approval
 
-Export the pending approval as a JSON file containing its **exact** `message` string; preserve whitespace. Pin `LEDGER_CONTROLLER_ADDRESS` in both the app’s configuration and the operator signing environment. Connect the Ledger, open Ethereum, then run:
+First derive and confirm the controller using the Ethereum app: run `wallet-cli account discover ethereum`, then `wallet-cli receive <returned-label>`, selecting the account that matches `LEDGER_DERIVATION_PATH` (default `44'/60'/0'/0/0`). Verify the address on the device before pinning `LEDGER_CONTROLLER_ADDRESS` in both the app’s configuration and the operator signing environment. Ring enrollment does not perform this pinning. Export the pending approval JSON from the app; it contains the **exact** `message` string, whose whitespace must be preserved. Connect the Ledger, open Ethereum, then run:
 
 ```sh
 npm run ledger:approve -- /absolute/path/approval.json
 ```
 
-The script displays the derived address on the device, compares it to the pinned controller, and asks the physical Ethereum app to sign the UTF-8 personal message. It locally verifies the returned signature before emitting JSON. Paste its signature into the run’s approval form; server verification also binds the saved nonce, run, expiry and proposed mandate. The script refuses rehearsal messages.
+The script displays the derived address on the device, compares it to the pinned controller, and asks the physical Ethereum app to sign the UTF-8 personal message. It locally verifies the returned signature before emitting JSON. Paste its signature into the run’s approval form; server verification also binds the saved nonce, run, expiry and proposed mandate. The script refuses rehearsal messages. After acceptance, the app retains the exact message, nonce, signer/signature, verification time and previous/approved mandates in `run.authorizations`; these records are included in the run export. Simulated approvals retain their mode but do not claim a Ledger signature.
 
 This uses the official LedgerJS `hw-app-eth` and Node HID transport. Ledger labels LedgerJS legacy; migration to DMK is future work, not a claim of present DMK use. Hardware provenance comes from the demonstrated physical signing flow and pinned address, not from the ECDSA signature alone. A browser EOA signature is not labeled hardware. [Ledger message-signing documentation](https://developers.ledger.com/docs/device-interaction/dmk-ts/ledgerjs/beginner/personal-message)
 
@@ -52,3 +52,7 @@ Before either financial call the broker atomically saves and fsyncs a pending in
 After a crash, stop the broker and inspect its private journal alongside the Hedera adapter journal, Circle transaction history, and chain explorers. The Circle idempotency UUID can be recomputed from `sha256("agentgdp:arc:" + runId + ":" + requestId)` using the code in `circle.ts`. If a transfer settled, reconstruct and validate its receipt before any operator-managed state repair. If status cannot be proven, preserve the reservation and do not resubmit. There is intentionally no automatic repair endpoint. A stale `broker.lock` requires confirming the old process is gone and reconciling pending intents before removing the lock.
 
 Local tests do not establish funded accounts, physical Ledger approval, a live Blocky402 request, or Arc settlement. Capture those external demonstrations separately before submission.
+
+## Operator setup and read-only diagnostics
+
+The [live setup guide](live-setup.md) maps all public values, private credentials and process locations. Connections provides authenticated read-only balance snapshots and links; `npm run preflight` inspects local configuration and paths without CLI execution, bundle decryption or network calls. Run the latter only in the private management context that already has access to the three environment files. Do not weaken process isolation to satisfy a diagnostic. Neither surface proves a live settlement or hardware demonstration.

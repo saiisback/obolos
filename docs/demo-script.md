@@ -1,16 +1,29 @@
-# Four-minute demo script
+# Four-minute live demo script
 
-Use an actual live funded run and capture the physical device. Cut waiting time by editing; do not substitute rehearsal receipts for chain evidence. Aim for 3:40, 720p or higher, human narration. Event upload accepts 2–4 minutes.
+This is a recording plan, not evidence that the live flow has occurred. Use an actual funded live run and capture the physical Ledger. Keep any rehearsal recording explicitly labeled. Aim for 3:50 with human narration at 720p or higher; the intended event upload is 2–4 minutes.
 
 | Time | Screen / action | Narration |
 |---|---|---|
-| 0:00–0:20 | Job overview and report output | “AgentGDP lets an agent buy research and pay for verification within a human-controlled allowance.” |
-| 0:20–0:45 | Mandate editor, separate HBAR/USDC budgets | “The human chooses providers, limits and expiry. The model has no keys or wallet tools.” |
-| 0:45–1:10 | Discovery and price increase before purchase | “Our service sells current repository evidence per repository. The planner reads real prices. This quote now exceeds its mandate.” |
-| 1:10–1:45 | Blocked request, exported message, physical Ledger | “Expanding authority needs the controller's signature. This nonce is run-bound and expires. Rejecting leaves funds untouched.” |
-| 1:45–2:15 | Approve, resume, Hedera receipt and explorer | “The agent gets HTTP 402, signs the authorized amount, and Blocky402 settles HBAR on Hedera testnet before delivering the paid evidence.” |
-| 2:15–2:45 | Worker report, Arc receipt and explorer | “The scoped worker writes from purchased evidence. A separate verifier job is paid with Circle Agent Stack USDC on Arc.” |
-| 2:45–3:15 | Verification checks and JSON export | “Every source, unit, payment and intervention is visible. Structural checks do not certify all model prose.” |
-| 3:15–3:40 | Architecture diagram and secret broker | “Ledger Key Ring provisions the encrypted secrets. Only the broker decrypts them; the agent receives capabilities. The two chains keep separate balances.” |
+| 0:00–0:20 | Foundation-referenced overview; create a repository comparison | “AgentGDP lets agents buy research inputs and pay for source checks within a human-controlled mandate.” |
+| 0:20–0:40 | Connections: public wallet addresses, separate HBAR/USDC balances, sources and readiness | “These are read-only testnet snapshots. A balance is not an allowance, and setup readiness is not payment proof.” |
+| 0:40–1:00 | Mandate editor and discovered live quotes | “The human chooses the providers, price ceiling, budgets and expiry. The worker model has no signing keys or wallet tools.” |
+| 1:00–1:20 | Change your own service's quote before purchase; advance to blocked request | “The planner reads actual service prices. Both allowed quotes now exceed this mandate, so spending stops for a human decision.” |
+| 1:20–1:55 | Download approval JSON; show exact message and physical Ethereum-app approval | “The controller address is pinned to this device. This run-bound authorization expires and changes only the spending mandate. The signed message and both mandate versions are saved.” |
+| 1:55–2:25 | Resume; inspect settled Hedera receipt and HashScan | “The broker validates an HTTP 402 challenge, signs the permitted HBAR payment, and requires Blocky402 settlement plus matching mirror-node evidence.” |
+| 2:25–2:50 | Worker output; Circle Arc payment receipt and ArcScan | “The worker writes from purchased evidence. A separate USDC payment through Circle Agent Wallet on Arc pays the broker's verification capability.” |
+| 2:50–3:15 | Source checks, saved authorization history, JSON export, Connections evidence counts | “We retain source timestamps, settled receipts and the approval proof. These checks cover source integrity and structure; they do not certify every model statement.” |
+| 3:15–3:50 | Architecture diagram, short Ring provisioning clip and trust boundary | “Ledger Sync enrolls the Ring. The trusted broker decrypts stored secrets in memory. Ethereum signs mandate approvals. Circle has separate MPC custody. Payments settle on-chain; the model, orchestration and service infrastructure remain off-chain.” |
 
-Prepare accounts, source repositories, fresh quotes, a device camera view and the operator script before recording. Reset your service's prices through its authenticated operator endpoint between takes; never delete a payment journal to reset spending history.
+## Before recording
+
+Complete [live setup](live-setup.md) yourself: funded testnet payer and recipients, Circle email-OTP session, Ring enrollment, a device-confirmed controller address, the inference credential and real service deployment. Run read-only preflight and inspect Connections, then separately prove live payments. Do not record private files, OTPs, the Ring password, recovery phrases or tokens.
+
+Prepare three public repositories, fresh prices, a camera view of the Ledger, the signing script and explorer tabs. The live price-change action requires the app's matching `DATA_SERVICE_OPERATOR_TOKEN` for your own evidence service. A one-provider increase can demonstrate rerouting; increasing both above the ceiling demonstrates escalation. Use the shortest route that proves the behavior clearly.
+
+Reset quotes through the authenticated service control between takes. Never delete payment journals, change request IDs or create a new state directory to bypass an uncertain transfer. Edit waiting time in the video while preserving the visible order of authorization, payment and evidence.
+
+## Evidence to retain
+
+Save the live export with `receipts`, `authorizations`, source timestamps and audit events; the public HashScan/ArcScan links; device footage of Ring enrollment and mandate approval; and actual tooling feedback. The ECDSA signature alone does not prove the hardware was used. Show missing evidence honestly if recording before these steps are complete.
+
+A public service, public repository, real paid requests, physical device demo, developer-experience feedback and narrated video remain submission gates until their artifacts exist. Preserve the September 3 prior-paper disclosure and seek the organizer's eligibility decision.

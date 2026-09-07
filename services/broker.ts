@@ -8,6 +8,7 @@ import type { BrokerHealth, DataPurchase, Receipt, RepoEvidence, Report } from '
 import { decryptBrokerSecrets, type BrokerEnv, type BrokerSecrets } from '../src/lib/integrations/ledger';
 import { circleAgentReady, purchaseCircleVerification } from '../src/lib/integrations/circle';
 import { purchaseHederaData } from '../src/lib/integrations/hedera';
+import { getBrokerWallets } from '../src/lib/integrations/wallets';
 
 const id=z.string().min(1).max(128).regex(/^[a-zA-Z0-9_-]+$/);
 const requestId=z.string().min(1).max(180).regex(/^[a-zA-Z0-9_:-]+$/);
@@ -112,6 +113,12 @@ export function createBrokerApp({env=process.env}:{env?:BrokerEnv}={}) {
   app.use((req,res,next)=>{if(!authorization(req.headers.authorization,env.BROKER_TOKEN)){res.status(401).json({error:'Broker authentication required.'});return;}next();});
   app.use(express.json({limit:'64kb'}));
   app.get('/health',async(_req,res)=>{res.json(await health());});
+  app.get('/wallets',async(_req,res)=>{
+    let bundle:BrokerSecrets|undefined;
+    try {bundle=await secrets();}catch{/* Public Arc balance can still be observed without unlocking Hedera. */}
+    res.setHeader('Cache-Control','no-store');
+    res.json(await getBrokerWallets(env,bundle));
+  });
   app.post('/data',async(req,res)=>{
     const input=dataSchema.parse(req.body);
     assertMandateActive(input.mandateExpiresAt);
