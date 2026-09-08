@@ -1,49 +1,31 @@
-# Obolos presentation outline
+# Obolos presentation
 
-Use this outline with the actual live artifacts after setup. Statements describing paid transactions or hardware demonstrations are demonstration targets until matching evidence is attached. The [submission matrix](submission.md) is the source of completion status.
+Open [the seven-slide presentation](presentation/index.html) in a browser, or use the [seven-page PDF](presentation/obolos-presentation.pdf). It runs without a build, account, external font or JavaScript dependency. The original illustration is included alongside the HTML. Use **Present**, arrow keys, or **Print / PDF**; printing includes every slide at 16:9 even when presentation mode shows one slide.
 
-## Slide 1 — Delegation with limits
+The deck follows Obolos's existing Foundation/Mobbin reference: black-and-white typography, colorful pill accents, generous framing, and the original flat illustration. It contains a visible SVG architecture diagram and direct links to both actual testnet receipts.
 
-- Agents purchase repository evidence and commission source/structure verification.
-- Humans define allowed providers, price ceilings, separate budgets and expiry.
-- Show the real Foundation-referenced workspace and its original flat illustration.
-- A repository comparison makes each input, decision and payment inspectable.
+## Talk track (approximately 3:30)
 
-## Slide 2 — Two payment networks, one mandate
-
-- Discover current quotes → check policy → purchase evidence through native Hedera x402.
-- Produce a source-backed report → pay canonical USDC on Arc through Circle Agent Wallet → run verification checks.
-- Quote increases cause rerouting or an approval pause before the next purchase.
-- HBAR and USDC balances, allowances and receipts stay separate. There is no bridge or atomic cross-chain transaction.
-
-## Slide 3 — Three integrations with distinct roles
-
-| Integration | Implemented role | Evidence to show |
+| Slide | Time | Narration |
 |---|---|---|
-| Ledger Agent Stack | Sync-based Ring enrollment protects stored inference/HBAR secrets; Ethereum-app controller signs mandate escalation | Device provisioning footage, exact approval JSON, saved live authorization and tooling feedback |
-| Hedera / Blocky402 | Public metered repository service and native HBAR x402 consuming client, with matching settlement checks | Public service URL, paid request and HashScan receipt |
-| Arc / Circle Agent Stack | Email-OTP agent-wallet CLI session pays verification in canonical Arc testnet USDC | Circle agent wallet identity and matching ArcScan transfer |
+| 1. Obolos | 0:00–0:20 | “Obolos buys research evidence and pays for source checks within a human-defined mandate.” |
+| 2. Product flow | 0:20–0:45 | “The human chooses providers, spending caps and expiry. The planner discovers actual quotes, purchases inputs, commissions checks, and keeps the evidence.” |
+| 3. Architecture | 0:45–1:20 | “Next.js invokes narrow broker capabilities. Ledger Ring protects the stored inference and Hedera credentials; Circle uses its separate agent-wallet session. Only settlement is on-chain.” |
+| 4. Executed payments | 1:20–1:55 | “This completed testnet run purchased three records for 0.003 HBAR via Blocky402. It paid 0.05 USDC through Circle on Arc for verification. Both receipts are inspectable.” |
+| 5. Spending control | 1:55–2:25 | “A refreshed quote can trigger rerouting or an approval pause. An exact, expiring mandate change must be signed by the configured controller before proceeding.” The saved live escalation establishes user-authorized Speculos approval, mandate v2 and a resumed 0.008 HBAR purchase. Disclose the subsequent uncertain Arc verification attempt and pending reservation. |
+| 6. Ledger integration | 2:25–3:00 | “We ran official Ledger applications in Speculos against the real staging protocol, through a disclosed adaptation of wallet-cli ring. This is software emulation; hardware security and sponsor approval are not claimed.” |
+| 7. Submission | 3:00–3:30 | Name the three tracks, link the repository, and state any remaining external gates from the current submission matrix. |
 
-Circle's MPC/session infrastructure is separate from Ledger. No Circle API-key integration, Ledger-signed Circle transfer or unimplemented optional protocol should appear on this slide.
+## Evidence and update rules
 
-## Slide 4 — A usable operator setup surface
+The September 8 first paid run is established by [the saved report and export](evidence/2026-09-08-first-paid-run.md). Ring tests are established by [the execution record](../tools/ledger-speculos/ring-evidence.json). The first run did not exercise price escalation. A subsequent [live quote-increase export](evidence/2026-09-08-blocked-price-increase.json) establishes a pause before spending; a later [fresh run](evidence/2026-09-08-approved-price-increase.md) proves user-authorized Speculos signing, backend mandate v2 acceptance and resumed Hedera settlement. Its Arc verification attempt became uncertain; do not describe it as a completed two-rail escalation run. [Public HTTPS hosting and a data-only paid request](evidence/2026-09-08-public-data-purchase.md) are now verified. Temporary tunnels require the Mac to remain online; Arc reconciliation remains pending.
 
-- Connections displays operator-only public addresses, recipients, exact balance strings, source/check time and explorer links.
-- Ready/missing/action-required checks distinguish configuration, funding, recorded payments and unfinished external demonstrations.
-- Recorded evidence comes from this browser's live runs. Simulated receipts and approvals are excluded.
-- Wallet management and `npm run preflight` are read-only. Login, funding, Ring enrollment and hardware signing remain explicit operator actions.
+Do not present this slide deck as the required demo video. Record the actual application workflow, emulator review, and explorer receipts with clear narration. Do not record private environment files, API keys, key material, the Ring password, Circle sessions or OTPs. The source/structure verifier does not establish every prose statement as independently true. No physical Ledger was used, and sponsor acceptance of the emulator/source-adapter combination is unconfirmed.
 
-## Slide 5 — What is actually verified
+The [submission matrix](submission.md) tracks qualification artifacts; the [Ledger feedback draft](ledger-feedback.md) is ready for operator review and has not been sent externally.
 
-- Show actual transaction IDs and inspect network, asset, amount and payee in the explorers.
-- Show the saved message, nonce, signer/signature, timestamp and before/after mandate from `run.authorizations`.
-- Report checks cover source integrity, freshness, repository coverage and structure; they do not certify arbitrary model prose or represent an independent audit.
-- A transaction proves payment. A signature proves the address signed; physical device provenance needs footage and a device-confirmed controller.
+## Narrated evidence demo
 
-## Slide 6 — Trust boundaries and submission status
+[Watch the testnet demo](presentation/obolos-testnet-demo.mp4). The video combines read-only captures of actual saved application runs, recorded Speculos signing footage, a [fresh public paid request executing](evidence/2026-09-08-final-recorded-public-purchase.md), and architecture slides. macOS Samantha provides disclosed synthetic narration. Waiting time in the emulator segment is condensed; no transfer or signature is simulated.
 
-- Include the README architecture diagram: chains settle payments; the model, deterministic orchestration/verifier, broker, facilitator, Circle infrastructure and local journal are off-chain.
-- Ring protects secrets at rest. Runtime plaintext exists inside the trusted broker; OS isolation and durable journals remain deployment responsibilities.
-- The local hash chain is not publicly anchored or tamper-proof against a compromised host. Gas fees are outside principal allowances.
-- Clearly list any missing public service/repository, real paid receipts, physical demo, developer feedback and video artifacts.
-- Disclose AI assistance and the September 3 PDF. New-project eligibility is an organizer decision, not an implementation claim.
+The three executions remain distinct: the first completed both payment rails, the approved escalation settled Hedera but left Arc uncertain, and the public request purchased data only and was paused. The public data-only segment visibly shows mandate acceptance, discovery and the settled purchase. This is an edited walkthrough of separate executions, not a continuous recording of one entire two-rail run.

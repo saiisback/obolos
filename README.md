@@ -2,7 +2,7 @@
 
 **Work, within limits.** Agents buy evidence and pay for verification. Humans control their spending authority.
 
-[Public demo](https://obolos.app) · [Source code](https://github.com/saiisback/obolos) · [Live setup](docs/live-setup.md) · [Speculos setup](docs/speculos-setup.md) · [Architecture](docs/architecture.md) · [Submission checklist](docs/submission.md) · [Demo script](docs/demo-script.md)
+[Public demo](https://obolos.app) · [Source code](https://github.com/saiisback/obolos) · [Live setup](docs/live-setup.md) · [Speculos setup](docs/speculos-setup.md) · [Architecture](docs/architecture.md) · [Submission checklist](docs/submission.md) · [Demo video](docs/presentation/obolos-testnet-demo.mp4) · [Presentation PDF](docs/presentation/obolos-presentation.pdf) · [Demo script](docs/demo-script.md)
 
 ![Three robot coworkers exchanging a payment token and a research report](public/illustrations/agent-workforce.png)
 

@@ -1,0 +1,146 @@
+{
+  "schema": "obolos.evidence.v1",
+  "exportedAt": "2026-09-08T18:34:34.038Z",
+  "auditChainValid": true,
+  "disclosure": "Live mode: inspect each settled receipt and source timestamp. Configuration alone does not establish qualification.",
+  "run": {
+    "id": "4e0399c7-b65b-4dbb-a06c-be07f28a44c8",
+    "mode": "live",
+    "title": "Compare Hello-World",
+    "repos": [
+      "octocat/Hello-World"
+    ],
+    "status": "paused",
+    "stage": "report",
+    "createdAt": "2026-09-08T18:34:04.818Z",
+    "updatedAt": "2026-09-08T18:34:28.701Z",
+    "mandate": {
+      "dataBudgetAtomic": 100000,
+      "maxDataUnitPriceAtomic": 100000,
+      "verificationBudgetAtomic": 1,
+      "allowedProviders": [
+        "repo-standard"
+      ],
+      "expiresAt": "2026-09-08T19:34:04.818Z",
+      "version": 1
+    },
+    "providers": [
+      {
+        "id": "repo-standard",
+        "name": "Repository Standard",
+        "description": "Live public GitHub metadata, timestamped per request. Both tiers use the same source for transparent price competition.",
+        "network": "hedera:testnet",
+        "asset": "HBAR",
+        "unit": "repository",
+        "unitPriceAtomic": 100000,
+        "endpoint": "https://obolos.app/x402/evidence/repo-standard"
+      },
+      {
+        "id": "repo-economy",
+        "name": "Repository Economy",
+        "description": "Live public GitHub metadata, timestamped per request. Both tiers use the same source for transparent price competition.",
+        "network": "hedera:testnet",
+        "asset": "HBAR",
+        "unit": "repository",
+        "unitPriceAtomic": 120000,
+        "endpoint": "https://obolos.app/x402/evidence/repo-economy"
+      }
+    ],
+    "dataSpentAtomic": 100000,
+    "verificationSpentAtomic": 0,
+    "evidence": [
+      {
+        "repo": "octocat/Hello-World",
+        "description": "My first repository on GitHub!",
+        "stars": 3806,
+        "forks": 6720,
+        "openIssues": 7112,
+        "pushedAt": "2024-08-20T23:54:42Z",
+        "language": "Not specified",
+        "license": "Not specified",
+        "sourceUrl": "https://api.github.com/repos/octocat/Hello-World",
+        "fetchedAt": "2026-09-08T18:34:22.350Z"
+      }
+    ],
+    "receipts": [
+      {
+        "id": "hedera-4e0399c7-b65b-4dbb-a06c-be07f28a44c8:data",
+        "requestId": "4e0399c7-b65b-4dbb-a06c-be07f28a44c8:data",
+        "mode": "live",
+        "network": "hedera:testnet",
+        "asset": "HBAR",
+        "amountAtomic": 100000,
+        "units": 1,
+        "provider": "repo-standard",
+        "status": "settled",
+        "timestamp": "2026-09-08T18:34:25.865Z",
+        "transactionId": "0.0.7162784@1788892453.769066107",
+        "explorerUrl": "https://hashscan.io/testnet/transaction/0.0.7162784%401788892453.769066107"
+      }
+    ],
+    "events": [
+      {
+        "id": "47f4ee4c-1e35-4c74-b07a-513cf9c11a94",
+        "timestamp": "2026-09-08T18:34:04.818Z",
+        "actor": "supervisor",
+        "kind": "info",
+        "title": "Mandate created",
+        "detail": "Up to 0.001 HBAR for evidence and 0.000001 USDC for verification. Expires 2026-09-08T19:34:04.818Z.",
+        "previousHash": "genesis",
+        "hash": "e82ebcf867b6a10561da3d2aae9f24ace03ecbc1385b3fafb352a60474e37e51"
+      },
+      {
+        "id": "7475487c-16fd-4f99-a078-fe3bfad05ee9",
+        "timestamp": "2026-09-08T18:34:13.234Z",
+        "actor": "broker",
+        "kind": "success",
+        "title": "Mandate accepted",
+        "detail": "Only named services can receive requests. Wallet and provider credentials remain outside the agent.",
+        "previousHash": "e82ebcf867b6a10561da3d2aae9f24ace03ecbc1385b3fafb352a60474e37e51",
+        "hash": "ad5bcb1cc9de24a965f3b6193c4fac8bbc3d010aec556601fae8209d32aa3d00"
+      },
+      {
+        "id": "c30d02d0-7cc8-4230-a4e4-50b9614ff171",
+        "timestamp": "2026-09-08T18:34:16.727Z",
+        "actor": "planner",
+        "kind": "success",
+        "title": "Services discovered",
+        "detail": "Selected Repository Standard at 0.001 HBAR per repository from 1 approved quotes.",
+        "previousHash": "ad5bcb1cc9de24a965f3b6193c4fac8bbc3d010aec556601fae8209d32aa3d00",
+        "hash": "610b29fa53f736397e9d34b7ca1d3073d057632202d57a475b98e430c231abb3"
+      },
+      {
+        "id": "db299630-8337-448d-9086-073ca13af436",
+        "timestamp": "2026-09-08T18:34:19.556Z",
+        "actor": "broker",
+        "kind": "info",
+        "title": "Payment authorized",
+        "detail": "Request 4e0399c7-b65b-4dbb-a06c-be07f28a44c8:data: 100000 tinybar for 1 repository units. A failed or uncertain transfer is never automatically repeated.",
+        "previousHash": "610b29fa53f736397e9d34b7ca1d3073d057632202d57a475b98e430c231abb3",
+        "hash": "b21f8d07ce1d22d226323a5f7900923215c061684d9153e80421ac7f13151563"
+      },
+      {
+        "id": "9b05f9d7-b389-41e1-9183-924a7d9679df",
+        "timestamp": "2026-09-08T18:34:25.886Z",
+        "actor": "broker",
+        "kind": "success",
+        "title": "Hedera payment settled",
+        "detail": "0.001 HBAR purchased 1 source records. 0.0.7162784@1788892453.769066107",
+        "previousHash": "b21f8d07ce1d22d226323a5f7900923215c061684d9153e80421ac7f13151563",
+        "hash": "d47213cf4f187214dffc364466d1620b751401189aa1b65b21b92d0e0be52d47"
+      },
+      {
+        "id": "844d5460-3c83-4bff-bebf-1fdc573e13f0",
+        "timestamp": "2026-09-08T18:34:28.701Z",
+        "actor": "supervisor",
+        "kind": "warning",
+        "title": "Run paused",
+        "detail": "The next payment step follows the updated run state. Settled transfers are not reversed.",
+        "previousHash": "d47213cf4f187214dffc364466d1620b751401189aa1b65b21b92d0e0be52d47",
+        "hash": "cc2e14fd68dedfaeb88b99c6313827bcf9e7129be7fcf339d74f55928782cc40"
+      }
+    ],
+    "shockApplied": false,
+    "selectedProvider": "repo-standard"
+  }
+}
