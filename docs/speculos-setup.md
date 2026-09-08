@@ -2,7 +2,7 @@
 
 Obolos supports an explicit emulator mode while retaining USB Ledger support. This uses actual Ledger Sync and Ethereum applications in Speculos, a disclosed adaptation of upstream `wallet-cli ring`, and Ledger's real staging trustchain service. It does not enable the mocked SDK. Emulator approvals are labeled in the console and exported proof; the signed mandate includes the emulator disclosure. Changing signer mode while an approval is pending invalidates that approval.
 
-**Verified on September8,2026:** actual Sync and Ethereum APDU identity, Ledger staging acceptance of an emulated Sync challenge signature/attestation, and a real Ethereum emulator personal-message signature verified by Obolos. The test message explicitly authorized no payment or permission change. Password-protected Ring enrollment and a live encrypted-bundle round-trip still require the operator's password setup. These checks do not establish paid Hedera/Arc requests or bounty eligibility.
+**Verified on September 8, 2026:** actual Sync and Ethereum APDU identity, staging challenge authentication, password-protected Ring enrollment, and an encrypt/decrypt round-trip using harmless test data. Tampered ciphertext, a wrong key domain and a wrong password all failed without creating plaintext output. See [Ring execution evidence](../tools/ledger-speculos/ring-evidence.json). A real Ethereum emulator personal-message signature also verified; its message explicitly authorized no payment or permission change. The actual broker credential bundle is still missing. These checks do not establish paid Hedera/Arc requests or bounty eligibility.
 
 ## Start
 

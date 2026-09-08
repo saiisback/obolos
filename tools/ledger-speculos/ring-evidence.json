@@ -1,0 +1,47 @@
+{
+  "checkedAt": "2026-09-08T09:09:15.517846+00:00",
+  "mode": "speculos",
+  "hardwareBacked": false,
+  "backend": "https://trustchain-backend.api.aws.stg.ldg-tech.com",
+  "applicationId": 17,
+  "memberName": "obolos-speculos",
+  "rootId": "0044267ce4b12f5459cdbd4c8239c2cee84f2f478ffeb482cf43b765d5fb8b8210",
+  "ringEnrollment": {
+    "status": "verified",
+    "exitCode": 0,
+    "approval": "Reviewed Sync Connect and Turn on sync screens; confirmed with emulator buttons."
+  },
+  "roundTrip": {
+    "status": "verified",
+    "encryptExitCode": 0,
+    "decryptExitCode": 0,
+    "plaintextBytes": 123,
+    "plaintextSha256": "02044d8a78f11e61308d96a56981df94ac7b3c4ece6e4929f90a3462e6018377",
+    "ciphertextBytes": 151,
+    "fixture": "Harmless purpose text and random nonce; no wallet or API credentials."
+  },
+  "negativeChecks": {
+    "tamperedCiphertext": {
+      "status": "rejected",
+      "exitCode": 1,
+      "plaintextOutputCreated": false
+    },
+    "wrongKeyDomain": {
+      "status": "rejected",
+      "exitCode": 1,
+      "plaintextOutputCreated": false
+    },
+    "wrongPassword": {
+      "status": "rejected",
+      "exitCode": 1,
+      "plaintextOutputCreated": false
+    }
+  },
+  "credentialStorage": "Password-wrapped member credentials in macOS Keychain; password supplied through Keychain lookup without logging.",
+  "limitations": [
+    "Source adapter of pinned upstream wallet-cli ring; not the stock CLI binary.",
+    "Speculos development attestation and staging service; not physical-device security.",
+    "Actual broker secrets bundle and paid Hedera/Arc workflow remain unconfigured.",
+    "Emulator-only bounty eligibility is unconfirmed."
+  ]
+}

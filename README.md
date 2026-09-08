@@ -16,7 +16,7 @@ A user asks: *Compare these three developer tools using current repository activ
 
 | Target track | Integration in Obolos | Evidence still needed |
 |---|---|---|
-| Ledger — AI Agents x Ledger | `wallet-cli ring` integration plus explicit Speculos development support using upstream commands, real Sync/Ethereum apps and Ledger staging; signed mandate increases | Password-protected Ring enrollment, encrypted-bundle round-trip, demo and tooling feedback; emulator-only eligibility needs sponsor confirmation |
+| Ledger — AI Agents x Ledger | `wallet-cli ring` integration plus explicit Speculos development support using upstream commands, real Sync/Ethereum apps and Ledger staging; signed mandate increases | Actual broker credential bundle, paid demo and tooling feedback; emulator-only eligibility needs sponsor confirmation |
 | Hedera — AI & Agentic Payments | Per-repository HBAR pricing, native x402 challenges, Blocky402 settlement and a consuming planner | Public HTTPS service and a real paid request with matching receipt |
 | Circle — Best Agentic Economy Application with Circle Agent Stack | Circle Agent Wallet pays the verification capability in USDC on Arc testnet | Funded agent wallet, confirmed transfer and narrated demo/presentation |
 
@@ -72,7 +72,7 @@ See [architecture and trust boundaries](docs/architecture.md), [Hedera setup](do
 
 ## Live setup
 
-Without hardware, follow [Speculos development setup](docs/speculos-setup.md). Real staging challenge authentication and emulator message signing have been verified; this does not establish physical-device security or bounty eligibility.
+Without hardware, follow [Speculos development setup](docs/speculos-setup.md). Real staging authentication, password-protected Ring enrollment, encryption/decryption and emulator message signing have been verified. [Execution evidence](tools/ledger-speculos/ring-evidence.json) includes rejection of altered ciphertext, wrong domains and wrong passwords. This does not establish physical-device security or bounty eligibility.
 
 Follow the [step-by-step credential and wallet guide](docs/live-setup.md). It distinguishes public addresses from private credentials and keeps setup actions with the operator.
 
