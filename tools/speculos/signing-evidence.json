@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-09-08T06:25:48.353Z",
+  "signerMode": "speculos",
+  "hardwareBacked": false,
+  "paymentAuthorized": false,
+  "address": "0xA7a1C8b8d1aa6c5B32aECB56F4396A353c5f81fa",
+  "message": "Obolos mandate authorization\nMode: live\nSigner: Speculos emulator (development only; not physical hardware)\nPurpose: integration test only. No payment or permission change is authorized.\nNonce: obolos-speculos-signing-check-2026-09-08",
+  "signature": "0x74eb7dd292e2ec821bc97404ec77c10ee9b7f95bb08a8232861869fdcc98b3b7369071247665326f45b70bf1fb6679c8f6509af4de24eb3ef6be2f383fd6fb6d1c",
+  "verified": true
+}

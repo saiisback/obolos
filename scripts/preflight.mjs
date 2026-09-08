@@ -53,6 +53,8 @@ export async function runPreflight(root=process.cwd(),runtime=process.env){
   add('broker:BROKER_PORT',port(broker.BROKER_PORT||'4319')?'ready':'invalid');
   const brokerUrl=safeUrl(app.BROKER_URL,{localOnly:true,originOnly:true});
   add('BROKER_URL/BROKER_PORT',brokerUrl&&Number(brokerUrl.port||(brokerUrl.protocol==='https:'?'443':'80'))===Number(broker.BROKER_PORT||'4319')?'ready':'mismatch');
+  const appSigner=app.LEDGER_SIGNER_MODE||'usb',brokerSigner=broker.LEDGER_SIGNER_MODE||'usb';
+  add('LEDGER_SIGNER_MODE:app/broker',['usb','speculos'].includes(appSigner)&&appSigner===brokerSigner?'ready':'mismatch');
   required('broker',broker,'LEDGER_RING_KEY');
   required('broker',broker,'LEDGER_CONTROLLER_ADDRESS',validAddress);
   add('broker:LEDGER_DERIVATION_PATH',/^44'\/60'\/\d+'\/\d+\/\d+$/.test(broker.LEDGER_DERIVATION_PATH||"44'/60'/0'/0/0")?'ready':'invalid');

@@ -1,0 +1,27 @@
+# Speculos and Ledger Key Ring feasibility
+
+Investigated 2026-09-08. **A real protocol development path exists:** Ledger's own LKRP end-to-end recorder runs the Sync ELF in Speculos and enrolls against the staging trustchain service. Stock wallet-cli2.1.0 does not expose this transport, so Obolos needs a disclosed source adapter. Emulation is not hardware-backed security, and no source here establishes emulator-only bounty eligibility.
+
+## Evidence
+
+- [Ledger Sync README](https://github.com/LedgerHQ/app-ledger-sync#tests) documents real Speculos execution of the compiled app. [Makefile](https://github.com/LedgerHQ/app-ledger-sync/blob/develop/Makefile) defaults to the development attestation build. [Attestation documentation](https://github.com/LedgerHQ/app-ledger-sync/blob/develop/attestations/README.md) says test attestation material is publicly committed and must never be used in production.
+- [LKRP recorder](https://github.com/LedgerHQ/ledger-live/blob/08be88be108394bf64ed0108dff9a53b8ffb14df/libs/ledger-key-ring-protocol/tests/test-helpers/recordTrustchainSdkTests.ts) constructs a real Speculos transport, injects it via `withDevice`, selects `TRUSTCHAIN_API_STAGING`, and records networking with `onUnhandledRequest: "bypass"`. This recording path runs actual requests; replay fixtures are a separate test facility.
+- The [Ring17 recording](https://github.com/LedgerHQ/ledger-live/blob/08be88be108394bf64ed0108dff9a53b8ffb14df/libs/ledger-key-ring-protocol/mocks/scenarios/ringInitPreservesLedgerSyncMember.json) contains staging200 authenticate,204 seed creation and204 derivation responses. It is historical evidence of acceptance, not a fresh local test result.
+- [HWDeviceProvider](https://github.com/LedgerHQ/ledger-live/blob/08be88be108394bf64ed0108dff9a53b8ffb14df/libs/ledger-key-ring-protocol/src/HWDeviceProvider.ts) obtains a backend challenge, sends it to the real Sync `getSeedId` APDU, then posts the returned signature, public credential and attestation to `/v1/authenticate`. No attestation bypass is required by the published staging recorder.
+- [Environment definitions](https://github.com/LedgerHQ/ledger-live/blob/08be88be108394bf64ed0108dff9a53b8ffb14df/shared/env/src/definitions/team-platform/index.ts) specify staging `https://trustchain-backend.api.aws.stg.ldg-tech.com` and production `https://trustchain.api.live.ledger.com`. Read-only live probes on2026-09-08 returned200 from staging`/_info` (version1.7.0-RC2) and`/v1/challenge` (protocol1.0.0,390hex TLV). Production attestation acceptance was not tested and must not be assumed.
+
+## Transport adaptation
+
+[wallet-cli DMK setup](https://github.com/LedgerHQ/ledger-live/blob/08be88be108394bf64ed0108dff9a53b8ffb14df/apps/wallet-cli/src/device/dmk.ts) registers Node WebUSB; [Ring session bridge](https://github.com/LedgerHQ/ledger-live/blob/08be88be108394bf64ed0108dff9a53b8ffb14df/apps/wallet-cli/src/session/bridge-device-session.ts) opens Sync through ConnectApp. [SDK constructor](https://github.com/LedgerHQ/ledger-live/blob/08be88be108394bf64ed0108dff9a53b8ffb14df/apps/wallet-cli/src/key-ring/lkrp-sdk.ts) selects production and optionally mock mode. Neither is appropriate for silently pointing the stock binary at an emulator.
+
+Two legitimate source approaches exist: add the official DMK Speculos transport with an explicit model and disabled refresher, or inject the official legacy HTTP Speculos transport directly into the SDK as the recorder does. [Official DMK adapter implementation](https://github.com/LedgerHQ/ledger-live/blob/08be88be108394bf64ed0108dff9a53b8ffb14df/libs/live-dmk-speculos/src/transport/DeviceManagementKitTransportSpeculos.ts) shows `speculosTransportFactory(baseUrl,true,model)`; [HTTP transport](https://github.com/LedgerHQ/ledger-live/blob/08be88be108394bf64ed0108dff9a53b8ffb14df/libs/ledgerjs/packages/hw-transport-node-speculos-http/src/SpeculosHttpTransport.ts) exchanges real `/apdu` requests and exposes the local button/event API.
+
+The isolated adapter at `tools/ledger-speculos/` takes the second route. It vendors pinned upstream Ring handlers/crypto and documents the runtime modifications. It uses real SDK0.15.2 with application17, an immutable staging backend, localhost-only transport, password-protected OS-keychain credentials in a separate namespace, and no mock flag. Ring passwords remain user-owned. Five local security tests passed; an actual `e004000000` APDU on local Sync5001 returned `Ledger Sync`. Fresh real staging authentication subsequently succeeded: `src/probe-auth.ts` received the backend challenge, displayed `Connect to Ledger Sync?`, accepted a visible local emulator Connect approval, and the real backend accepted its signature/attestation. The probe exited0 without persisting a JWT or member credentials; see `tools/ledger-speculos/auth-evidence.json`. Complete fresh enrollment/encrypt/decrypt still requires the user-owned password.
+
+## Acceptance evidence to collect
+
+1. Fresh staging challenge accepted after visible Sync emulator approval; record only public status, never its JWT.
+2. Real `ring init` produces a public trustchain root and app17 path; encrypted member credentials stay in private keychain.
+3. `ring encrypt`/`decrypt` round-trip a harmless fixture; wrong password/domain and tampered ciphertext fail.
+4. Feed the broker scoped testnet credentials, preserve all budget/replay restrictions, and prove separate Hedera/Arc real receipts.
+5. Clearly disclose Speculos in UI, README and demo. Keep physical deployment an explicit later option.

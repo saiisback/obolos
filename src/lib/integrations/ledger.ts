@@ -16,7 +16,7 @@ export async function decryptBrokerSecrets(env: BrokerEnv, runner = runFile): Pr
     if (!env.LEDGER_RING_FILE || !env.LEDGER_RING_KEY || !env.WALLET_PASS) throw Error();
     const {stdout} = await runner(env.LEDGER_WALLET_CLI || 'wallet-cli',
       ['ring','decrypt','-i',env.LEDGER_RING_FILE,'--key',env.LEDGER_RING_KEY],
-      {shell:false,timeout:30_000,maxBuffer:64*1024,encoding:'utf8',env:{NODE_ENV:'production',PATH:env.PATH,HOME:env.HOME,WALLET_PASS:env.WALLET_PASS}});
+      {shell:false,timeout:30_000,maxBuffer:64*1024,encoding:'utf8',env:{NODE_ENV:'production',PATH:env.PATH,HOME:env.HOME,WALLET_PASS:env.WALLET_PASS,...(env.LEDGER_SIGNER_MODE==='speculos'?{OBOLOS_SPECULOS_STATE_DIR:env.OBOLOS_SPECULOS_STATE_DIR,OBOLOS_SPECULOS_SYNC_URL:env.OBOLOS_SPECULOS_SYNC_URL}:{})}});
     return secretSchema.parse(JSON.parse(String(stdout)));
   } catch { throw new Error('Key Ring unavailable; provision the encrypted broker bundle.'); }
 }

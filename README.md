@@ -2,7 +2,7 @@
 
 **Work, within limits.** Agents buy evidence and pay for verification. Humans control their spending authority.
 
-[Source code](https://github.com/saiisback/obolos) · [Live setup](docs/live-setup.md) · [Architecture](docs/architecture.md) · [Submission checklist](docs/submission.md) · [Demo script](docs/demo-script.md)
+[Source code](https://github.com/saiisback/obolos) · [Live setup](docs/live-setup.md) · [Speculos setup](docs/speculos-setup.md) · [Architecture](docs/architecture.md) · [Submission checklist](docs/submission.md) · [Demo script](docs/demo-script.md)
 
 ![Three robot coworkers exchanging a payment token and a research report](public/illustrations/agent-workforce.png)
 
@@ -16,7 +16,7 @@ A user asks: *Compare these three developer tools using current repository activ
 
 | Target track | Integration in Obolos | Evidence still needed |
 |---|---|---|
-| Ledger — AI Agents x Ledger | `wallet-cli ring` protects broker secrets; a physical Ledger signs spending-limit increases; the backend retains and verifies the authorization | Device provisioning, real hardware demonstration and completed tooling feedback |
+| Ledger — AI Agents x Ledger | `wallet-cli ring` integration plus explicit Speculos development support using upstream commands, real Sync/Ethereum apps and Ledger staging; signed mandate increases | Password-protected Ring enrollment, encrypted-bundle round-trip, demo and tooling feedback; emulator-only eligibility needs sponsor confirmation |
 | Hedera — AI & Agentic Payments | Per-repository HBAR pricing, native x402 challenges, Blocky402 settlement and a consuming planner | Public HTTPS service and a real paid request with matching receipt |
 | Circle — Best Agentic Economy Application with Circle Agent Stack | Circle Agent Wallet pays the verification capability in USDC on Arc testnet | Funded agent wallet, confirmed transfer and narrated demo/presentation |
 
@@ -47,7 +47,7 @@ Open http://127.0.0.1:3000. Rehearsal works without environment variables, walle
 ```mermaid
 flowchart LR
   Human[Human operator] --> UI[Next.js console]
-  Ledger[Physical Ledger] -->|Sign expiring mandate| UI
+  Ledger[Ledger USB or labeled Speculos development signer] -->|Sign expiring mandate| UI
   UI -->|Read-only wallet snapshots and readiness| Readiness[Session-scoped live setup API]
   Readiness --> Broker
   UI --> Policy[Policy engine + run store]
@@ -71,6 +71,8 @@ The data service charges **per repository**, so one repository costs one unit an
 See [architecture and trust boundaries](docs/architecture.md), [Hedera setup](docs/hedera-setup.md) and [broker, Circle and Ledger setup](docs/broker-setup.md).
 
 ## Live setup
+
+Without hardware, follow [Speculos development setup](docs/speculos-setup.md). Real staging challenge authentication and emulator message signing have been verified; this does not establish physical-device security or bounty eligibility.
 
 Follow the [step-by-step credential and wallet guide](docs/live-setup.md). It distinguishes public addresses from private credentials and keeps setup actions with the operator.
 

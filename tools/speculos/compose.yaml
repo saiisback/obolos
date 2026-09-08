@@ -1,0 +1,21 @@
+name: obolos-speculos
+x-emulator: &emulator
+  image: ghcr.io/ledgerhq/speculos@sha256:6ed9eefd51cddd862b746719af4cd7a3265fe43d0588c388359753cab8d46d11
+  entrypoint: ["python3", "/runtime/start.py"]
+  volumes:
+    - ./apps:/speculos/apps:ro
+    - ./start.py:/runtime/start.py:ro
+    - ../../data/speculos/device.seed:/run/obolos/device.seed:ro
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: ["ALL"]
+services:
+  sync:
+    <<: *emulator
+    container_name: obolos-speculos-sync
+    ports: ["127.0.0.1:5001:5000"]
+    command: ["--display", "headless", "--model", "nanosp", "--api-port", "5000", "apps/sync.elf"]
+  ethereum:
+    <<: *emulator
+    container_name: obolos-speculos-ethereum
+    ports: ["127.0.0.1:5002:5000"]
+    command: ["--display", "headless", "--model", "nanosp", "--api-port", "5000", "apps/ethereum.elf"]

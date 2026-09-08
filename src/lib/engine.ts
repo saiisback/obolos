@@ -23,8 +23,9 @@ function log(run:Run,actor:AuditEvent['actor'],kind:AuditEvent['kind'],title:str
 function requestApproval(run:Run,p:Provider,reason:string){
  const proposed:Mandate={...run.mandate,version:run.mandate.version+1,maxDataUnitPriceAtomic:Math.max(run.mandate.maxDataUnitPriceAtomic,p.unitPriceAtomic),dataBudgetAtomic:Math.max(run.mandate.dataBudgetAtomic,run.dataSpentAtomic+p.unitPriceAtomic*run.repos.length),expiresAt:new Date(Date.now()+3600000).toISOString()};
  const nonce=randomUUID(),expiresAt=new Date(Date.now()+300000).toISOString();
- const message=['Obolos mandate authorization','Purpose: approve spending limits only; this does not sign a token transfer.',`Run: ${run.id}`,`Mode: ${run.mode}`,`Nonce: ${nonce}`,`Approval expires: ${expiresAt}`,`Previous mandate version: ${run.mandate.version}`,`New mandate: ${JSON.stringify(proposed)}`].join('\n');
- run.approval={nonce,message,expiresAt,proposedMandate:proposed,reason};run.status='awaiting_approval';
+ const signerMode=process.env.LEDGER_SIGNER_MODE==='speculos'?'speculos':'usb';
+ const message=['Obolos mandate authorization','Purpose: approve spending limits only; this does not sign a token transfer.',`Run: ${run.id}`,`Mode: ${run.mode}`,...(run.mode==='live'&&signerMode==='speculos'?['Signer: Speculos emulator (development only; not physical hardware)']:[]),`Nonce: ${nonce}`,`Approval expires: ${expiresAt}`,`Previous mandate version: ${run.mandate.version}`,`New mandate: ${JSON.stringify(proposed)}`].join('\n');
+ run.approval={nonce,message,expiresAt,proposedMandate:proposed,reason,...(run.mode==='live'?{signerMode}:{})};run.status='awaiting_approval';
  log(run,'planner','blocked','Human approval required',reason);
 }
 function validateReceipt(run:Run,r:Receipt,requestId:string,network:Receipt['network'],amount:number){
@@ -94,14 +95,16 @@ export async function approveRun(run:Run,input:{signature?:string}){
  if(Date.parse(a.expiresAt)<=Date.now())throw new Error('Approval expired. Reject this request and start a new job.');
  if(a.proposedMandate.version!==run.mandate.version+1)throw new Error('The approval does not match the current mandate.');
  if(run.mode==='live'){
+  const configuredMode=process.env.LEDGER_SIGNER_MODE||'usb';
+  if(!['usb','speculos'].includes(configuredMode)||(a.signerMode||'usb')!==configuredMode)throw new Error('Controller signer mode changed; request a new approval.');
   const address=process.env.LEDGER_CONTROLLER_ADDRESS;
   if(!address||!/^0x[0-9a-fA-F]{40}$/.test(address)||!input.signature||!/^0x[0-9a-fA-F]{130}$/.test(input.signature))throw new Error('A valid Ledger controller signature is required.');
   if(!await verifyMessage({address:address as `0x${string}`,message:a.message,signature:input.signature as `0x${string}`}))throw new Error('Signature does not match the configured Ledger controller.');
  }
  run.authorizations??=[];
- run.authorizations.push({mode:run.mode,nonce:a.nonce,message:a.message,verifiedAt:new Date().toISOString(),previousMandate:structuredClone(run.mandate),approvedMandate:structuredClone(a.proposedMandate),...(run.mode==='live'?{signer:process.env.LEDGER_CONTROLLER_ADDRESS,signature:input.signature}:{})});
+ run.authorizations.push({mode:run.mode,nonce:a.nonce,message:a.message,verifiedAt:new Date().toISOString(),previousMandate:structuredClone(run.mandate),approvedMandate:structuredClone(a.proposedMandate),...(run.mode==='live'?{signer:process.env.LEDGER_CONTROLLER_ADDRESS,signature:input.signature,signerMode:a.signerMode||'usb'}:{})});
  run.mandate=a.proposedMandate;run.approval=undefined;run.status='running';
- log(run,'supervisor','success',run.mode==='rehearsal'?'Rehearsal allowance approved':'Controller signature verified',`Mandate version ${run.mandate.version}; nonce ${a.nonce} consumed. ${run.mode==='rehearsal'?'This was a simulated approval, not a Ledger signature.':'Hardware provenance depends on provisioning the pinned address from the Ledger device.'}`);return run;
+ log(run,'supervisor','success',run.mode==='rehearsal'?'Rehearsal allowance approved':'Controller signature verified',`Mandate version ${run.mandate.version}; nonce ${a.nonce} consumed. ${run.mode==='rehearsal'?'This was a simulated approval, not a Ledger signature.':a.signerMode==='speculos'?'Speculos emulator signature verified; not physical hardware evidence.':'Hardware provenance depends on provisioning the pinned address from the Ledger device.'}`);return run;
 }
 export function pauseRun(run:Run){
  if(['failed','completed','awaiting_approval'].includes(run.status))throw new Error('This run cannot be paused or resumed in its current state.');

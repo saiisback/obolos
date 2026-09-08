@@ -31,6 +31,7 @@ export function buildLiveOverview(input:{
   health:BrokerHealth; wallets?:BrokerWallets; serviceReachable:boolean;
 }):LiveOverview {
   const {authenticated,env,health}=input;
+  const signerMode=env.LEDGER_SIGNER_MODE==='speculos'?'speculos':'usb';
   const service=safeServiceUrl(env.DATA_SERVICE_URL);
   const controller=/^0x[0-9a-fA-F]{40}$/.test(env.LEDGER_CONTROLLER_ADDRESS??'')?env.LEDGER_CONTROLLER_ADDRESS!:null;
   const wallets=authenticated?(input.wallets?.wallets??[]):[];
@@ -40,15 +41,15 @@ export function buildLiveOverview(input:{
   const checks:ReadinessCheck[]=[
     {id:'operator',label:'Operator authenticated',status:authenticated?'ready':'action',detail:authenticated?'This browser can inspect wallet details and request live jobs.':'Enter the operator token below. Wallet details stay private until authentication.'},
     {id:'broker',label:'Ledger-enrolled broker and Circle session',status:health.ready?'ready':'missing',detail:health.ready?'Required capabilities report configured; this is not payment proof.':'Provision Key Ring, the model credential, Hedera payer and Circle testnet session in the private broker.'},
-    {id:'controller',label:'Pinned Ledger controller',status:controller?'ready':'missing',detail:controller?'A controller address is configured; confirm it on the physical Ledger.':'Derive and confirm the controller address on your Ledger, then configure it on app and broker.'},
+    {id:'controller',label:signerMode==='speculos'?'Pinned Speculos controller':'Pinned Ledger controller',status:controller?'ready':'missing',detail:signerMode==='speculos'?'Speculos development signer selected; verify its address in the emulator. This is not physical hardware evidence.':controller?'A controller address is configured; confirm it on the physical Ledger.':'Derive and confirm the controller address on your Ledger, then configure it on app and broker.'},
     {id:'service',label:'Hedera x402 service',status:input.serviceReachable?'ready':'missing',detail:input.serviceReachable?'The service health endpoint identifies Hedera testnet and hosted Blocky402. A paid request is still needed.':authenticated?'Start the data service and set DATA_SERVICE_URL. Read-only health could not be confirmed.':'Authenticate to check the configured resource service.'},
     ...(['hedera-payer','circle-agent'] as const).map(id=>{
       const wallet=wallets.find(w=>w.id===id),positive=wallet?.balanceStatus==='available'&&wallet.balanceAtomic!==null&&BigInt(wallet.balanceAtomic)>0n;
       return {id:`funding-${id}`,label:id==='hedera-payer'?'HBAR payer funded':'Arc agent wallet funded',status:positive?'ready':'action',detail:positive?'A positive testnet balance was observed. Each job still needs enough principal plus network fees.':'Fund the testnet wallet and refresh. Unknown balances are not displayed as zero.'} as ReadinessCheck;
     }),
     {id:'payments',label:'Real paid request on both rails',status:evidence.hederaPayments>0&&evidence.arcPayments>0?'ready':'action',detail:`This workspace has ${evidence.hederaPayments} confirmed Hedera and ${evidence.arcPayments} confirmed Arc receipts. Rehearsals do not count.`},
-    {id:'hardware',label:'Physical Ledger demo and authorization proof',status:'action',detail:`${evidence.ledgerApprovals} saved controller proofs in this workspace. A recorded physical device demonstration and Ledger tooling feedback are still required.`},
+    {id:'hardware',label:signerMode==='speculos'?'Emulator disclosure and Ledger eligibility':'Physical Ledger demo and authorization proof',status:'action',detail:signerMode==='speculos'?'Speculos is not physical Ledger security. Emulator-only eligibility requires sponsor confirmation; retain tooling feedback and the recorded walkthrough.':`${evidence.ledgerApprovals} saved controller proofs in this workspace. A recorded physical device demonstration and Ledger tooling feedback are still required.`},
     {id:'publish',label:'Public service and demo',status:'action',detail:'The public repository is linked below. Deploy the x402 service over HTTPS and record the real paid request in a 2–4 minute video.'},
   ];
-  return {checkedAt:input.wallets?.observedAt??new Date().toISOString(),operatorAuthenticated:authenticated,liveEnabled:authenticated&&health.ready&&liveConfiguration(env),controllerAddress:authenticated?controller:null,serviceUrl:authenticated?service:null,wallets,checks,evidence,resources:LIVE_RESOURCES};
+  return {signerMode,checkedAt:input.wallets?.observedAt??new Date().toISOString(),operatorAuthenticated:authenticated,liveEnabled:authenticated&&health.ready&&liveConfiguration(env),controllerAddress:authenticated?controller:null,serviceUrl:authenticated?service:null,wallets,checks,evidence,resources:LIVE_RESOURCES};
 }

@@ -14,7 +14,12 @@
     "broker": "tsx --env-file-if-exists=.env.broker services/broker.ts",
     "ledger:approve": "tsx --env-file-if-exists=.env.broker scripts/ledger-approve.ts",
     "preflight": "node scripts/preflight.mjs",
-    "setup:local": "node scripts/setup-local.mjs"
+    "setup:local": "node scripts/setup-local.mjs",
+    "speculos:prepare": "node scripts/setup-speculos.mjs",
+    "speculos:up": "npm run speculos:prepare && docker compose -f tools/speculos/compose.yaml up -d",
+    "speculos:down": "docker compose -f tools/speculos/compose.yaml down",
+    "speculos:ring": "bun --env-file=.env.broker ./tools/ledger-speculos/src/cli.ts",
+    "speculos:auth": "cd tools/ledger-speculos && bun src/probe-auth.ts"
   },
   "dependencies": {
     "@circle-fin/cli": "^1.0.0",
@@ -31,7 +36,8 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "viem": "^2.38.0",
-    "zod": "^4.0.0"
+    "zod": "^4.0.0",
+    "@ledgerhq/hw-transport": "6.35.7"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.0",

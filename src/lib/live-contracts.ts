@@ -19,6 +19,7 @@ export interface ReadinessCheck {
   id: string; label: string; status: 'ready' | 'missing' | 'action'; detail: string;
 }
 export interface LiveOverview {
+  signerMode: 'usb' | 'speculos';
   checkedAt: string; operatorAuthenticated: boolean; liveEnabled: boolean;
   controllerAddress: string | null; serviceUrl: string | null;
   wallets: WalletSnapshot[]; checks: ReadinessCheck[];

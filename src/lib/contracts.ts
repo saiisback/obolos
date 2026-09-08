@@ -29,12 +29,13 @@ export interface AuditEvent {
   previousHash: string; hash: string;
 }
 export interface ApprovalRequest {
+  signerMode?: 'usb' | 'speculos';
   nonce: string; message: string; expiresAt: string; proposedMandate: Mandate; reason: string;
 }
 export interface AuthorizationProof {
   mode: Mode; nonce: string; message: string; verifiedAt: string;
   previousMandate: Mandate; approvedMandate: Mandate;
-  signer?: string; signature?: string;
+  signer?: string; signature?: string; signerMode?: 'usb' | 'speculos';
 }
 export interface Run {
   id: string; mode: Mode; title: string; repos: string[]; status: RunStatus; stage: Stage;

@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+LEDGER_SPECULOS_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+exec bun "$LEDGER_SPECULOS_DIR/src/cli.ts" "$@"

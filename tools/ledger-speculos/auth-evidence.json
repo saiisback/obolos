@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-09-08T06:22:12.930580+00:00",
+  "mode": "speculos",
+  "hardwareBacked": false,
+  "transport": "Bounded local Node HTTP APDU adapter using @ledgerhq/hw-transport",
+  "app": "Ledger Sync",
+  "backend": "https://trustchain-backend.api.aws.stg.ldg-tech.com",
+  "challengeAuthentication": "verified",
+  "ringEnrolled": false,
+  "method": "Published LKRP HWDeviceProvider: real challenge, emulated APDU signature/attestation, real staging authenticate; visible emulator Connect approval.",
+  "secretsPersisted": false,
+  "seedNote": "Validated against newly recreated emulators using a fresh private local test seed, not the shared Speculos default. Seed material is not included."
+}

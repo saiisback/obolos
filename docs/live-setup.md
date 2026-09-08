@@ -65,6 +65,8 @@ npm run data-service
 
 Discovery and an unpaid HTTP 402 challenge can be inspected without transferring funds. For submission, deploy this service at its own public HTTPS URL and use that same URL in the app and broker. The service uses hosted Blocky402 on Hedera testnet. See [Hedera service setup](hedera-setup.md) and [Blocky402 testnet documentation](https://blocky402.com/docs/testnet/).
 
+For the user-selected emulator route, follow [Speculos development setup](speculos-setup.md). The physical-device procedure below remains available; Speculos uses a separately disclosed source adapter, isolated identity and staging backend.
+
 ## 4. Provision Ledger Ring with the Sync app
 
 Use the project-local official Wallet CLI under the broker/operator account. From that account's deployment checkout, either invoke `./node_modules/.bin/wallet-cli` directly or expose only that checkout's installed binaries for the following commands:

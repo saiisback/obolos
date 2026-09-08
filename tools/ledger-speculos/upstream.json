@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/LedgerHQ/ledger-live",
+  "commit": "08be88be108394bf64ed0108dff9a53b8ffb14df",
+  "files": [
+    "commands/ring/init.ts",
+    "commands/ring/encrypt.ts",
+    "commands/ring/decrypt.ts",
+    "commands/ring/shared.ts",
+    "key-ring/crypto.ts",
+    "key-ring/keychain.ts",
+    "key-ring/prompt.ts",
+    "key-ring/load-key-ring.ts",
+    "shared/secure-file.ts",
+    "shared/hex.ts",
+    "key-ring/constants.ts"
+  ]
+}
