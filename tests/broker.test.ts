@@ -136,3 +136,32 @@ describe('mandate validity at financial submission',()=>{
     expect(commands).toHaveLength(1);expect(commands[0].slice(0,2)).toEqual(['wallet','list']);
   });
 });
+
+describe('report model compatibility',()=>{
+  it.each(['gpt-5-nano','gpt-4.1-mini'])('generates a report with compatible bounded parameters for %s',async model=>{
+    const j=await journal();
+    await j.execute('input-data','report-check','data',{},1,10,async()=>({evidence:[sourceEvidence]}));
+    vi.spyOn(ledger,'decryptBrokerSecrets').mockResolvedValue({inferenceApiKey:'test-only',hedera:{accountId:'0.0.123',privateKey:'test-only',keyType:'der'}});
+    const realFetch=globalThis.fetch;
+    let modelCalls=0;
+    vi.spyOn(globalThis,'fetch').mockImplementation(async(input,init)=>{
+      if(String(input)==='https://api.openai.com/v1/chat/completions'){
+        modelCalls++;
+        const body=JSON.parse(String(init?.body));
+        if(model==='gpt-5-nano'&&('max_tokens' in body||body.max_completion_tokens!==1000||body.reasoning_effort!=='minimal')){
+          return new Response(JSON.stringify({error:{code:'unsupported_parameter'}}),{status:400});
+        }
+        if(model==='gpt-4.1-mini')expect(body.max_tokens).toBe(1000);
+        expect(body.model).toBe(model);
+        return Response.json({choices:[{message:{content:'owner/repo: evidence-based report'}}]});
+      }
+      return realFetch(input,init);
+    });
+    await withBroker({BROKER_DATA_DIR:join(j.path,'..'),INFERENCE_MODEL:model,INFERENCE_BASE_URL:'https://api.openai.com/v1'},async url=>{
+      const response=await post(url+'/report',{runId:'report-check',evidence:[sourceEvidence]});
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({summary:'owner/repo: evidence-based report'});
+    });
+    expect(modelCalls).toBe(1);
+  });
+});

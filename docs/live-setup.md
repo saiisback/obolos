@@ -142,6 +142,14 @@ Use the [Arc connection details](https://docs.arc.io/arc/references/connect-to-a
 
 The Ring bundle does not contain Circle's private signing key. Circle Agent Wallet uses its own MPC infrastructure and the broker's authenticated CLI session; Ledger does not sign the Circle transfer.
 
+### Circle device registration errors
+
+If wallet listing works but creation returns `Provided device ID is not found in the system`, listing alone has not verified signing readiness. The installed CLI uses the saved device ID when executing signing challenges; a fresh email login creates a new device registration. Reauthenticate using the same `CIRCLE_CLI_HOME`, email and `--testnet`, enter the OTP privately in the terminal, then list wallets before retrying creation. Preserve the existing wallet and funding. This is a recovery step to test, not a guarantee that a backend error is resolved.
+
+### GPT-5 nano compatibility
+
+The report worker supports `gpt-5-nano` and its dated snapshots using `max_completion_tokens=1000` and `reasoning_effort=minimal`. Other configured models retain the existing `max_tokens=1000` request. A live OpenAI probe on September 8, 2026 rejected the old nano request with `unsupported_parameter` for `max_tokens`; the compatible request returned HTTP 200 with nonempty text. Broker HTTP regression tests cover nano and the existing non-nano request. Model listing alone does not prove generation quota; this check included a small generation request.
+
 ## 7. Start the broker and app
 
 Finish the private broker configuration: inference origin/model, service URL, recipients, controller address, Circle CLI/session paths and persistent `BROKER_DATA_DIR`. Keep `ARC_VERIFICATION_FEE_ATOMIC=50000` (0.05 USDC), which is the current fixed verification contract. Set broker lifetime principal caps deliberately: defaults are 10,000,000 tinybar (0.1 HBAR) and 1,000,000 micro-USDC (1 USDC). They apply across the complete retained journal, not per run.
