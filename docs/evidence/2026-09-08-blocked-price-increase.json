@@ -1,0 +1,126 @@
+{
+  "schema": "obolos.evidence.v1",
+  "exportedAt": "2026-09-08T18:00:11.130Z",
+  "auditChainValid": true,
+  "disclosure": "Live mode: inspect each settled receipt and source timestamp. Configuration alone does not establish qualification.",
+  "run": {
+    "id": "6bd96c2d-88dd-4a7a-9f4c-d71f2c2b47e3",
+    "mode": "live",
+    "title": "Compare next.js, kit",
+    "repos": [
+      "vercel/next.js",
+      "sveltejs/kit"
+    ],
+    "status": "awaiting_approval",
+    "stage": "purchase",
+    "createdAt": "2026-09-08T17:55:09.146Z",
+    "updatedAt": "2026-09-08T17:55:22.036Z",
+    "mandate": {
+      "dataBudgetAtomic": 200000,
+      "maxDataUnitPriceAtomic": 100000,
+      "verificationBudgetAtomic": 50000,
+      "allowedProviders": [
+        "repo-standard"
+      ],
+      "expiresAt": "2026-09-08T18:25:06.675Z",
+      "version": 1
+    },
+    "providers": [
+      {
+        "id": "repo-standard",
+        "name": "Repository Standard",
+        "description": "Live public GitHub metadata, timestamped per request. Both tiers use the same source for transparent price competition.",
+        "network": "hedera:testnet",
+        "asset": "HBAR",
+        "unit": "repository",
+        "unitPriceAtomic": 400000,
+        "endpoint": "http://127.0.0.1:4402/evidence/repo-standard"
+      },
+      {
+        "id": "repo-economy",
+        "name": "Repository Economy",
+        "description": "Live public GitHub metadata, timestamped per request. Both tiers use the same source for transparent price competition.",
+        "network": "hedera:testnet",
+        "asset": "HBAR",
+        "unit": "repository",
+        "unitPriceAtomic": 450000,
+        "endpoint": "http://127.0.0.1:4402/evidence/repo-economy"
+      }
+    ],
+    "dataSpentAtomic": 0,
+    "verificationSpentAtomic": 0,
+    "evidence": [],
+    "receipts": [],
+    "events": [
+      {
+        "id": "e2f35b34-629b-4850-934c-b64f508613d9",
+        "timestamp": "2026-09-08T17:55:09.147Z",
+        "actor": "supervisor",
+        "kind": "info",
+        "title": "Mandate created",
+        "detail": "Up to 0.002 HBAR for evidence and 0.05 USDC for verification. Expires 2026-09-08T18:25:06.675Z.",
+        "previousHash": "genesis",
+        "hash": "bce288552b3b33f866adc804947bcb960acda8632ab44ca86937d4fbdcde3929"
+      },
+      {
+        "id": "15fadd46-b1d3-4fe6-b925-c5a898f2768a",
+        "timestamp": "2026-09-08T17:55:13.302Z",
+        "actor": "broker",
+        "kind": "success",
+        "title": "Mandate accepted",
+        "detail": "Only named services can receive requests. Wallet and provider credentials remain outside the agent.",
+        "previousHash": "bce288552b3b33f866adc804947bcb960acda8632ab44ca86937d4fbdcde3929",
+        "hash": "84b0bddcfc1567a7cbb4785f1abdcc7cb989468698813048a12c9a8b46f97a3e"
+      },
+      {
+        "id": "fcfb996d-1a77-4da8-8272-a37de4ab3471",
+        "timestamp": "2026-09-08T17:55:16.055Z",
+        "actor": "planner",
+        "kind": "success",
+        "title": "Services discovered",
+        "detail": "Selected Repository Standard at 0.001 HBAR per repository from 1 approved quotes.",
+        "previousHash": "84b0bddcfc1567a7cbb4785f1abdcc7cb989468698813048a12c9a8b46f97a3e",
+        "hash": "04475154292b741127f81fe4b9cb018812863ea15dcc655ebc16f804c7633a0e"
+      },
+      {
+        "id": "d6e21176-0700-4673-8289-50426ad6ba38",
+        "timestamp": "2026-09-08T17:55:19.080Z",
+        "actor": "supervisor",
+        "kind": "warning",
+        "title": "Provider price increased",
+        "detail": "Quotes increased to 0.004 HBAR/repository and 0.0045 HBAR/repository. The planner must evaluate the new prices before paying.",
+        "previousHash": "04475154292b741127f81fe4b9cb018812863ea15dcc655ebc16f804c7633a0e",
+        "hash": "32ed938b10a27fb709bc0148bcf6cae8af78ea4e464e479b85015063f471496a"
+      },
+      {
+        "id": "a28262e7-17c8-432a-a11f-5dfb76042550",
+        "timestamp": "2026-09-08T17:55:22.035Z",
+        "actor": "planner",
+        "kind": "blocked",
+        "title": "Human approval required",
+        "detail": "The provider quote exceeds the approved price per repository.",
+        "previousHash": "32ed938b10a27fb709bc0148bcf6cae8af78ea4e464e479b85015063f471496a",
+        "hash": "49a6b82d4a05b990296ed8d5aac4f8dcdbe4c727041f273be9949eaf625e65a5"
+      }
+    ],
+    "shockApplied": true,
+    "selectedProvider": "repo-standard",
+    "approval": {
+      "nonce": "0ec1697d-d771-4fc0-8929-d5ca3304dc6d",
+      "message": "Obolos mandate authorization\nPurpose: approve spending limits only; this does not sign a token transfer.\nRun: 6bd96c2d-88dd-4a7a-9f4c-d71f2c2b47e3\nMode: live\nSigner: Speculos emulator (development only; not physical hardware)\nNonce: 0ec1697d-d771-4fc0-8929-d5ca3304dc6d\nApproval expires: 2026-09-08T18:00:22.035Z\nPrevious mandate version: 1\nNew mandate: {\"dataBudgetAtomic\":800000,\"maxDataUnitPriceAtomic\":400000,\"verificationBudgetAtomic\":50000,\"allowedProviders\":[\"repo-standard\"],\"expiresAt\":\"2026-09-08T18:55:22.035Z\",\"version\":2}",
+      "expiresAt": "2026-09-08T18:00:22.035Z",
+      "proposedMandate": {
+        "dataBudgetAtomic": 800000,
+        "maxDataUnitPriceAtomic": 400000,
+        "verificationBudgetAtomic": 50000,
+        "allowedProviders": [
+          "repo-standard"
+        ],
+        "expiresAt": "2026-09-08T18:55:22.035Z",
+        "version": 2
+      },
+      "reason": "The provider quote exceeds the approved price per repository.",
+      "signerMode": "speculos"
+    }
+  }
+}

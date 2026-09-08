@@ -1,0 +1,2 @@
+Obolos demo reverse proxy. Application and x402 service run on the operator's Mac.
+Availability depends on the Mac, local processes and temporary HTTPS tunnels.

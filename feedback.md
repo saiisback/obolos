@@ -15,3 +15,7 @@ On September 7, the official `@ledgerhq/wallet-cli` 2.1.0 package was installed 
 ## Experience still to record
 
 No physical Ledger was connected during the automated implementation run. Append device model, firmware/app versions, provisioning behavior, message review usability, actual error messages (without secrets) and reproducible fixes after the operator's device session. The points above are source/code integration feedback, not invented hardware testing results.
+
+## Verified Speculos development work — September 8, 2026
+
+The subsequent [detailed DX report](docs/ledger-feedback.md) documents the disclosed upstream Ring source adapter, real staging enrollment, encryption/decryption negative checks, and Ethereum emulator signing. The [first paid run](docs/evidence/2026-09-08-first-paid-run.md) used the resulting encrypted broker bundle for actual Hedera and Arc testnet settlement. No physical Ledger was used, and the development evidence does not establish emulator-only bounty eligibility.

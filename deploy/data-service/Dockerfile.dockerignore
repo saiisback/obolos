@@ -1,0 +1,14 @@
+# Dockerfile-specific context allowlist. Secrets are not sent to the builder.
+**
+!deploy/
+!deploy/data-service/
+!deploy/data-service/Dockerfile
+!deploy/data-service/package.json
+!deploy/data-service/package-lock.json
+!services/
+!services/data-service.ts
+!src/
+!src/lib/
+!src/lib/contracts.ts
+!src/lib/integrations/
+!src/lib/integrations/hedera.ts

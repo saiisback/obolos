@@ -1,0 +1,61 @@
+name: obolos-data
+
+services:
+  data-service:
+    build:
+      context: ../..
+      dockerfile: deploy/data-service/Dockerfile
+    restart: unless-stopped
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    environment:
+      DATA_SERVICE_HOST: 0.0.0.0
+      DATA_SERVICE_PORT: "4402"
+      DATA_SERVICE_PUBLIC_URL: https://${DATA_SERVICE_DOMAIN:?Set DATA_SERVICE_DOMAIN}
+      DATA_SERVICE_DATA_DIR: /var/lib/obolos
+      HEDERA_PAY_TO: ${HEDERA_PAY_TO:-0.0.10425234}
+      DATA_SERVICE_OPERATOR_TOKEN: ${DATA_SERVICE_OPERATOR_TOKEN:?Set the private operator token}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+    volumes:
+      - service-data:/var/lib/obolos
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4402/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+
+  caddy:
+    image: caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d
+    restart: unless-stopped
+    security_opt: [no-new-privileges:true]
+    depends_on:
+      data-service:
+        condition: service_healthy
+    environment:
+      DATA_SERVICE_DOMAIN: ${DATA_SERVICE_DOMAIN:?Set DATA_SERVICE_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+
+volumes:
+  service-data:
+    name: obolos-data-service-state
+  caddy-data:
+  caddy-config:

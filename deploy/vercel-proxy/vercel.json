@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "",
+  "installCommand": "",
+  "outputDirectory": "public",
+  "headers": [{
+    "source": "/(.*)",
+    "headers": [
+      { "key": "Cache-Control", "value": "no-store" },
+      { "key": "CDN-Cache-Control", "value": "no-store" },
+      { "key": "Vercel-CDN-Cache-Control", "value": "no-store" },
+      { "key": "x-vercel-enable-rewrite-caching", "value": "0" }
+    ]
+  }],
+  "rewrites": [
+    { "source": "/", "destination": "https://api-onion-import-commerce.trycloudflare.com/" },
+    { "source": "/x402/:path*", "destination": "https://but-enhance-word-turn.trycloudflare.com/:path*" },
+    { "source": "/:path*", "destination": "https://api-onion-import-commerce.trycloudflare.com/:path*" }
+  ]
+}

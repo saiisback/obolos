@@ -2,13 +2,15 @@
 
 **Work, within limits.** Agents buy evidence and pay for verification. Humans control their spending authority.
 
-[Source code](https://github.com/saiisback/obolos) · [Live setup](docs/live-setup.md) · [Speculos setup](docs/speculos-setup.md) · [Architecture](docs/architecture.md) · [Submission checklist](docs/submission.md) · [Demo script](docs/demo-script.md)
+[Public demo](https://obolos.app) · [Source code](https://github.com/saiisback/obolos) · [Live setup](docs/live-setup.md) · [Speculos setup](docs/speculos-setup.md) · [Architecture](docs/architecture.md) · [Submission checklist](docs/submission.md) · [Demo script](docs/demo-script.md)
 
 ![Three robot coworkers exchanging a payment token and a research report](public/illustrations/agent-workforce.png)
 
 An operator console for agents that buy evidence, pay for verification, and work within a human-defined spending mandate. Built for the **Ledger AI Agents x Ledger**, **Hedera AI & Agentic Payments**, and **Arc Best Agentic Economy Application with Circle Agent Stack** tracks at ETHOnline 2026.
 
-**Status:** runnable rehearsal, implemented live adapters, and an operator-only Connections view for real wallet snapshots, readiness and saved live evidence. Configuration, local checks and an unpaid HTTP 402 challenge do **not** establish a paid testnet request, physical Ledger approval or track qualification. See the [submission evidence checklist](docs/submission.md) before claiming qualification.
+**Status:** the public app and x402 service are available at [obolos.app](https://obolos.app). A complete testnet run bought three records for **0.003 HBAR**, generated a report with GPT-5 nano and paid **0.05 USDC** for verification on Arc. A separate public HTTPS purchase settled **0.001 HBAR**. A real chat-approved Speculos mandate increase also settled **0.008 HBAR**, but its Arc step has an unresolved payment intent and is not retried. See the [evidence matrix](docs/submission.md) and [reconciliation record](docs/evidence/2026-09-08-arc-reconciliation.md).
+
+The public demo currently depends on the operator's Mac and temporary HTTPS tunnels staying online. The broker stays local. Speculos is emulated development signing, not physical-device security; Ledger acceptance and prior-paper eligibility remain external decisions.
 
 ## One workflow, three tracks
 
@@ -16,9 +18,9 @@ A user asks: *Compare these three developer tools using current repository activ
 
 | Target track | Integration in Obolos | Evidence still needed |
 |---|---|---|
-| Ledger — AI Agents x Ledger | `wallet-cli ring` integration plus explicit Speculos development support using upstream commands, real Sync/Ethereum apps and Ledger staging; signed mandate increases | Recorded mandate-escalation demo and tooling feedback; emulator-only eligibility needs sponsor confirmation |
-| Hedera — AI & Agentic Payments | Per-repository HBAR pricing, native x402 challenges, Blocky402 settlement and a consuming planner | Public HTTPS service and demo video; first paid request and receipt verified |
-| Circle — Best Agentic Economy Application with Circle Agent Stack | Circle Agent Wallet pays the verification capability in USDC on Arc testnet | Narrated demo/presentation; funded wallet and first USDC transfer verified |
+| Ledger — AI Agents x Ledger | `wallet-cli ring` integration plus explicit Speculos development support using upstream commands, real Sync/Ethereum apps and Ledger staging; signed mandate increases | Accepted emulator mandate and retained signature verified; sponsor decision and delivery of tooling feedback remain |
+| Hedera — AI & Agentic Payments | Per-repository HBAR pricing, native x402 challenges, Blocky402 settlement and a consuming planner | Public HTTPS 402 and paid request verified; retain the narrated demo artifact and host availability |
+| Circle — Best Agentic Economy Application with Circle Agent Stack | Circle Agent Wallet pays the verification capability in USDC on Arc testnet | First USDC transfer verified; second attempt remains pending reconciliation |
 
 The frontend and backend use **Next.js, React and TypeScript**. Separate Node services implement the metered API and private capability broker. The interface uses the user-selected Foundation reference on Mobbin, black-and-white surfaces, orange actions and an original flat illustration.
 
@@ -85,10 +87,10 @@ For a fresh local setup, `npm run setup:local` creates the three ignored environ
 3. Use the **Ethereum** device app to derive and confirm the separate controller address. Pin it and its derivation path before requesting a signature.
 4. Complete Circle CLI **agent/testnet email OTP** login yourself under the broker account. Select and fund its Arc wallet, then pin the verification recipient. This CLI path needs no Circle API key or imported Circle private key.
 5. Start the private broker and app with their independent tokens. Run `npm run preflight`, then authenticate in **Connections** and refresh wallet/readiness details. Unknown balances remain unavailable; balances and purchase allowances are different values.
-6. Create a live run. If authority must increase, download its approval JSON, run `npm run ledger:approve -- /absolute/path/approval.json`, review the physical Ledger prompt and submit the signature. Approved messages and signatures are saved in the run export.
-7. Inspect actual settled receipt IDs in HashScan and ArcScan. Record the physical device, live paid flow and developer-experience feedback before submission.
+6. Create a live run. If authority must increase, download its approval JSON, run `npm run ledger:approve -- /absolute/path/approval.json`, review the selected physical Ledger or explicitly labelled Speculos prompt and submit the signature. Approved messages and signatures are saved in the run export.
+7. Inspect actual settled receipt IDs in HashScan and ArcScan. Record the selected signer, disclose emulator use, and retain paid-flow evidence and developer feedback before submission.
 
-Key Ring protects stored broker secrets; only the trusted broker decrypts them in memory. LedgerJS performs physical Ethereum personal-message approval. Circle Agent Wallet uses its own MPC/session infrastructure, **not Ledger**, to sign Arc payments. No bridge or atomic cross-chain settlement is claimed.
+Key Ring protects stored broker secrets; only the trusted broker decrypts them in memory. LedgerJS performs Ethereum personal-message approval through USB or the disclosed Speculos adapter. Circle Agent Wallet uses its own MPC/session infrastructure, **not Ledger**, to sign Arc payments. No bridge or atomic cross-chain settlement is claimed.
 
 The Connections view is read-only wallet management: authenticated public addresses, recipients, exact HBAR/USDC balance strings, sources/timestamps, explorer/faucet links and session-owned receipt/authorization counts. It does not import keys, connect a replacement browser wallet, fund accounts or mark external submission requirements complete.
 
@@ -111,6 +113,8 @@ The dependency audit on September 7 reported zero high/critical advisories after
 
 ## Deployment
 
+The current [Vercel demo proxy](deploy/vercel-proxy/README.md) serves `obolos.app` while the persistent app and data service run on the operator’s Mac. Only the small proxy package is deployed to Vercel. The [standalone data-service container](deploy/data-service/README.md) is provided for a future persistent host.
+
 Use a long-running Node process with a persistent private volume for `OBOLOS_DATA_DIR`. This MVP uses one serialized local store; **do not deploy multiple replicas or ephemeral serverless storage**. Run the data service as a separate HTTPS process with a durable `DATA_SERVICE_DATA_DIR`. Run the trusted broker on the Ledger-enrolled private host; reach it over a private authenticated tunnel from the app host. The browser never contacts the broker directly.
 
 Set `APP_ORIGIN` to the actual public origin and `COOKIE_SECURE=true` behind HTTPS. Serve the app behind a reverse proxy, set a strong `SESSION_SECRET`, and preserve all broker/payment journals across deployments. App, data service and broker must use distinct OS permissions. A public demo can run rehearsal only with live configuration omitted.
@@ -125,7 +129,7 @@ Existing installations retain their data directory, cookies, signed messages and
 - `services/data-service.ts`: public discovery, metered quotes, native Hedera x402 endpoint.
 - `services/broker.ts`: isolated credentials and scoped capabilities.
 - `src/lib/integrations/`: Ledger Key Ring, Circle Arc and Hedera adapters.
-- `scripts/ledger-approve.ts`: physical USB hardware approval flow; pending JSON messages become saved authorization proofs after validation.
+- `scripts/ledger-approve.ts`: USB or explicitly labelled Speculos approval flow; pending JSON messages become saved authorization proofs after validation.
 - `src/lib/live-readiness.ts`, `src/lib/integrations/wallets.ts`: readiness aggregation and authenticated, read-only testnet balance snapshots.
 - `docs/live-setup.md`: public address map, secret locations and operator setup sequence.
 - `docs/`: approved plan, submission matrix, demo script, references and limitations.

@@ -1,0 +1,55 @@
+{
+  "checkedAt": "2026-09-08T18:26:13.673Z",
+  "origin": "https://obolos.app",
+  "deployment": "dpl_5xuw2xNAwE2CbiDn89qo2AKnqALM",
+  "architecture": "Vercel external rewrites to temporary Cloudflare tunnels; app and data service on operator Mac; broker loopback only",
+  "availability": "Mac and tunnels must remain running; no continuous-hosting guarantee",
+  "checks": [
+    {
+      "path": "/",
+      "method": "GET",
+      "status": 200,
+      "cacheControl": "no-store",
+      "paymentRequiredPresent": false
+    },
+    {
+      "path": "/x402/health",
+      "method": "GET",
+      "status": 200,
+      "cacheControl": "no-store",
+      "paymentRequiredPresent": false
+    },
+    {
+      "path": "/x402/discovery",
+      "method": "GET",
+      "status": 200,
+      "cacheControl": "no-store",
+      "paymentRequiredPresent": false
+    },
+    {
+      "path": "/x402/operator/prices",
+      "method": "POST",
+      "status": 401,
+      "cacheControl": "no-store",
+      "paymentRequiredPresent": false
+    },
+    {
+      "path": "/x402/evidence/repo-standard",
+      "method": "POST",
+      "status": 402,
+      "cacheControl": "no-store",
+      "paymentRequiredPresent": true
+    }
+  ],
+  "wwwRedirect": {
+    "status": 308,
+    "location": "https://obolos.app/"
+  },
+  "publicRehearsalSmoke": "Passed session, CSRF, live operator gate, validation, pause, price shock, simulated approval, completion, receipt count, export and ownership",
+  "publicBrowser": {
+    "title": "Obolos — Work, within limits.",
+    "pageErrors": [],
+    "screenshotReviewed": true
+  },
+  "payments": "This file records read-only/unauthenticated checks. Separate public paid-request evidence records settlement."
+}

@@ -1,0 +1,9 @@
+{
+	email {$ACME_EMAIL}
+	admin off
+}
+
+{$DATA_SERVICE_DOMAIN} {
+	header X-Content-Type-Options nosniff
+	reverse_proxy data-service:4402
+}

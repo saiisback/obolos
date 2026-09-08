@@ -1,0 +1,191 @@
+{
+  "schema": "obolos.approval-evidence.v1",
+  "exportedAt": "2026-09-08T18:09:16.666Z",
+  "sourceExportAuditChainValid": true,
+  "disclosure": "Partial execution: user authorized the increase in chat; the assistant reviewed and operated Speculos. This is software emulation, not physical-device security. Backend accepted the signature and Hedera settled. Arc verification transfer became uncertain; a 50000 micro-USDC reservation remains pending and must not be retried before reconciliation.",
+  "run": {
+    "id": "61be389c-ab9a-4ea4-8b02-957aa4bd2b5e",
+    "mode": "live",
+    "title": "Compare next.js, kit",
+    "repos": [
+      "vercel/next.js",
+      "sveltejs/kit"
+    ],
+    "status": "failed",
+    "stage": "verification",
+    "createdAt": "2026-09-08T18:05:45.582Z",
+    "updatedAt": "2026-09-08T18:09:15.244Z",
+    "mandate": {
+      "dataBudgetAtomic": 800000,
+      "maxDataUnitPriceAtomic": 400000,
+      "verificationBudgetAtomic": 50000,
+      "allowedProviders": [
+        "repo-standard"
+      ],
+      "expiresAt": "2026-09-08T19:05:45.728Z",
+      "version": 2
+    },
+    "dataSpentAtomic": 800000,
+    "verificationSpentAtomic": 0,
+    "receipts": [
+      {
+        "id": "hedera-61be389c-ab9a-4ea4-8b02-957aa4bd2b5e:data",
+        "requestId": "61be389c-ab9a-4ea4-8b02-957aa4bd2b5e:data",
+        "mode": "live",
+        "network": "hedera:testnet",
+        "asset": "HBAR",
+        "amountAtomic": 800000,
+        "units": 2,
+        "provider": "repo-standard",
+        "status": "settled",
+        "timestamp": "2026-09-08T18:08:23.897Z",
+        "transactionId": "0.0.7162784@1788890889.523865223",
+        "explorerUrl": "https://hashscan.io/testnet/transaction/0.0.7162784%401788890889.523865223"
+      }
+    ],
+    "events": [
+      {
+        "id": "0374a86c-3905-4f3e-8ec0-1ff0b2a86daf",
+        "timestamp": "2026-09-08T18:05:45.582Z",
+        "actor": "supervisor",
+        "kind": "info",
+        "title": "Mandate created",
+        "detail": "Up to 0.002 HBAR for evidence and 0.05 USDC for verification. Expires 2026-09-08T18:35:42.849Z.",
+        "previousHash": "genesis",
+        "hash": "d8f6197c101f323e1af12cf55ef0b9c0efdcc41d59467665569fe7602c6ee6b2"
+      },
+      {
+        "id": "92d415ef-90b1-4e3c-ac27-354de340a5e4",
+        "timestamp": "2026-09-08T18:05:45.610Z",
+        "actor": "broker",
+        "kind": "success",
+        "title": "Mandate accepted",
+        "detail": "Only named services can receive requests. Wallet and provider credentials remain outside the agent.",
+        "previousHash": "d8f6197c101f323e1af12cf55ef0b9c0efdcc41d59467665569fe7602c6ee6b2",
+        "hash": "b99acfe4241a801d8d78369bd94db6a1549a909e2fed2c6699b28fd3c74cd700"
+      },
+      {
+        "id": "69c76b6b-e228-4723-8b26-c847ddff85dd",
+        "timestamp": "2026-09-08T18:05:45.638Z",
+        "actor": "planner",
+        "kind": "success",
+        "title": "Services discovered",
+        "detail": "Selected Repository Standard at 0.001 HBAR per repository from 1 approved quotes.",
+        "previousHash": "b99acfe4241a801d8d78369bd94db6a1549a909e2fed2c6699b28fd3c74cd700",
+        "hash": "8ba25b9f9b32bbb43f718ef989dbcdf811d9c92c760afa40e811da67bcdd6710"
+      },
+      {
+        "id": "2909c779-f89e-4491-a494-bc5338eeae6f",
+        "timestamp": "2026-09-08T18:05:45.715Z",
+        "actor": "supervisor",
+        "kind": "warning",
+        "title": "Provider price increased",
+        "detail": "Quotes increased to 0.004 HBAR/repository and 0.0045 HBAR/repository. The planner must evaluate the new prices before paying.",
+        "previousHash": "8ba25b9f9b32bbb43f718ef989dbcdf811d9c92c760afa40e811da67bcdd6710",
+        "hash": "7b5b6809597474040da34ae1bb0a48d958909ec647c16fe3d14982cd63e0f4f0"
+      },
+      {
+        "id": "8ca711f0-c7a4-44ab-bee3-a92b8bfbf546",
+        "timestamp": "2026-09-08T18:05:45.728Z",
+        "actor": "planner",
+        "kind": "blocked",
+        "title": "Human approval required",
+        "detail": "The provider quote exceeds the approved price per repository.",
+        "previousHash": "7b5b6809597474040da34ae1bb0a48d958909ec647c16fe3d14982cd63e0f4f0",
+        "hash": "94acb3bec2c74b757e00faf35033031c61001cba05ab98352ce4f27a9f32e6d2"
+      },
+      {
+        "id": "1d49d8ee-0567-4d6d-8e9d-a470f16bb5fa",
+        "timestamp": "2026-09-08T18:08:07.085Z",
+        "actor": "supervisor",
+        "kind": "success",
+        "title": "Controller signature verified",
+        "detail": "Mandate version 2; nonce c32e3870-4708-4602-82fb-08f98d3d4c25 consumed. Speculos emulator signature verified; not physical hardware evidence.",
+        "previousHash": "94acb3bec2c74b757e00faf35033031c61001cba05ab98352ce4f27a9f32e6d2",
+        "hash": "8a52f77068660e00ce97441548fa398637cc92d536b5a9faf4ede0718fe5c772"
+      },
+      {
+        "id": "e6bcab39-91a8-4d31-b9e9-e167f882bf16",
+        "timestamp": "2026-09-08T18:08:14.416Z",
+        "actor": "broker",
+        "kind": "info",
+        "title": "Payment authorized",
+        "detail": "Request 61be389c-ab9a-4ea4-8b02-957aa4bd2b5e:data: 800000 tinybar for 2 repository units. A failed or uncertain transfer is never automatically repeated.",
+        "previousHash": "8a52f77068660e00ce97441548fa398637cc92d536b5a9faf4ede0718fe5c772",
+        "hash": "ba6d85ce3d17680cd69e562723625b4bdaff62d289db56b51c50d1bc879ddb1c"
+      },
+      {
+        "id": "dbcab47d-5a03-4dd9-b35a-ae5ee8973050",
+        "timestamp": "2026-09-08T18:08:23.924Z",
+        "actor": "broker",
+        "kind": "success",
+        "title": "Hedera payment settled",
+        "detail": "0.008 HBAR purchased 2 source records. 0.0.7162784@1788890889.523865223",
+        "previousHash": "ba6d85ce3d17680cd69e562723625b4bdaff62d289db56b51c50d1bc879ddb1c",
+        "hash": "adb8ace38e0b7f2dd3cbd33cb2eb8466a533b21ecc6641d33a96617de194f0c6"
+      },
+      {
+        "id": "b13f2cc3-2b8d-45ea-948b-1e953ad40ee9",
+        "timestamp": "2026-09-08T18:08:43.387Z",
+        "actor": "worker",
+        "kind": "success",
+        "title": "Report drafted",
+        "detail": "Model-generated analysis grounded in 2 purchased records. Source-integrity and structural checks are still pending.",
+        "previousHash": "adb8ace38e0b7f2dd3cbd33cb2eb8466a533b21ecc6641d33a96617de194f0c6",
+        "hash": "fc3c77cc2c022300582f4c783ab7bf5a1df906426dc90ac547ac2d439b27d43d"
+      },
+      {
+        "id": "7344ba06-e483-424d-b273-74a67786ebf3",
+        "timestamp": "2026-09-08T18:09:15.233Z",
+        "actor": "broker",
+        "kind": "blocked",
+        "title": "Run stopped",
+        "detail": "Broker operation failed (409). Inspect the broker locally; no payment retry was made.",
+        "previousHash": "fc3c77cc2c022300582f4c783ab7bf5a1df906426dc90ac547ac2d439b27d43d",
+        "hash": "87cb77eb2224d8a2e5cb42c486fb43651df0028db90c3da43c8eef7261364c65"
+      }
+    ],
+    "shockApplied": true,
+    "selectedProvider": "repo-standard",
+    "authorizations": [
+      {
+        "mode": "live",
+        "nonce": "c32e3870-4708-4602-82fb-08f98d3d4c25",
+        "message": "Obolos mandate authorization\nPurpose: approve spending limits only; this does not sign a token transfer.\nRun: 61be389c-ab9a-4ea4-8b02-957aa4bd2b5e\nMode: live\nSigner: Speculos emulator (development only; not physical hardware)\nNonce: c32e3870-4708-4602-82fb-08f98d3d4c25\nApproval expires: 2026-09-08T18:10:45.728Z\nPrevious mandate version: 1\nNew mandate: {\"dataBudgetAtomic\":800000,\"maxDataUnitPriceAtomic\":400000,\"verificationBudgetAtomic\":50000,\"allowedProviders\":[\"repo-standard\"],\"expiresAt\":\"2026-09-08T19:05:45.728Z\",\"version\":2}",
+        "verifiedAt": "2026-09-08T18:08:07.085Z",
+        "previousMandate": {
+          "dataBudgetAtomic": 200000,
+          "maxDataUnitPriceAtomic": 100000,
+          "verificationBudgetAtomic": 50000,
+          "allowedProviders": [
+            "repo-standard"
+          ],
+          "expiresAt": "2026-09-08T18:35:42.849Z",
+          "version": 1
+        },
+        "approvedMandate": {
+          "dataBudgetAtomic": 800000,
+          "maxDataUnitPriceAtomic": 400000,
+          "verificationBudgetAtomic": 50000,
+          "allowedProviders": [
+            "repo-standard"
+          ],
+          "expiresAt": "2026-09-08T19:05:45.728Z",
+          "version": 2
+        },
+        "signer": "0xA7a1C8b8d1aa6c5B32aECB56F4396A353c5f81fa",
+        "signature": "0x6236552a2516990fbc47a4a1631038c522c95029c1074b2703e288e512881f11527600fe312515df2bca89428370443d8b833e297d0838b96e5e30acf0534d131c",
+        "signerMode": "speculos"
+      }
+    ]
+  },
+  "verificationPayment": {
+    "network": "arc:testnet",
+    "asset": "USDC",
+    "amountAtomic": 50000,
+    "status": "uncertain",
+    "confirmedReceipt": false,
+    "action": "Do not retry, clear the reservation, or create a new payment request to bypass it. Reconcile the existing intent first."
+  },
+  "reportGenerated": true
+}
