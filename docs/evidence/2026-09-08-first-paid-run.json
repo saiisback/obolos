@@ -1,0 +1,284 @@
+{
+  "schema": "obolos.evidence.v1",
+  "exportedAt": "2026-09-08T17:47:17.826Z",
+  "auditChainValid": true,
+  "disclosure": "Live mode: inspect each settled receipt and source timestamp. Configuration alone does not establish qualification.",
+  "run": {
+    "id": "7536c82f-0c62-47b0-97bd-0f43992fa024",
+    "mode": "live",
+    "title": "Compare next.js, kit, react-router",
+    "repos": [
+      "vercel/next.js",
+      "sveltejs/kit",
+      "remix-run/react-router"
+    ],
+    "status": "completed",
+    "stage": "complete",
+    "createdAt": "2026-09-08T17:46:50.371Z",
+    "updatedAt": "2026-09-08T17:47:17.803Z",
+    "mandate": {
+      "dataBudgetAtomic": 300000,
+      "maxDataUnitPriceAtomic": 100000,
+      "verificationBudgetAtomic": 50000,
+      "allowedProviders": [
+        "repo-standard"
+      ],
+      "expiresAt": "2026-09-08T18:16:48.609Z",
+      "version": 1
+    },
+    "providers": [
+      {
+        "id": "repo-standard",
+        "name": "Repository Standard",
+        "description": "Live public GitHub metadata, timestamped per request. Both tiers use the same source for transparent price competition.",
+        "network": "hedera:testnet",
+        "asset": "HBAR",
+        "unit": "repository",
+        "unitPriceAtomic": 100000,
+        "endpoint": "http://127.0.0.1:4402/evidence/repo-standard"
+      },
+      {
+        "id": "repo-economy",
+        "name": "Repository Economy",
+        "description": "Live public GitHub metadata, timestamped per request. Both tiers use the same source for transparent price competition.",
+        "network": "hedera:testnet",
+        "asset": "HBAR",
+        "unit": "repository",
+        "unitPriceAtomic": 120000,
+        "endpoint": "http://127.0.0.1:4402/evidence/repo-economy"
+      }
+    ],
+    "dataSpentAtomic": 300000,
+    "verificationSpentAtomic": 50000,
+    "evidence": [
+      {
+        "repo": "vercel/next.js",
+        "description": "The React Framework",
+        "stars": 142216,
+        "forks": 31895,
+        "openIssues": 3298,
+        "pushedAt": "2026-09-08T17:37:07Z",
+        "language": "JavaScript",
+        "license": "MIT",
+        "sourceUrl": "https://api.github.com/repos/vercel/next.js",
+        "fetchedAt": "2026-09-08T17:46:54.540Z"
+      },
+      {
+        "repo": "sveltejs/kit",
+        "description": "web development, streamlined",
+        "stars": 20791,
+        "forks": 2314,
+        "openIssues": 799,
+        "pushedAt": "2026-09-08T17:41:13Z",
+        "language": "JavaScript",
+        "license": "MIT",
+        "sourceUrl": "https://api.github.com/repos/sveltejs/kit",
+        "fetchedAt": "2026-09-08T17:46:54.540Z"
+      },
+      {
+        "repo": "remix-run/react-router",
+        "description": "Declarative routing for React",
+        "stars": 56577,
+        "forks": 10915,
+        "openIssues": 179,
+        "pushedAt": "2026-09-08T16:23:16Z",
+        "language": "TypeScript",
+        "license": "MIT",
+        "sourceUrl": "https://api.github.com/repos/remix-run/react-router",
+        "fetchedAt": "2026-09-08T17:46:54.539Z"
+      }
+    ],
+    "receipts": [
+      {
+        "id": "hedera-7536c82f-0c62-47b0-97bd-0f43992fa024:data",
+        "requestId": "7536c82f-0c62-47b0-97bd-0f43992fa024:data",
+        "mode": "live",
+        "network": "hedera:testnet",
+        "asset": "HBAR",
+        "amountAtomic": 300000,
+        "units": 3,
+        "provider": "repo-standard",
+        "status": "settled",
+        "timestamp": "2026-09-08T17:47:00.400Z",
+        "transactionId": "0.0.7162784@1788889605.646083348",
+        "explorerUrl": "https://hashscan.io/testnet/transaction/0.0.7162784%401788889605.646083348"
+      },
+      {
+        "id": "arc-0x4d97395a52897a1b9c1255b1a9ba8023cec742ef64cb838a65962001930b81fe",
+        "requestId": "7536c82f-0c62-47b0-97bd-0f43992fa024:verify",
+        "mode": "live",
+        "network": "arc:testnet",
+        "asset": "USDC",
+        "amountAtomic": 50000,
+        "units": 1,
+        "provider": "arc-verifier",
+        "status": "settled",
+        "timestamp": "2026-09-08T17:47:17.782Z",
+        "transactionId": "0x4d97395a52897a1b9c1255b1a9ba8023cec742ef64cb838a65962001930b81fe",
+        "explorerUrl": "https://testnet.arcscan.app/tx/0x4d97395a52897a1b9c1255b1a9ba8023cec742ef64cb838a65962001930b81fe"
+      }
+    ],
+    "events": [
+      {
+        "id": "b7cdf0bb-ba94-4d27-8659-93ed419f18f8",
+        "timestamp": "2026-09-08T17:46:50.371Z",
+        "actor": "supervisor",
+        "kind": "info",
+        "title": "Mandate created",
+        "detail": "Up to 0.003 HBAR for evidence and 0.05 USDC for verification. Expires 2026-09-08T18:16:48.609Z.",
+        "previousHash": "genesis",
+        "hash": "01fd9511ac139693f1c69588930e7ed193b93fb8817984d94f8f3752a004e40e"
+      },
+      {
+        "id": "3d91d4bc-d24a-4e47-ac0e-918856178c9b",
+        "timestamp": "2026-09-08T17:46:51.153Z",
+        "actor": "broker",
+        "kind": "success",
+        "title": "Mandate accepted",
+        "detail": "Only named services can receive requests. Wallet and provider credentials remain outside the agent.",
+        "previousHash": "01fd9511ac139693f1c69588930e7ed193b93fb8817984d94f8f3752a004e40e",
+        "hash": "cc0a0d9d01517bcb9278eba6b6489619b2629b75eeaf72980a4da5f942789b0d"
+      },
+      {
+        "id": "5d3bb48e-d941-4d87-9ec8-bbbae233eede",
+        "timestamp": "2026-09-08T17:46:51.175Z",
+        "actor": "planner",
+        "kind": "success",
+        "title": "Services discovered",
+        "detail": "Selected Repository Standard at 0.001 HBAR per repository from 1 approved quotes.",
+        "previousHash": "cc0a0d9d01517bcb9278eba6b6489619b2629b75eeaf72980a4da5f942789b0d",
+        "hash": "1ccec54bfe9574a59778b56e6fa1b0bb746de1a2171352020db843d3008ec186"
+      },
+      {
+        "id": "32b2824c-54c6-4a24-9287-cf5a14ae5192",
+        "timestamp": "2026-09-08T17:46:51.187Z",
+        "actor": "broker",
+        "kind": "info",
+        "title": "Payment authorized",
+        "detail": "Request 7536c82f-0c62-47b0-97bd-0f43992fa024:data: 300000 tinybar for 3 repository units. A failed or uncertain transfer is never automatically repeated.",
+        "previousHash": "1ccec54bfe9574a59778b56e6fa1b0bb746de1a2171352020db843d3008ec186",
+        "hash": "f73fc64581d359e458dbda60e1303d71d581077c15ff56f6ccfe7e6ddde1781e"
+      },
+      {
+        "id": "69b36b08-936f-431e-ba17-ea1960361554",
+        "timestamp": "2026-09-08T17:47:00.429Z",
+        "actor": "broker",
+        "kind": "success",
+        "title": "Hedera payment settled",
+        "detail": "0.003 HBAR purchased 3 source records. 0.0.7162784@1788889605.646083348",
+        "previousHash": "f73fc64581d359e458dbda60e1303d71d581077c15ff56f6ccfe7e6ddde1781e",
+        "hash": "b57f1312b0661596e4f70a93d149b695b70385993a3ce2faa403905310043b7d"
+      },
+      {
+        "id": "bb11d0ab-2f3f-421b-8d90-2a15327db19b",
+        "timestamp": "2026-09-08T17:47:05.769Z",
+        "actor": "worker",
+        "kind": "success",
+        "title": "Report drafted",
+        "detail": "Model-generated analysis grounded in 3 purchased records. Source-integrity and structural checks are still pending.",
+        "previousHash": "b57f1312b0661596e4f70a93d149b695b70385993a3ce2faa403905310043b7d",
+        "hash": "08abf7fa77205ae1ce819ca79b52acd6a7c581c7315b62b742fd88056ce97601"
+      },
+      {
+        "id": "c32ddb9a-abcf-4685-8708-a1872a68f400",
+        "timestamp": "2026-09-08T17:47:17.803Z",
+        "actor": "verifier",
+        "kind": "success",
+        "title": "Evidence checked · job complete",
+        "detail": "8 structural/source checks passed. Narrative judgment is not independently certified. Arc USDC settlement confirmed.",
+        "previousHash": "08abf7fa77205ae1ce819ca79b52acd6a7c581c7315b62b742fd88056ce97601",
+        "hash": "2a8055d02154e209cfcdc87df8b38f1f73a9a81ff99039543222ca8d25bf1f05"
+      }
+    ],
+    "shockApplied": false,
+    "selectedProvider": "repo-standard",
+    "report": {
+      "title": "Compare next.js, kit, react-router",
+      "summary": "Evidence provided is a JSON array listing three GitHub repositories. I will compare the supplied metrics and cite the provided source URLs for each repository. I am not making any claims beyond the data given, and I note these metrics reflect maintenance/activity indicators rather than security assurances.\n\nRepositories covered (full owner/repo names and source URLs):\n- vercel/next.js\n  - Source URL: https://api.github.com/repos/vercel/next.js\n  - Metrics (as provided):\n    - description: The React Framework\n    - stars: 142216\n    - forks: 31895\n    - openIssues: 3298\n    - pushedAt: 2026-09-08T17:37:07Z\n    - language: JavaScript\n    - license: MIT\n    - fetchedAt: 2026-09-08T17:46:54.540Z\n\n- sveltejs/kit\n  - Source URL: https://api.github.com/repos/sveltejs/kit\n  - Metrics (as provided):\n    - description: web development, streamlined\n    - stars: 20791\n    - forks: 2314\n    - openIssues: 799\n    - pushedAt: 2026-09-08T17:41:13Z\n    - language: JavaScript\n    - license: MIT\n    - fetchedAt: 2026-09-08T17:46:54.540Z\n\n- remix-run/react-router\n  - Source URL: https://api.github.com/repos/remix-run/react-router\n  - Metrics (as provided):\n    - description: Declarative routing for React\n    - stars: 56577\n    - forks: 10915\n    - openIssues: 179\n    - pushedAt: 2026-09-08T16:23:16Z\n    - language: TypeScript\n    - license: MIT\n    - fetchedAt: 2026-09-08T17:46:54.539Z\n\nNotes on interpretation:\n- Distinctions: The data distinguishes maintenance/activity indicators (stars, forks, open issues, last pushed date) from software quality indicators (which are not provided here beyond language and license). The metrics cannot be used to establish security.\n- All timing stamps reflect the provided data snapshot times and should be treated as such.\n- I am not introducing any additional facts beyond the supplied metrics and URLs.",
+      "recommendation": "Use these observations as a starting point. Validate framework suitability against your project requirements; popularity is not a quality guarantee.",
+      "evidence": [
+        {
+          "repo": "vercel/next.js",
+          "description": "The React Framework",
+          "stars": 142216,
+          "forks": 31895,
+          "openIssues": 3298,
+          "pushedAt": "2026-09-08T17:37:07Z",
+          "language": "JavaScript",
+          "license": "MIT",
+          "sourceUrl": "https://api.github.com/repos/vercel/next.js",
+          "fetchedAt": "2026-09-08T17:46:54.540Z"
+        },
+        {
+          "repo": "sveltejs/kit",
+          "description": "web development, streamlined",
+          "stars": 20791,
+          "forks": 2314,
+          "openIssues": 799,
+          "pushedAt": "2026-09-08T17:41:13Z",
+          "language": "JavaScript",
+          "license": "MIT",
+          "sourceUrl": "https://api.github.com/repos/sveltejs/kit",
+          "fetchedAt": "2026-09-08T17:46:54.540Z"
+        },
+        {
+          "repo": "remix-run/react-router",
+          "description": "Declarative routing for React",
+          "stars": 56577,
+          "forks": 10915,
+          "openIssues": 179,
+          "pushedAt": "2026-09-08T16:23:16Z",
+          "language": "TypeScript",
+          "license": "MIT",
+          "sourceUrl": "https://api.github.com/repos/remix-run/react-router",
+          "fetchedAt": "2026-09-08T17:46:54.539Z"
+        }
+      ],
+      "generatedBy": "model",
+      "createdAt": "2026-09-08T17:47:05.769Z",
+      "checks": [
+        {
+          "label": "Source coverage",
+          "passed": true,
+          "detail": "3 distinct repository records are attached."
+        },
+        {
+          "label": "Source attribution",
+          "passed": true,
+          "detail": "Every record points to its exact GitHub API source."
+        },
+        {
+          "label": "Valid observed counts",
+          "passed": true,
+          "detail": "Stars, forks and issue counts are non-negative integers."
+        },
+        {
+          "label": "Observation timestamps",
+          "passed": true,
+          "detail": "Each observation includes fetch and last-push timestamps."
+        },
+        {
+          "label": "Purchased evidence integrity",
+          "passed": true,
+          "detail": "Report evidence is compared byte-for-byte after canonical JSON ordering to the settled data purchase."
+        },
+        {
+          "label": "Canonical public sources",
+          "passed": true,
+          "detail": "Every source URL must identify the exact purchased GitHub repository."
+        },
+        {
+          "label": "Evidence freshness",
+          "passed": true,
+          "detail": "Each evidence record was fetched within the last 24 hours."
+        },
+        {
+          "label": "Repository coverage",
+          "passed": true,
+          "detail": "The written report explicitly names every repository in the comparison. These checks do not establish all prose claims as true."
+        }
+      ],
+      "verified": true
+    }
+  }
+}

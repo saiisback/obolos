@@ -2,7 +2,7 @@
 
 Obolos supports an explicit emulator mode while retaining USB Ledger support. This uses actual Ledger Sync and Ethereum applications in Speculos, a disclosed adaptation of upstream `wallet-cli ring`, and Ledger's real staging trustchain service. It does not enable the mocked SDK. Emulator approvals are labeled in the console and exported proof; the signed mandate includes the emulator disclosure. Changing signer mode while an approval is pending invalidates that approval.
 
-**Verified on September 8, 2026:** actual Sync and Ethereum APDU identity, staging challenge authentication, password-protected Ring enrollment, and an encrypt/decrypt round-trip using harmless test data. Tampered ciphertext, a wrong key domain and a wrong password all failed without creating plaintext output. See [Ring execution evidence](../tools/ledger-speculos/ring-evidence.json). A real Ethereum emulator personal-message signature also verified; its message explicitly authorized no payment or permission change. The actual broker credential bundle is still missing. These checks do not establish paid Hedera/Arc requests or bounty eligibility.
+**Verified on September 8, 2026:** actual Sync and Ethereum APDU identity, staging challenge authentication, password-protected Ring enrollment, and an encrypt/decrypt round-trip using harmless test data. Tampered ciphertext, a wrong key domain and a wrong password all failed without creating plaintext output. See [Ring execution evidence](../tools/ledger-speculos/ring-evidence.json). A real Ethereum emulator personal-message signature also verified; its message explicitly authorized no payment or permission change. The actual broker bundle was subsequently provisioned and used in the [first paid Hedera/Arc workflow](evidence/2026-09-08-first-paid-run.md). Emulator checks alone do not establish bounty eligibility.
 
 ## Start
 
@@ -71,4 +71,4 @@ Confirm the pinned address and read the exact message in the Ethereum emulator a
 
 ## Remaining submission evidence
 
-Hedera and Arc settlement use real testnets independently of the emulator. They still require a complete paid run, live HTTPS service and recorded receipts. Ledger's published bounty does not explicitly confirm emulator-only acceptance; ask [official support](https://t.me/LedgerETHGlobal). Keep the source adaptation, development attestation, software-held seed and staging service disclosed. Do not claim hardware-backed secret protection from Speculos.
+Hedera and Arc settlement use real testnets independently of the emulator. The first paid run and its receipts are recorded above. Public HTTPS hosting and the recorded mandate-escalation demo remain outstanding. Ledger's published bounty does not explicitly confirm emulator-only acceptance; ask [official support](https://t.me/LedgerETHGlobal). Keep the source adaptation, development attestation, software-held seed and staging service disclosed. Do not claim hardware-backed secret protection from Speculos.

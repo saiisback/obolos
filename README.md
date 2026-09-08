@@ -16,9 +16,9 @@ A user asks: *Compare these three developer tools using current repository activ
 
 | Target track | Integration in Obolos | Evidence still needed |
 |---|---|---|
-| Ledger — AI Agents x Ledger | `wallet-cli ring` integration plus explicit Speculos development support using upstream commands, real Sync/Ethereum apps and Ledger staging; signed mandate increases | Actual broker credential bundle, paid demo and tooling feedback; emulator-only eligibility needs sponsor confirmation |
-| Hedera — AI & Agentic Payments | Per-repository HBAR pricing, native x402 challenges, Blocky402 settlement and a consuming planner | Public HTTPS service and a real paid request with matching receipt |
-| Circle — Best Agentic Economy Application with Circle Agent Stack | Circle Agent Wallet pays the verification capability in USDC on Arc testnet | Funded agent wallet, confirmed transfer and narrated demo/presentation |
+| Ledger — AI Agents x Ledger | `wallet-cli ring` integration plus explicit Speculos development support using upstream commands, real Sync/Ethereum apps and Ledger staging; signed mandate increases | Recorded mandate-escalation demo and tooling feedback; emulator-only eligibility needs sponsor confirmation |
+| Hedera — AI & Agentic Payments | Per-repository HBAR pricing, native x402 challenges, Blocky402 settlement and a consuming planner | Public HTTPS service and demo video; first paid request and receipt verified |
+| Circle — Best Agentic Economy Application with Circle Agent Stack | Circle Agent Wallet pays the verification capability in USDC on Arc testnet | Narrated demo/presentation; funded wallet and first USDC transfer verified |
 
 The frontend and backend use **Next.js, React and TypeScript**. Separate Node services implement the metered API and private capability broker. The interface uses the user-selected Foundation reference on Mobbin, black-and-white surfaces, orange actions and an original flat illustration.
 
@@ -69,6 +69,8 @@ The on-chain part is payment settlement on Hedera and Arc. The model, planner, b
 The data service charges **per repository**, so one repository costs one unit and three cost three units. The planner selects the cheapest permitted quote. Price increases can trigger rerouting or require a new mandate. Verification is a separate fixed-fee job paid in Arc USDC. Network fees are **not included** in purchase allowances.
 
 See [architecture and trust boundaries](docs/architecture.md), [Hedera setup](docs/hedera-setup.md) and [broker, Circle and Ledger setup](docs/broker-setup.md).
+
+The [first paid testnet run](docs/evidence/2026-09-08-first-paid-run.md) completed on September 8, 2026: three repository records purchased for 0.003 HBAR through Blocky402, GPT-5 nano report generation, and verification settled for 0.05 USDC on Arc. Transaction links and the application export are included.
 
 ## Live setup
 
