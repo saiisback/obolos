@@ -24,8 +24,12 @@ Do not present this slide deck as the required demo video. Record the actual app
 
 The [submission matrix](submission.md) tracks qualification artifacts; the [Ledger feedback draft](ledger-feedback.md) is ready for operator review and has not been sent externally.
 
-## Narrated evidence demo
+## Video correction and human recording
 
-[Watch the testnet demo](presentation/obolos-testnet-demo.mp4). The video combines read-only captures of actual saved application runs, recorded Speculos signing footage, a [fresh public paid request executing](evidence/2026-09-08-final-recorded-public-purchase.md), and architecture slides. macOS Samantha provides disclosed synthetic narration. Waiting time in the emulator segment is condensed; no transfer or signature is simulated.
+**The earlier synthetic-voice video is an internal preview and must not be submitted.** The [official ETHOnline instructions](https://ethglobal.com/events/ethonline2026/info/details) prohibit text-to-speech/AI voiceover and speeding up footage, and require 2–4 minutes at 720p or above. Disclosing Samantha does not make synthetic narration acceptable.
 
-The three executions remain distinct: the first completed both payment rails, the approved escalation settled Hedera but left Arc uncertain, and the public request purchased data only and was paused. The public data-only segment visibly shows mandate acceptance, discovery and the settled purchase. This is an edited walkthrough of separate executions, not a continuous recording of one entire two-rail run.
+Use the [silent human-narration visual bed](presentation/obolos-human-narration-visual-bed.mp4) with the [timed human script and Mac recording steps](presentation/demo-transcript.md). It preserves original playback speed for the actual Speculos and public paid-request clips. Human narration remains required before upload.
+
+The [old TTS preview — DO NOT SUBMIT](presentation/obolos-internal-tts-preview-DO-NOT-SUBMIT.mp4) is retained only as an internal historical artifact. Its Speculos segment was also compressed from 30 seconds to approximately 28.35 seconds; the visual bed replaces it with the original 30-second footage. No old synthetic audio is included in the visual bed.
+
+The first completed two-rail run, partially completed escalation and actual public data-only purchase remain distinct. The public segment visibly executes the paid purchase; saved report/receipt views are later read-only captures. This is an edited walkthrough of separate executions, not one continuous two-rail recording.

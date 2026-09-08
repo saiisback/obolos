@@ -14,6 +14,12 @@ This is the intended full-flow recording plan; the actual evidence video must di
 | 2:50–3:15 | Source checks, saved authorization history, JSON export, Connections evidence counts | “We retain source timestamps, settled receipts and the approval proof. These checks cover source integrity and structure; they do not certify every model statement.” |
 | 3:15–3:50 | Architecture diagram, short Ring provisioning clip and trust boundary | “Ledger Sync enrolls the Ring. The trusted broker decrypts stored secrets in memory. Ethereum signs mandate approvals. Circle has separate MPC custody. Payments settle on-chain; the model, orchestration and service infrastructure remain off-chain.” |
 
+## Required video correction
+
+The previous synthetic-narration preview must not be submitted. ETHOnline prohibits TTS/AI voiceover and speeding up video, requires 2–4 minutes, and requires at least 720p. Editing out waiting is permitted. [Official event rules](https://ethglobal.com/events/ethonline2026/info/details).
+
+Use the [original-speed silent visual bed](presentation/obolos-human-narration-visual-bed.mp4) and [timed human script with Mac recording steps](presentation/demo-transcript.md). Record your own voice. The silent bed and internal TTS preview are both incomplete submission artifacts until compliant human narration is added.
+
 ## Before recording
 
 Complete [live setup](live-setup.md) yourself: funded testnet payer and recipients, Circle email-OTP session, Ring enrollment, an emulator-confirmed controller address in explicit Speculos mode, the inference credential and real service deployment. Run read-only preflight and inspect Connections, then separately prove live payments. Do not record private files, OTPs, the Ring password, recovery phrases or tokens.

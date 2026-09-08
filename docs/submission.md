@@ -19,7 +19,7 @@ The [first paid testnet run](evidence/2026-09-08-first-paid-run.md) completed th
 | Arc + USDC + Circle Agent Stack | Circle Agent Wallet CLI paid actual canonical USDC on Arc testnet; [Arc receipt](https://testnet.arcscan.app/tx/0x4d97395a52897a1b9c1255b1a9ba8023cec742ef64cb838a65962001930b81fe). | No extra Circle API-key path, Nanopayments or Paymaster is claimed. |
 | Decision logic tied to real signals | Quotes, provider allowlist, expiry, separate currency budgets and current evidence drive the workflow. | Actual increase, zero-spend pause, signed mandate version 2 and resumed Hedera settlement exported. Arc reconciliation and recording remain. |
 | Working frontend/backend and diagram | Next.js console, broker, data service and first paid HTTP workflow; [visible SVG diagram in the presentation](presentation/index.html#slide-3). | Public service and final narrated product recording. |
-| Video and presentation | [Seven-slide browser/printable deck](presentation/index.html), [talk track](presentation.md), [demo script](demo-script.md). | [Narrated edited evidence demo](presentation/obolos-testnet-demo.mp4) combines actual saved app views and recorded emulator signing. Includes a [fresh public request visibly executing](evidence/2026-09-08-final-recorded-public-purchase.md). Separate runs are explicitly labeled; it is not a single continuous two-rail recording. |
+| Video and presentation | [Seven-slide deck](presentation/index.html), original-speed [silent visual bed](presentation/obolos-human-narration-visual-bed.mp4), and [timed human script](presentation/demo-transcript.md). Actual public purchase and emulator signing are recorded. | Human narration and final upload remain required. The old synthetic preview is prohibited by event rules and must not be submitted. |
 
 ### Approved escalation with a pending Arc transfer
 
@@ -28,6 +28,10 @@ A fresh [approved price-increase run](evidence/2026-09-08-approved-price-increas
 ### Public deployment
 
 [obolos.app](https://obolos.app) and its `/x402` service completed a [public paid one-record request](evidence/2026-09-08-public-data-purchase.md) for 0.001 HBAR. This separate run paused before inference/Arc. Vercel currently proxies through temporary Cloudflare tunnels to persistent Mac processes; the Mac and tunnels must remain online. Durable VPS deployment remains separate.
+
+## Video rule correction
+
+The [official ETHOnline instructions](https://ethglobal.com/events/ethonline2026/info/details) explicitly prohibit text-to-speech/AI voiceover and speeding up footage. Disclosing synthetic narration is insufficient. The previous TTS video is retained only as an internal preview; the original-speed silent visual bed still requires the team’s own spoken narration before submission.
 
 ## Submission package
 
@@ -40,10 +44,11 @@ A fresh [approved price-increase run](evidence/2026-09-08-approved-price-increas
 - [x] Public HTTPS Hedera data service at https://obolos.app/x402, recorded unpaid challenge and actual paid request.
 - [x] Live quote increase, Speculos controller approval and resumed Hedera purchase exported with signature.
 - [ ] Reconcile the uncertain Arc verification transfer in the escalation run; its pending reservation must remain intact.
-- [x] Recorded actual Speculos signing and disclosed the partial escalation outcome in the narrated demo.
+- [x] Recorded actual Speculos signing and disclosed the partial escalation outcome in the visual bed and human narration script.
 - [ ] Deployment with broker OS isolation, durable journals and continuing availability for review.
 - [ ] Developer feedback sent by the team; sponsor response on emulator/source-adapter eligibility recorded.
-- [x] Narrated edited application/evidence demo with synthetic voice disclosed; includes actual recorded Speculos signing.
+- [ ] Human-narrated 2–4 minute demo at 720p or higher. Old TTS preview is internal only and must not be uploaded.
+- [x] Silent visual bed prepared with original-speed Speculos/public execution clips and timed human narration script.
 - [x] Finalized actual screen recording of a fresh public x402 paid request: mandate, discovery, purchase and settled receipt visible.
 - [ ] Team review/upload of the narrated video and submission package.
 - [ ] Organizer determination of the disclosed prior-paper eligibility.
