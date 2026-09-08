@@ -8,6 +8,8 @@
 
 An operator console for agents that buy evidence, pay for verification, and work within a human-defined spending mandate. Built for the **Ledger AI Agents x Ledger**, **Hedera AI & Agentic Payments**, and **Arc Best Agentic Economy Application with Circle Agent Stack** tracks at ETHOnline 2026.
 
+**Self-service preview:** the landing page, wallet sign-in, agent workspace and scoped API credentials are implemented. Account persistence requires a Neon `DATABASE_URL`. New users cannot spend through the operator's wallet; their isolated payment runner and signed-mandate onboarding remain unfinished. See [self-service setup and exact release limits](docs/self-service-setup.md). The original paid demonstration is at `/demo`.
+
 **Status:** the public app and x402 service are available at [obolos.app](https://obolos.app). A complete testnet run bought three records for **0.003 HBAR**, generated a report with GPT-5 nano and paid **0.05 USDC** for verification on Arc. A separate public HTTPS purchase settled **0.001 HBAR**. A real chat-approved Speculos mandate increase also settled **0.008 HBAR**, but its Arc step has an unresolved payment intent and is not retried. See the [evidence matrix](docs/submission.md) and [reconciliation record](docs/evidence/2026-09-08-arc-reconciliation.md).
 
 **Submission video correction (September 9, 2026):** ETHGlobal prohibits synthetic/AI voiceovers and speeding up footage. The earlier narrated MP4 is an internal preview and **must not be submitted**. The [visual bed and human recording guide](docs/presentation.md) require the team’s own voice before upload. See the [official video rules](https://ethglobal.com/events/ethonline2026/info/details).
@@ -37,7 +39,7 @@ npm ci
 npm run dev
 ```
 
-Open http://127.0.0.1:3000. Rehearsal works without environment variables, wallet funding or a Ledger device. Repository data is an explicitly labeled fixture, report text is a template, and receipts say simulated with no chain hash. Changing to live mode never falls back to rehearsal. If you set `APP_ORIGIN`, use that exact origin in your browser.
+Open http://127.0.0.1:3000 for the landing page, or http://127.0.0.1:3000/demo for the operator console. Rehearsal works in the operator console without environment variables, wallet funding or a Ledger device. Repository data is an explicitly labeled fixture, report text is a template, and receipts say simulated with no chain hash. Changing to live mode never falls back to rehearsal. If you set `APP_ORIGIN`, use that exact origin in your browser. Wallet accounts require [Neon setup](docs/self-service-setup.md).
 
 1. Create a research job with one to three GitHub `owner/repository` names.
 2. Set separate HBAR and USDC purchase allowances, a data unit-price cap, permitted providers, and expiry.
