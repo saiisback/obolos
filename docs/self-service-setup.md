@@ -2,7 +2,7 @@
 
 Obolos provides wallet sign-in (`/login`), user-owned agents (`/app`), scoped API access, private runner pairing, signed spending mandates, and persisted jobs with reports and runner-confirmed receipts. The landing page is `/` and the developer guide is `/developers`. The separate operator console remains at `/demo`.
 
-The account, API, and runner flows are implemented. A fresh funded run through the deployed self-service path is still pending; the historical operator payments do not establish that result.
+The deployed account, API and runner path completed a [bounded funded testnet run](evidence/2026-09-09-self-service-testnet.md): one repository purchase for 0.001 HBAR and verification for 0.05 USDC, with both payments independently checked on chain. That test used a generated EOA owner and an explicitly authorized funded broker fixture with Speculos credential retrieval; it does not establish physical Ledger signing or browser-wallet interaction.
 
 ## Configure the application and Neon
 
@@ -55,10 +55,10 @@ A normal owner-wallet signature does not establish physical Ledger use. Speculos
 
 ## Verification and remaining release gates
 
-- [Real Neon account verification](evidence/2026-09-09-neon-accounts.md) records 43 assertions against the local production server using the actual Neon HTTP transport. Those zero-budget checks did not move funds.
+- [Real Neon account verification](evidence/2026-09-09-neon-accounts.md) records 43 assertions against both public HTTPS and the local production server using the actual Neon HTTP transport. Those zero-budget checks did not move funds.
 - Unit and integration tests cover tenant ownership, credential scope, signed mandates, queue reservations, and durable runner recovery. Runner tests use generated signatures and fake gateways; they do not prove settlement.
 - Isolated browser fixture checks cover owner-wallet matching, exact-message signing, pairing, mandate totals, idempotent retries, revocation, visible-only active polling, and result/explorer rendering. Desktop and 390-pixel mobile layouts were checked without overflow.
-- Fresh public deployment verification and a separately authorized, bounded funded self-service run remain release gates until their results are recorded. Preserve the historical unresolved Arc intent; do not retry it as part of this release.
+- The [funded self-service evidence](evidence/2026-09-09-self-service-testnet.md) records the native public deployment, a one-run signed mandate, persisted successful result, and independently checked Hedera and Arc payments. The historical unresolved Arc intent remains preserved and was not retried.
 
 The PostgreSQL integration suite uses a dedicated test database and creates/drops its own random schema:
 
