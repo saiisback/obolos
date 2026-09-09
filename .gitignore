@@ -1,5 +1,6 @@
 node_modules/
 .next/
+.next-*/
 .env*
 !.env.example
 !.env.broker.example
@@ -13,3 +14,4 @@ test-results/
 *.enc
 secrets*.json
 .vercel/
+.vercel

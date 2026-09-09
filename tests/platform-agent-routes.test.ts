@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 
-const database = vi.hoisted(() => ({ query: vi.fn() }));
+const database = vi.hoisted(() => { const transaction=vi.fn();return {query:Object.assign(vi.fn(),{transaction}),transaction}; });
 vi.mock('@/lib/platform/db', () => ({ sql: () => database.query }));
 import { GET, POST } from '@/app/api/v1/agents/[id]/runs/route';
 import { GET as getRun } from '@/app/api/v1/agents/[id]/runs/[runId]/route';
@@ -24,11 +24,12 @@ beforeEach(() => {
   token = createCredential().token;
   credential = { agent_id: agentId, expires_at: '2026-10-01T00:00:00Z', revoked_at: null, checked_at: '2026-09-09T00:00:00Z' };
   database.query.mockReset();
+  database.transaction.mockReset().mockResolvedValue([[],[],[]]);
   // Neon is the sole replaced external boundary. Unexpected reads/writes fail.
   database.query.mockImplementation(async (parts: TemplateStringsArray) => {
     const query = parts.join('?');
     if (query.includes('FROM platform_api_keys')) return [credential];
-    if (query.includes('FROM platform_jobs')) return [];
+    if (query.includes('FROM platform_jobs') || query.includes('platform_runners') || query.includes('FOR UPDATE') || query.includes('WITH inserted')) return [];
     throw new Error('Unexpected database operation');
   });
 });
@@ -41,7 +42,6 @@ describe('tenant run HTTP boundary', () => {
     const response = await POST(request('POST'), { params: Promise.resolve({ id: agentId }) });
     expect(response.status).toBe(409);
     expect(await response.json()).toMatchObject({ code: 'RUNNER_REQUIRED' });
-    expect(database.query).toHaveBeenCalledTimes(1);
     expect(externalCalls).toBe(0);
     expect(response.headers.get('cache-control')).toContain('no-store');
   });

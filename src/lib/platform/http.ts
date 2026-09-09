@@ -27,9 +27,8 @@ export function requireOrigin(req: NextRequest) {
   if (req.headers.get('origin') !== appOrigin() || req.headers.get('sec-fetch-site') === 'cross-site')
     throw new PlatformError(403, 'INVALID_ORIGIN', 'This action must start from your Obolos workspace.');
 }
-export async function readJson(req: NextRequest): Promise<unknown> {
+export async function readJson(req: NextRequest, limit = 16384): Promise<unknown> {
   if (!req.headers.get('content-type')?.toLowerCase().startsWith('application/json')) throw new PlatformError(415, 'JSON_REQUIRED', 'Send application/json.');
-  const limit = 16384;
   if (Number(req.headers.get('content-length') || '0') > limit) throw new PlatformError(413, 'REQUEST_TOO_LARGE', 'The request is too large.');
   const reader = req.body?.getReader();
   if (!reader) throw new PlatformError(400, 'INVALID_REQUEST', 'A JSON body is required.');

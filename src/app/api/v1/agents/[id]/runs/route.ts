@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
-import { listAgentRuns, runnerRequired, validateRunInput } from '@/lib/platform/agents';
+import { listAgentRuns } from '@/lib/platform/agents';
+import { queueRun } from '@/lib/platform/execution';
 import { authenticateAgentKey } from '@/lib/platform/credentials';
 import { platformError, platformJson, readJson } from '@/lib/platform/http';
 
@@ -19,8 +20,7 @@ export async function POST(request: NextRequest, context: Context) {
   try {
     const { id } = await context.params;
     await authenticateAgentKey(request.headers.get('authorization'), id);
-    validateRunInput(await readJson(request), request.headers.get('idempotency-key'));
-    // No job or spend can be created until a tenant execution path is configured.
-    runnerRequired();
+    const queued = await queueRun(id, await readJson(request), request.headers.get('idempotency-key'));
+    return platformJson({ run: queued.run }, queued.replayed ? 200 : 202);
   } catch (error) { return platformError(error); }
 }

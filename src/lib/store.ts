@@ -2,6 +2,7 @@ import { mkdir,readFile,rename,writeFile } from 'node:fs/promises';
 import { join,resolve } from 'node:path';
 import type { Run } from './contracts';
 import { appendAudit } from './policy';
+import { NeonDemoStore } from './platform/demo-store';
 
 interface StoredRun {owner:string;run:Run;inFlight?:{stage:string;startedAt:string}}
 interface Snapshot {version:1;records:StoredRun[]}
@@ -44,5 +45,5 @@ export class RunStore {
   catch(error){record.inFlight=undefined;await this.write(data);throw error;}
  });}
 }
-const g=globalThis as unknown as {agentgdpStore?:RunStore};
-export const store=g.agentgdpStore??=new RunStore();
+const g=globalThis as unknown as {agentgdpStore?:RunStore|NeonDemoStore};
+export const store=g.agentgdpStore??=(process.env.VERCEL==='1'?new NeonDemoStore():new RunStore());

@@ -20,7 +20,8 @@
     "speculos:down": "docker compose -f tools/speculos/compose.yaml down",
     "speculos:ring": "bun --env-file=.env.broker ./tools/ledger-speculos/src/cli.ts",
     "speculos:auth": "cd tools/ledger-speculos && bun src/probe-auth.ts",
-    "db:migrate": "tsx --env-file-if-exists=.env.local scripts/db-migrate.ts"
+    "db:migrate": "tsx --env-file-if-exists=.env.local scripts/db-migrate.ts",
+    "agent:runner": "tsx --env-file=.env.broker --env-file=.env.runner services/agent-runner.ts"
   },
   "dependencies": {
     "@circle-fin/cli": "^1.0.0",

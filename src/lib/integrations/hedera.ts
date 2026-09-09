@@ -4,23 +4,12 @@ import path from 'node:path';
 import type { PaymentRequirements, SettleResponse } from '@x402/core/types';
 import type { DataPurchase, Receipt, RepoEvidence } from '../contracts';
 
-export const HEDERA_NETWORK = 'hedera:testnet' as const;
-export const BLOCKY402_URL = 'https://api.testnet.blocky402.com';
-export const HBAR_ASSET = '0.0.0';
+import { HEDERA_NETWORK, BLOCKY402_URL, HBAR_ASSET, validateRepos } from '../repository-service';
+export { HEDERA_NETWORK, BLOCKY402_URL, HBAR_ASSET, validateRepos } from '../repository-service';
 const accountPattern = /^0\.0\.[1-9]\d*$/;
 const providerIds = ['repo-standard', 'repo-economy'];
 type PurchaseResult = { evidence: RepoEvidence[]; receipt: Receipt };
 export interface HederaCredentials { accountId: string; privateKey: string; keyType?: 'ecdsa' | 'ed25519' | 'der' }
-
-export function validateRepos(value: unknown): string[] {
-  if (!Array.isArray(value) || value.length < 1 || value.length > 3) throw new Error('Provide one to three repositories.');
-  const repos = value.map(repo => {
-    if (typeof repo !== 'string' || !/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})\/[A-Za-z0-9_.-]{1,100}$/.test(repo) || ['.', '..'].includes(repo.split('/')[1])) throw new Error('Invalid GitHub owner/repository.');
-    return repo;
-  });
-  if (new Set(repos.map(repo => repo.toLowerCase())).size !== repos.length) throw new Error('Duplicate repositories are not billable.');
-  return repos;
-}
 
 function positiveAtomic(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value > 0;

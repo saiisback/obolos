@@ -1,0 +1,13 @@
+.env*
+data/
+tools/
+docs/
+tests/
+.superpowers/
+.git/
+node_modules/
+.next/
+.next-*/
+deploy/
+*.enc
+secrets*.json

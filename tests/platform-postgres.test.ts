@@ -13,6 +13,9 @@ import { issueChallenge, redeemChallenge, requireUser, revokeSession, CHALLENGE_
 import { createAgent, listAgents } from '../src/lib/platform/agents';
 import { issueAgentKey, listAgentKeys, revokeAgentKey, authenticateAgentKey } from '../src/lib/platform/credentials';
 import { POST as runPost } from '../src/app/api/v1/agents/[id]/runs/route';
+import { pairRunner, prepareMandate, approveMandate, authenticateRunner, claimJob, queueRun, revokeMandate, saveRunnerResult } from '../src/lib/platform/execution';
+import { createRun } from '../src/lib/engine';
+import { NeonDemoStore } from '../src/lib/platform/demo-store';
 
 describe.skipIf(!process.env.TEST_DATABASE_URL)('PostgreSQL account isolation', () => {
   let admin: pg.Pool;
@@ -110,5 +113,47 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)('PostgreSQL account isolation', 
     expect((await pool.query('SELECT count(*)::int AS count FROM platform_jobs')).rows[0].count).toBe(0);
     await pool.query("UPDATE platform_api_keys SET created_at=now()-interval '2 days',expires_at=now()-interval '1 day' WHERE id=$1",[key.key.id]);
     await expect(authenticateAgentKey(`Bearer ${key.token}`,agent.id)).rejects.toMatchObject({status:401});
+  });
+  it('atomically reserves mandate runs, claims once and persists immutable runner results',async()=>{
+    const a=await identity();
+    const agent=await createAgent(a.user.id,input);
+    const prepared=await prepareMandate(a.user,agent.id,{phase:'prepare',repos:['octocat/Hello-World','vercel/next.js'],maxDataUnitPriceAtomic:150000,maxRuns:2,expiresAt:new Date(Date.now()+3600000).toISOString()});
+    await approveMandate(a.user,agent.id,{phase:'approve',mandateId:prepared.mandate.id,signature:await a.wallet.signMessage({message:prepared.message})});
+    const paired=await pairRunner(a.user.id,agent.id);
+    const runner=await authenticateRunner(`Bearer ${paired.token}`);
+    await expect(queueRun(agent.id,{repos:['octocat/Hello-World']},'before-heartbeat')).rejects.toMatchObject({code:'RUNNER_REQUIRED'});
+    expect(await claimJob(runner)).toEqual({job:null});
+    const queued=await Promise.allSettled([1,2,3].map(i=>queueRun(agent.id,{repos:['octocat/Hello-World']},`job-${i}`)));
+    const successes=queued.filter((r):r is PromiseFulfilledResult<Awaited<ReturnType<typeof queueRun>>>=>r.status==='fulfilled');
+    expect(successes).toHaveLength(2);
+    const firstKey=queued.findIndex(r=>r.status==='fulfilled')+1;
+    const replay=await queueRun(agent.id,{repos:['octocat/Hello-World']},`job-${firstKey}`);
+    expect(replay.replayed).toBe(true);
+    expect(replay.run.id).toBe(successes[0].value.run.id);
+    await expect(queueRun(agent.id,{repos:['vercel/next.js']},`job-${firstKey}`)).rejects.toMatchObject({code:'IDEMPOTENCY_CONFLICT'});
+    const claims=await Promise.all([claimJob(runner),claimJob(runner),claimJob(runner)]);
+    const jobs=claims.flatMap(c=>c.job?[c.job]:[]);
+    expect(jobs).toHaveLength(2);expect(new Set(jobs.map(j=>j.id)).size).toBe(2);
+    const job=jobs[0],m=job.mandate;
+    const result=createRun({mode:'live',repos:job.repos,mandate:{dataBudgetAtomic:m.dataBudgetAtomic,verificationBudgetAtomic:m.verificationBudgetAtomic,maxDataUnitPriceAtomic:m.maxDataUnitPriceAtomic,allowedProviders:m.allowedProviders,expiresAt:m.expiresAt}});
+    result.id=job.id;result.status='failed';result.error='Test stopped before any capability.';
+    const saved=await saveRunnerResult(runner,job.id,{result});
+    expect(saved.run.status).toBe('failed');
+    expect((await saveRunnerResult(runner,job.id,{result})).run.id).toBe(job.id);
+    await expect(saveRunnerResult(runner,job.id,{result:{...result,error:'Different terminal result'}})).rejects.toMatchObject({code:'RESULT_CONFLICT'});
+    const count=await pool.query('SELECT reserved_runs FROM platform_mandates WHERE id=$1',[m.id]);expect(count.rows[0].reserved_runs).toBe(2);
+    await revokeMandate(a.user.id,agent.id);
+    await expect(queueRun(agent.id,{repos:['octocat/Hello-World']},'after-revoke')).rejects.toMatchObject({code:'MANDATE_REQUIRED'});
+  });
+  it('keeps serverless demo ownership and preserves interrupted-operation locks',async()=>{
+    const store=new NeonDemoStore();
+    const run=createRun({mode:'rehearsal',repos:['octocat/Hello-World']});
+    await store.insert('test-owner',run);
+    await expect(store.get('another-owner',run.id)).rejects.toThrow('Run not found');
+    let calls=0;
+    await expect(store.mutate('test-owner',run.id,()=>{calls++;throw Error('Interrupted after dispatch');})).rejects.toThrow('Interrupted after dispatch');
+    await expect(store.mutate('test-owner',run.id,r=>{calls++;return r;})).rejects.toThrow('will not be retried');
+    expect(calls).toBe(1);
+    expect((await store.get('test-owner',run.id)).status).toBe('failed');
   });
 });

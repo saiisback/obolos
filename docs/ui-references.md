@@ -36,3 +36,9 @@ This is a presentation update to the existing Next.js/TypeScript application. Re
 - Parent browser verified global search and no-match state, run gallery navigation, receipt A→B→Escape restoring B's trigger, mobile menu focus, expanded mandate fields, and a fresh automatically completed rehearsal with three evidence records and two simulated receipts.
 - At a measured 390 CSS-pixel viewport: document width was 390 pixels; heading bottom was 354 pixels and artwork top 504 pixels, with no overlap. Desktop composition was visually checked against the inspected Foundation references. Temporary viewport overrides were reset.
 - Source changes are presentation/navigation only. Real settlement and physical Ledger requirements remain in the submission checklist.
+
+## User-owned runner setup
+
+The self-service workspace extends the same Foundation-inspired typography and flat surfaces with per-agent runner pairing, exact signed-mandate review, and persisted jobs. Runner tokens appear once in a separate secret field; configuration examples contain public pins and a token-file path only. The spending signature displays both per-run and total HBAR/USDC allowances and is distinct from wallet sign-in.
+
+Runner online status reflects its recent heartbeat, not proof of funding or settlement. Job reports, source checks, events, and receipts are supplied by the user's runner; receipts are explicitly labeled Runner-confirmed. Explorer links are limited to Hedera and Arc testnet transaction paths. Queued/running jobs poll only while the agent panel is mounted and the document is visible. Empty, setup, offline, revoked, expired, blocked, and uncertain states show the corresponding real server state.
