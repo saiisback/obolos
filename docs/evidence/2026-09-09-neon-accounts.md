@@ -1,6 +1,6 @@
 # Neon account and credential verification — 2026-09-09
 
-The production Next.js server on port 3000 completed the real account and agent API smoke test against Neon using its HTTP transport. The local production check passed **43 assertions**. No database mock or local PostgreSQL proxy was used.
+The public HTTPS application at [obolos.app](https://obolos.app) and the local production Next.js server on port 3000 both completed the real account and agent API smoke test against Neon using its HTTP transport. Each check passed **43 assertions**. No database mock or local PostgreSQL proxy was used.
 
 The reusable test is [`scripts/platform-smoke.ts`](../../scripts/platform-smoke.ts). It generates a fresh EOA private key in memory, signs the actual server-issued SIWE message with `viem`, and keeps all signatures, session cookies and API credentials in memory. Output contains check labels and HTTP statuses; it does not print those secrets.
 
@@ -45,8 +45,10 @@ PLATFORM_SMOKE_APP_ORIGIN=https://obolos.app \
 npx tsx --env-file=.env.local scripts/platform-smoke.ts
 ```
 
-The local check manually sends cookies and the expected `Origin` header, so it validates the server/database behavior rather than browser cookie transport. A separate public HTTPS run is recorded below once hosting is restored.
+The local check manually sends cookies and the expected `Origin` header, so it validates the server/database behavior rather than browser cookie transport. Public HTTPS verification is recorded below.
 
 ## Public HTTPS verification
 
-Pending restoration of the public tunnel. At 16:22 UTC, the public `/api/account` endpoint returned HTTP 502 while the local production server passed the smoke test.
+At **16:49 UTC**, the complete smoke passed against the native public deployment at `https://obolos.app`. All 43 assertions above passed over HTTPS, including signed login, actual Neon persistence, secure cookie attributes, credential scope, rejected unauthorized execution, revocation and logout. The temporary user, its cascading tenant rows, its challenge and its own rate-limit buckets were removed. No payments were executed.
+
+An earlier public attempt returned HTTP 503 during challenge creation. After the deployment's environment was corrected, the complete rerun passed. This evidence reports the fresh successful public run rather than inferring public behavior from the local server.
