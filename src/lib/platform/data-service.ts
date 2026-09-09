@@ -39,10 +39,13 @@ function operator(header:string|null) {
 /** Public, metered repository service. Neon owns quote state and replay intents;
  * no signing key or Circle session is loaded by this Vercel function. */
 export async function publicDataRequest(req:NextRequest,path:string[]) {
+  let stage='recipient';
   try {
     const endpoint=path.join('/');
     const payTo=recipient();
+    stage='origin';
     const publicBase=`${appOrigin()}/x402`;
+    stage='database';
     if(req.method==='GET'&&endpoint==='health') {
       await prices();
       return json({ready:true,network:HEDERA_NETWORK,facilitator:BLOCKY402_URL,storage:'postgres'});
@@ -65,6 +68,7 @@ export async function publicDataRequest(req:NextRequest,path:string[]) {
     const providerId=endpoint==='quote'?String(input.providerId):path[1];
     try {repos=validateRepos(input.repos);quote=createQuote(providerId,repos,await prices(),payTo);}catch{return json({error:'Invalid provider or repository request.'},400);}
     if(endpoint==='quote')return json(quote);
+    stage='facilitator';
     const service=await server();
     const requirements=(await service.buildPaymentRequirements({scheme:'exact',network:HEDERA_NETWORK,payTo,price:{asset:HBAR_ASSET,amount:String(quote.amountAtomic)},maxTimeoutSeconds:60}))[0];
     const resource={url:`${publicBase}/evidence/${providerId}`,description:`Live GitHub evidence for ${repos.length} repositories`,mimeType:'application/json'};
@@ -95,6 +99,7 @@ export async function publicDataRequest(req:NextRequest,path:string[]) {
     await sql()`UPDATE platform_service_payments SET state='settled',settlement=${JSON.stringify(settlement)}::jsonb,evidence=${JSON.stringify(evidence)}::jsonb,settled_at=now() WHERE transaction_id=${transactionId} AND state='pending'`;
     return json({evidence,quote},200,responseHeader);
   } catch {
+    console.error('Public data service unavailable', {stage});
     return json({error:'Data service unavailable. Reconcile any submitted payment before retrying.'},503);
   }
 }

@@ -2,19 +2,19 @@
 
 **Work, within limits.** Agents buy evidence and pay for verification. Humans control their spending authority.
 
-[Public demo](https://obolos.app) · [Source code](https://github.com/saiisback/obolos) · [Live setup](docs/live-setup.md) · [Speculos setup](docs/speculos-setup.md) · [Architecture](docs/architecture.md) · [Submission checklist](docs/submission.md) · [Video footage — human narration required](docs/presentation/obolos-human-narration-visual-bed.mp4) · [Presentation PDF](docs/presentation/obolos-presentation.pdf) · [Demo script](docs/demo-script.md)
+[Public app](https://obolos.app) · [Operator demo](https://obolos.app/demo) · [Source code](https://github.com/saiisback/obolos) · [Live setup](docs/live-setup.md) · [Speculos setup](docs/speculos-setup.md) · [Architecture](docs/architecture.md) · [Submission checklist](docs/submission.md) · [Video footage — human narration required](docs/presentation/obolos-human-narration-visual-bed.mp4) · [Presentation PDF](docs/presentation/obolos-presentation.pdf) · [Demo script](docs/demo-script.md)
 
 ![Three robot coworkers exchanging a payment token and a research report](public/illustrations/agent-workforce.png)
 
-An operator console for agents that buy evidence, pay for verification, and work within a human-defined spending mandate. Built for the **Ledger AI Agents x Ledger**, **Hedera AI & Agentic Payments**, and **Arc Best Agentic Economy Application with Circle Agent Stack** tracks at ETHOnline 2026.
+A self-service workspace for research agents with wallet accounts, scoped API access, and signed spending limits. User-owned runners execute through private local brokers; the original operator console remains available at `/demo`. Built for the **Ledger AI Agents x Ledger**, **Hedera AI & Agentic Payments**, and **Arc Best Agentic Economy Application with Circle Agent Stack** tracks at ETHOnline 2026.
 
-**Self-service preview:** the landing page, wallet sign-in, agent workspace and scoped API credentials are implemented. Account persistence requires a Neon `DATABASE_URL`. New users cannot spend through the operator's wallet; their isolated payment runner and signed-mandate onboarding remain unfinished. See [self-service setup and exact release limits](docs/self-service-setup.md). The original paid demonstration is at `/demo`.
+**Self-service implementation:** wallet sign-in, Neon account persistence, agents, scoped API credentials, runner pairing, signed spending mandates, durable job delivery and runner-reported results are implemented. A fresh funded run through the deployed self-service path is still pending validation. See [self-service setup](docs/self-service-setup.md) and [private runner setup](docs/runner-setup.md).
 
-**Status:** the public app and x402 service are available at [obolos.app](https://obolos.app). A complete testnet run bought three records for **0.003 HBAR**, generated a report with GPT-5 nano and paid **0.05 USDC** for verification on Arc. A separate public HTTPS purchase settled **0.001 HBAR**. A real chat-approved Speculos mandate increase also settled **0.008 HBAR**, but its Arc step has an unresolved payment intent and is not retried. See the [evidence matrix](docs/submission.md) and [reconciliation record](docs/evidence/2026-09-08-arc-reconciliation.md).
+**Historical operator evidence:** a complete testnet run bought three records for **0.003 HBAR**, generated a report with GPT-5 nano and paid **0.05 USDC** for verification on Arc. A separate public HTTPS purchase settled **0.001 HBAR**. A real chat-approved Speculos mandate increase also settled **0.008 HBAR**, but its Arc step has an unresolved payment intent and is not retried. See the [evidence matrix](docs/submission.md) and [reconciliation record](docs/evidence/2026-09-08-arc-reconciliation.md).
 
 **Submission video correction (September 9, 2026):** ETHGlobal prohibits synthetic/AI voiceovers and speeding up footage. The earlier narrated MP4 is an internal preview and **must not be submitted**. The [visual bed and human recording guide](docs/presentation.md) require the team’s own voice before upload. See the [official video rules](https://ethglobal.com/events/ethonline2026/info/details).
 
-The public demo currently depends on the operator's Mac and temporary HTTPS tunnels staying online. The broker stays local. Speculos is emulated development signing, not physical-device security; Ledger acceptance and prior-paper eligibility remain external decisions.
+The application and x402 service support native Vercel hosting with Neon. Paid execution still requires the owner’s local runner and funded broker to be online. A wallet signature does not prove physical Ledger use; Speculos is emulated development signing. Ledger acceptance and prior-paper eligibility remain external decisions.
 
 ## One workflow, three tracks
 
@@ -41,6 +41,8 @@ npm run dev
 
 Open http://127.0.0.1:3000 for the landing page, or http://127.0.0.1:3000/demo for the operator console. Rehearsal works in the operator console without environment variables, wallet funding or a Ledger device. Repository data is an explicitly labeled fixture, report text is a template, and receipts say simulated with no chain hash. Changing to live mode never falls back to rehearsal. If you set `APP_ORIGIN`, use that exact origin in your browser. Wallet accounts require [Neon setup](docs/self-service-setup.md).
 
+For self-service work, follow [account setup](docs/self-service-setup.md), then pair a runner and sign a bounded mandate. The following steps describe the separate operator demonstration:
+
 1. Create a research job with one to three GitHub `owner/repository` names.
 2. Set separate HBAR and USDC purchase allowances, a data unit-price cap, permitted providers, and expiry.
 3. Run the job: mandate → discovery → data purchase → report → verification.
@@ -52,25 +54,23 @@ Open http://127.0.0.1:3000 for the landing page, or http://127.0.0.1:3000/demo f
 
 ```mermaid
 flowchart LR
-  Human[Human operator] --> UI[Next.js console]
-  Ledger[Ledger USB or labeled Speculos development signer] -->|Sign expiring mandate| UI
-  UI -->|Read-only wallet snapshots and readiness| Readiness[Session-scoped live setup API]
-  Readiness --> Broker
-  UI --> Policy[Policy engine + run store]
-  Policy -->|Scoped authenticated requests| Broker[Isolated capability broker]
-  Ring[wallet-cli ring encrypted bundle] --> Broker
-  Broker -->|402 challenge then one signed paid request| Data[Public metered repository API]
-  Data -->|Verify and settle x402| Blocky[Blocky402]
-  Blocky --> Hedera[Hedera testnet HBAR]
+  Owner[Owner wallet] -->|Identity and separate spending signatures| UI[Next.js workspace]
+  UI --> Platform[Agent and job API]
+  Platform --> Neon[Neon accounts, mandates and jobs]
+  Runner[User-owned isolated runner] -->|Claim jobs and upload results| Platform
+  Runner -->|Verify signed scope and journal execution| Engine[Local policy engine]
+  Engine --> Broker[Private loopback broker]
+  Ring[Local Ledger Key Ring] --> Broker
+  Broker -->|Signed x402 purchase| Data[Public metered repository API]
+  Data -->|Verify and settle through Blocky402| Hedera[Hedera testnet HBAR]
   Data --> GitHub[Public GitHub evidence]
   Broker --> Model[Fixed inference provider]
-  Broker -->|Agent wallet transfer| Circle[Circle Agent Stack CLI]
-  Circle --> Arc[Arc testnet USDC verifier payment]
-  Broker -->|Evidence + receipts + checks| Policy
-  Policy --> UI
+  Broker --> Circle[Local Circle Agent Stack CLI]
+  Circle --> Arc[Arc testnet USDC verification payment]
+  Broker -->|Evidence, receipts and checks| Engine
 ```
 
-The on-chain part is payment settlement on Hedera and Arc. The model, planner, broker, facilitator, Circle infrastructure and local journal remain off-chain/trusted dependencies; this is not a fully decentralized agent runtime. Verification checks evidence structure, sources, timestamps and coverage, not the truth of every generated sentence.
+The on-chain part is payment settlement on Hedera and Arc. The model, planner, broker, facilitator, Circle infrastructure and local journal remain off-chain/trusted dependencies; this is not a fully decentralized agent runtime. Verification checks evidence structure, sources, timestamps and coverage, not the truth of every generated sentence. Self-service receipts are labeled runner-confirmed until independently checked on chain.
 
 The data service charges **per repository**, so one repository costs one unit and three cost three units. The planner selects the cheapest permitted quote. Price increases can trigger rerouting or require a new mandate. Verification is a separate fixed-fee job paid in Arc USDC. Network fees are **not included** in purchase allowances.
 
@@ -117,17 +117,20 @@ The dependency audit on September 7 reported zero high/critical advisories after
 
 ## Deployment
 
-The current [Vercel demo proxy](deploy/vercel-proxy/README.md) serves `obolos.app` while the persistent app and data service run on the operator’s Mac. Only the small proxy package is deployed to Vercel. The [standalone data-service container](deploy/data-service/README.md) is provided for a future persistent host.
+The repository’s root `vercel.json` builds the native Next.js application. Neon stores account sessions, agent credentials, mandates, jobs, and the x402 service’s durable quote/payment state. Configure the server-side `DATABASE_URL` and exact `APP_ORIGIN`, apply migrations, and set the public service recipient and its independent operator control token. See [self-service setup](docs/self-service-setup.md). Deployment and fresh funded-run validation are separate release checks; historical operator receipts do not establish the new path.
 
-Use a long-running Node process with a persistent private volume for `OBOLOS_DATA_DIR`. This MVP uses one serialized local store; **do not deploy multiple replicas or ephemeral serverless storage**. Run the data service as a separate HTTPS process with a durable `DATA_SERVICE_DATA_DIR`. Run the trusted broker on the Ledger-enrolled private host; reach it over a private authenticated tunnel from the app host. The browser never contacts the broker directly.
+The user’s runner and broker stay on a private host with their durable journals and local wallet/provider credentials. Do not copy wallet keys, Circle sessions, Ring passwords, inference credentials, or broker secrets into Vercel or Neon. A local runner needs outbound access to the platform and configured services, with its broker bound to loopback.
 
-Set `APP_ORIGIN` to the actual public origin and `COOKIE_SECURE=true` behind HTTPS. Serve the app behind a reverse proxy, set a strong `SESSION_SECRET`, and preserve all broker/payment journals across deployments. App, data service and broker must use distinct OS permissions. A public demo can run rehearsal only with live configuration omitted.
+The [older Vercel proxy](deploy/vercel-proxy/README.md) and [standalone data service](deploy/data-service/README.md) remain legacy deployment options. Local file-backed services require long-running processes and persistent private volumes; they must not share or clone a payment journal across replicas. Preserve all prior journals and reconcile uncertain payments manually.
 
 Existing installations retain their data directory, cookies, signed messages and payment journals across the rename. `OBOLOS_DATA_DIR` is the current setting; the previous environment variable remains a fallback. Keep already-provisioned Ring key names and file paths unchanged. The original Circle idempotency namespace is intentionally stable so renaming the product cannot create a second payment identity.
 
 ## Project navigation
 
-- `src/components/`: interactive Next.js console.
+- `src/components/platform/`: self-service account, agent, runner, mandate and job interfaces.
+- `src/lib/platform/`, `db/migrations/`: Neon-backed control plane and native x402 service.
+- `services/agent-runner.ts`, `src/lib/runner/`: isolated execution, signed-scope enforcement and durable recovery.
+- `src/components/dashboard.tsx`: separate operator demonstration.
 - `src/lib/engine.ts`, `policy.ts`, `store.ts`: mandate, stage machine, audit and persistence.
 - `src/app/api/`: session-scoped run actions and operator authentication.
 - `services/data-service.ts`: public discovery, metered quotes, native Hedera x402 endpoint.
