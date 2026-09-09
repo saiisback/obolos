@@ -5,6 +5,7 @@ node_modules/
 !.env.example
 !.env.broker.example
 !.env.services.example
+!.env.runner.example
 data/
 *.tsbuildinfo
 playwright-report/

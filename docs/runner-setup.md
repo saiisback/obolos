@@ -4,11 +4,53 @@ The deployed application queues work and stores results. A runner on your own co
 
 Use one runner process and a separate durable directory for each agent. Do not copy a runner directory to another computer or run cloned directories concurrently: a local journal cannot coordinate independent machines. Keep the directory and its backups private and never delete it to reset a signed mandate's run allowance.
 
+## Prepare your own broker first
+
+Using the hosted workspace does not require your own Vercel account, Neon database, `.env.local`, or local web server. You do need a private local checkout, your own Hedera testnet payer, your own Circle Arc testnet agent-wallet session, an inference-provider credential, and a provisioned Ledger Key Ring. A browser wallet used for account sign-in does not provision any of these payment capabilities.
+
+1. Install Node.js 22.12 or newer, clone [the repository](https://github.com/saiisback/obolos), and run `npm ci` in the checkout. Use a private OS account/environment for your broker and wallet sessions. Separate folders alone do not isolate OS keychains. The installed dependencies include the Wallet CLI, Circle CLI and `tsx`.
+2. Copy the examples in that checkout, preserving any existing private configuration:
+
+```sh
+umask 077
+cp -n .env.broker.example .env.broker
+cp -n .env.runner.example .env.runner
+chmod 600 .env.broker .env.runner
+```
+
+Edit the files locally. Generate a new random `BROKER_TOKEN` for your own broker and keep it only in `.env.broker`; the runner command reads that same file. Do not copy a demo operator's token, wallet, Circle session or retained journal. Keep `BROKER_PORT=4319` aligned with the runner's `BROKER_URL=http://127.0.0.1:4319`.
+
+3. Follow [live setup: Hedera testnet accounts](live-setup.md#3-set-up-hedera-testnet-accounts) to create and fund your payer, and [Ledger Ring provisioning](live-setup.md#4-provision-ledger-ring-with-the-sync-app) to encrypt your payer key and inference key. Set your own absolute `LEDGER_WALLET_CLI`, `LEDGER_RING_FILE` and private state paths in `.env.broker`. Set `INFERENCE_BASE_URL` and `INFERENCE_MODEL` for your credential. Physical enrollment uses the Ledger Sync app. The separately disclosed [Speculos development procedure](speculos-setup.md) requires its own emulator dependencies and does not establish physical-device use.
+4. Follow [Circle login and funding](live-setup.md#6-log-in-to-the-circle-agent-wallet-yourself) under the broker account. Export the same private `CIRCLE_CLI_HOME` while logging in that the broker configuration uses; complete the email OTP yourself. Pin your returned Arc **agent** wallet as `CIRCLE_WALLET_ADDRESS`, choose the verification recipient as `ARC_VERIFIER_ADDRESS`, and fund testnet USDC. Keep `ARC_VERIFICATION_FEE_ATOMIC=50000`, the fixed 0.05-USDC verification principal. The browser owner EOA, Hedera payer and Circle wallet have separate roles and can have different addresses.
+5. To buy from the hosted service, set `DATA_SERVICE_URL=https://obolos.app/x402` in **both** `.env.broker` and `.env.runner`. The broker example initially points to a local service; replace that value. Obtain and inspect the hosted service's public recipient and current quote with this unpaid request:
+
+```sh
+curl --fail-with-body --silent --show-error \
+  https://obolos.app/x402/quote \
+  -H 'Content-Type: application/json' \
+  --data '{"providerId":"repo-standard","repos":["octocat/Hello-World"]}'
+```
+
+Copy the response's public `payTo` into `HEDERA_PAY_TO` in `.env.broker` after reviewing the intended service recipient. It must match the hosted service, not an arbitrary address of your own. Confirm `network` is `hedera:testnet`, `asset` is `HBAR`, and review the atomic amount. This quote endpoint does not purchase evidence or transfer funds. If it is unavailable, wait for the service to recover; do not guess the recipient. You do not need to start `npm run data-service` or configure `.env.services` when using the hosted service.
+
+6. Choose broker lifetime principal caps deliberately. `BROKER_MAX_DATA_ATOMIC` and `BROKER_MAX_USDC_ATOMIC` cover every reservation in that broker's retained journal; the signed per-run allowance is an additional limit. Network fees and inference-provider charges are separate. Keep `BROKER_ALLOWED_PROVIDERS=repo-standard,repo-economy`, and use durable private paths for `BROKER_DATA_DIR`, the Ring bundle and Circle session. Inject `WALLET_PASS` from your local secret manager into the **broker launch** environment, then start `npm run broker` in its own terminal. Do not inject the Ring password into the runner terminal.
+
+The detailed [broker guide](broker-setup.md) covers private provisioning and uncertain-payment reconciliation. Its legacy operator-console approval flow is separate from this guide's owner-signed runner mandate; you do not need an operator token or `/demo` to pair a self-service runner.
+
 ## Pairing
 
-1. Sign in with your owner wallet, create an agent, and choose **Pair runner**. Copy the agent UUID and the one-time runner token. An API key is a separate credential and cannot pair a runner or change a mandate.
-2. Save only the raw runner token in a private file. Create the containing directory with mode `0700`, and the file with mode `0600`; do not put the token in shell arguments, source control, chat, or browser URLs. The runner rejects symlink token files, other owners, and group/world-readable permissions.
-3. Create a local `.env.runner` file (also private) using your real values:
+1. Sign in with your owner wallet, create an agent, and choose **Pair a runner**. Copy the agent UUID and the one-time runner token. An API key is a separate credential and cannot pair a runner or change a mandate.
+2. Save only the raw runner token in a private file using your local editor. For example, first create the directory and empty file (these commands contain no token):
+
+```sh
+mkdir -p "$HOME/.local/share/obolos/my-agent"
+chmod 700 "$HOME/.local/share/obolos/my-agent"
+(umask 077; touch "$HOME/.local/share/obolos/my-agent/runner.token")
+chmod 600 "$HOME/.local/share/obolos/my-agent/runner.token"
+```
+
+Open that file in your editor and paste only the once-displayed token. Use a different directory for every agent. Do not put the token in shell arguments, source control, chat, or browser URLs. The runner rejects symlink token files, other owners, and group/world-readable permissions.
+3. Fill the copied `.env.runner` template using your real values. Replace every placeholder, and write full absolute paths; do not use `~` or shell variables inside the env file:
 
 ```dotenv
 RUNNER_PLATFORM_URL=https://obolos.app
@@ -22,13 +64,13 @@ DATA_SERVICE_URL=https://obolos.app/x402
 
 The owner address must be the wallet you independently intend to authorize spending. Do not derive it from a claimed job. The platform origin, owner address, and agent ID are all pinned locally and every signed mandate must match all three. HTTPS is required for a public platform; HTTP is accepted only for loopback development. The broker must use loopback HTTP. The configured data-service URL is the only discovery endpoint; provider-supplied destinations are ignored.
 
-4. Keep your existing private `.env.broker` with `BROKER_TOKEN`, broker wallet configuration, and a distinct `BROKER_DATA_DIR`. Start that broker normally. Run the runner from the project root:
+4. With your own configured broker running, use a second terminal in the same private checkout. Ensure `RUNNER_DATA_DIR` is distinct from `BROKER_DATA_DIR`, and run:
 
 ```sh
 npm run agent:runner
 ```
 
-The command loads `.env.broker` and `.env.runner` and starts `services/agent-runner.ts`. Node.js with `tsx`, the repository dependencies, and the existing broker's wallet integrations must be installed. A locked Key Ring or unavailable Circle session may leave broker health unready; the runner will wait without claiming a job. Normal operation emits only generic state messages; private configuration and credentials are never logged.
+The command loads `.env.broker` and `.env.runner` and starts `services/agent-runner.ts`. Node.js with `tsx`, the repository dependencies, and the existing broker's wallet integrations must be installed. A locked Key Ring or unavailable Circle session may leave broker health unready; the runner will wait without claiming a job. Normal operation emits only generic state messages; private configuration and credentials are never logged. Remove conflicting exported configuration from your shell before launch: existing process environment variables take precedence over env-file values. Keep both terminals running while jobs execute, and wait for the workspace to show a recent runner heartbeat before requesting work.
 
 5. In the agent setup panel, prepare the spending mandate, inspect its exact message, and sign with your owner wallet. The message binds the platform, agent, mandate nonce, repositories, providers, per-repository price cap, separate per-run HBAR/USDC caps, maximum run count, derived total allowances, and expiry. It authorizes Hedera and Arc **testnet** execution only, for at most 24 hours and 10 runs. Queue a job only after you have checked these limits and the available testnet funds.
 
