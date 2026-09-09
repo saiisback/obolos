@@ -10,7 +10,7 @@ A self-service workspace for research agents with wallet accounts, scoped API ac
 
 **Verified self-service testnet run:** the deployed account, agent, signed-mandate and isolated-runner path purchased one repository record for **0.001 HBAR**, generated a report and paid **0.05 USDC** for verification. Both payments were independently checked on chain. The bounded test used a generated EOA owner and an explicitly authorized funded broker with Speculos credential retrieval. See [run evidence](docs/evidence/2026-09-09-self-service-testnet.md), [self-service setup](docs/self-service-setup.md) and [private runner setup](docs/runner-setup.md).
 
-**Historical operator evidence:** a complete testnet run bought three records for **0.003 HBAR**, generated a report with GPT-5 nano and paid **0.05 USDC** for verification on Arc. A separate public HTTPS purchase settled **0.001 HBAR**. A real chat-approved Speculos mandate increase also settled **0.008 HBAR**, but its Arc step has an unresolved payment intent and is not retried. See the [evidence matrix](docs/submission.md) and [reconciliation record](docs/evidence/2026-09-08-arc-reconciliation.md).
+**Historical operator evidence:** a complete testnet run bought three records for **0.003 HBAR**, generated a report with GPT-5 nano and paid **0.05 USDC** for verification on Arc. A separate public HTTPS purchase settled **0.001 HBAR**. A real chat-approved Speculos mandate increase also settled **0.008 HBAR**, and its older Arc intent was recovered under explicit user authorization and settled for **0.05 USDC**. See the [evidence matrix](docs/submission.md) and [reconciliation record](docs/evidence/2026-09-08-arc-reconciliation.md).
 
 **Submission video correction (September 9, 2026):** ETHGlobal prohibits synthetic/AI voiceovers and speeding up footage. The earlier narrated MP4 is an internal preview and **must not be submitted**. The [visual bed and human recording guide](docs/presentation.md) require the team’s own voice before upload. See the [official video rules](https://ethglobal.com/events/ethonline2026/info/details).
 
@@ -24,7 +24,7 @@ A user asks: *Compare these three developer tools using current repository activ
 |---|---|---|
 | Ledger — AI Agents x Ledger | `wallet-cli ring` integration plus explicit Speculos development support using upstream commands, real Sync/Ethereum apps and Ledger staging; signed mandate increases | Accepted emulator mandate and retained signature verified; sponsor decision and delivery of tooling feedback remain |
 | Hedera — AI & Agentic Payments | Per-repository HBAR pricing, native x402 challenges, Blocky402 settlement and a consuming planner | Public HTTPS 402 and paid request verified; retain the narrated demo artifact and host availability |
-| Circle — Best Agentic Economy Application with Circle Agent Stack | Circle Agent Wallet pays the verification capability in USDC on Arc testnet | Fresh self-service USDC payment verified; a separate historical intent remains pending reconciliation |
+| Circle — Best Agentic Economy Application with Circle Agent Stack | Circle Agent Wallet pays the verification capability in USDC on Arc testnet | Fresh self-service USDC payment verified; historical intent also reconciled and settled |
 
 The frontend and backend use **Next.js, React and TypeScript**. Separate Node services implement the metered API and private capability broker. The interface uses the user-selected Foundation reference on Mobbin, black-and-white surfaces, orange actions and an original flat illustration.
 

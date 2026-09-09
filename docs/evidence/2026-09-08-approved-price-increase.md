@@ -1,5 +1,7 @@
 # Approved price increase — partial paid execution
 
+**September 9 update:** the original pending Arc challenge was recovered and completed under explicit user authorization. The job now has both receipts and is complete; see [the recovery evidence](2026-09-08-arc-reconciliation.md). The record below preserves the original execution outcome.
+
 Run `61be389c-ab9a-4ea4-8b02-957aa4bd2b5e`, September 8, 2026. [Sanitized public export](2026-09-08-approved-price-increase.json).
 
 The user authorized the spending increase in chat. The assistant reviewed the exact message and operated the Ethereum app in Speculos. The backend verified the signature from pinned controller `0xA7a1C8b8d1aa6c5B32aECB56F4396A353c5f81fa` at `2026-09-08T18:08:07.085Z`, retained the signature and both mandates, and advanced the mandate from version 1 to version 2.

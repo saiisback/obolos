@@ -1,4 +1,16 @@
-# Arc verification intent awaiting reconciliation
+# Arc verification intent — resolved September 9, 2026
+
+**Resolved:** following the user's explicit retry instruction on September 9, we recovered the transfer challenge using the original idempotency key, then completed that same challenge. [The resulting 0.05 USDC transfer](https://testnet.arcscan.app/tx/0x256009eb661e5942ae66ddd79b7704b80dffc4efb16efca32c16cbaff5677099) is confirmed on Arc. The original broker intent is now `settled`, and job `61be389c-ab9a-4ea4-8b02-957aa4bd2b5e` is `completed` with eight passing evidence checks and a valid audit chain.
+
+- Recovered challenge: `9f5c5282-d898-58c2-a03c-5c42f707a6d5`, initially `PENDING`.
+- Circle transaction: `c54f5d9b-dca5-5879-8a14-81083ebe9c22`, `COMPLETE`.
+- Independent RPC verification: chain `5042002`, successful receipt `0x1`, canonical USDC Transfer from the original payer to the original verifier for exactly `50000` atomic units.
+- The original request ID, idempotency key, mandate and earlier failure events were retained. Private snapshots were taken before the journal/store update, and a recovery event was appended. No other payment was reused, and no fresh research or inference was purchased.
+- This was explicitly authorized manual operator recovery through chat, not a new Ledger-signed mandate. The signed escalation remains separately recorded.
+
+The remaining sections preserve the **historical investigation before recovery**. Their pending-state statements describe that earlier point in time.
+
+## Historical investigation record
 
 Run: `61be389c-ab9a-4ea4-8b02-957aa4bd2b5e` — the [approved price increase](2026-09-08-approved-price-increase.md).
 

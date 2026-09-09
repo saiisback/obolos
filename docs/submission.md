@@ -10,7 +10,7 @@ The [first paid testnet run](evidence/2026-09-08-first-paid-run.md) completed th
 |---|---|---|
 | Ledger Agent Stack / wallet-cli ring central | Broker decrypts its inference/Hedera bundle through a disclosed adaptation of upstream Ring commands and the real staging SDK. [Ring execution evidence](../tools/ledger-speculos/ring-evidence.json); [paid workflow](evidence/2026-09-08-first-paid-run.md). | Ledger must confirm whether Speculos plus the source adapter satisfies the bounty. This is not the stock CLI binary or physical-device security. |
 | Agent uses secrets without receiving raw keys | Fixed broker capabilities; the model receives no inference key, payer key or capability token. | Production OS isolation and trusted broker operation remain deployment responsibilities. |
-| Human approval before escalation | Exact expiring message, pinned controller, version/nonce/signature validation and retained authorization proofs implemented. Real harmless Ethereum emulator signing verified. | [Actual signed escalation and post-approval Hedera settlement](evidence/2026-09-08-approved-price-increase.md) are exported. Arc verification became uncertain; reconcile before retry. Recording remains. |
+| Human approval before escalation | Exact expiring message, pinned controller, version/nonce/signature validation and retained authorization proofs implemented. Real harmless Ethereum emulator signing verified. | [Actual signed escalation and post-approval Hedera settlement](evidence/2026-09-08-approved-price-increase.md) are exported. Arc verification became uncertain and was subsequently reconciled; see the recovery record. Recording remains. |
 | New work during event | New implementation history and [AI/prior-work disclosure](ai-disclosure.md). | Organizer determination for the September 3 concept paper. |
 | Ledger tooling feedback | [Actual emulator/SDK experience, reproducible environment and exact sponsor question](ledger-feedback.md). | Team review and external delivery; physical hardware experience is not claimed. |
 | Live x402-gated Hedera service | Metered repository API executes actual native HBAR x402 requests. | [Public HTTPS challenge and paid purchase verified](evidence/2026-09-08-public-data-purchase.md). Mac/tunnels must remain online. |
@@ -23,7 +23,7 @@ The [first paid testnet run](evidence/2026-09-08-first-paid-run.md) completed th
 
 ### Approved escalation with a pending Arc transfer
 
-A fresh [approved price-increase run](evidence/2026-09-08-approved-price-increase.md) records the user-authorized Speculos signature, backend acceptance of mandate version 2, and a settled **0.008 HBAR** purchase after the increase. The report was generated. Its **0.05 USDC Arc verification attempt became uncertain**, with a 50,000 micro-USDC pending reservation and no confirmed Arc receipt for this run. Reconciliation is required before any retry. This partial run does not replace the earlier complete two-rail run.
+A fresh [approved price-increase run](evidence/2026-09-08-approved-price-increase.md) records the user-authorized Speculos signature, backend acceptance of mandate version 2, and a settled **0.008 HBAR** purchase after the increase. The report was generated. Its **0.05 USDC Arc verification attempt initially became uncertain**. On September 9, explicit user-authorized recovery completed the original challenge; independent chain verification allowed the pending intent to be settled and the job completed. See [recovery evidence](evidence/2026-09-08-arc-reconciliation.md). The original exports remain historical snapshots.
 
 ### Public deployment
 
@@ -43,7 +43,7 @@ The [official ETHOnline instructions](https://ethglobal.com/events/ethonline2026
 - [x] Developer feedback and sponsor/organizer questions drafted from actual execution.
 - [x] Public HTTPS Hedera data service at https://obolos.app/x402, recorded unpaid challenge and actual paid request.
 - [x] Live quote increase, Speculos controller approval and resumed Hedera purchase exported with signature.
-- [ ] Reconcile the uncertain Arc verification transfer in the escalation run; its pending reservation must remain intact.
+- [x] Reconcile the older Arc verification transfer: original challenge recovered, exact transfer confirmed, intent settled with backups and audit retained. See [recovery evidence](evidence/2026-09-08-arc-reconciliation.md).
 - [x] Recorded actual Speculos signing and disclosed the partial escalation outcome in the visual bed and human narration script.
 - [ ] Deployment with broker OS isolation, durable journals and continuing availability for review.
 - [ ] Developer feedback sent by the team; sponsor response on emulator/source-adapter eligibility recorded.
