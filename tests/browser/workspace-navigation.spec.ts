@@ -76,17 +76,17 @@ test('credentials stay scoped to the selected agent and one-time secrets leave w
   await expect(page.getByLabel('Shell · Selected agent code')).not.toContainText(first.id);
 });
 
-test('login returns to the private section originally requested', async ({page}) => {
+for(const destination of ['/app/evidence','/app?service=13936142-3321-4de8-8e09-e57dcf7d1a82']) test(`login preserves ${destination}`, async ({page}) => {
   await fixture(page,false);
   await page.addInitScript(() => {
     const provider = {request: async ({method}: {method: string}) => method === 'eth_requestAccounts' ? ['0x1111111111111111111111111111111111111111'] : '0xfixture'};
     window.addEventListener('eip6963:requestProvider', () => window.dispatchEvent(new CustomEvent('eip6963:announceProvider',{detail:{info:{uuid:'browser-fixture', name:'Fixture wallet'},provider}})));
   });
-  await page.goto(origin+'/app/evidence');
-  await expect(page).toHaveURL(origin+'/login?next=%2Fapp%2Fevidence');
+  await page.goto(origin+destination);
+  await expect(page).toHaveURL(origin+'/login?next='+encodeURIComponent(destination));
   await page.getByRole('button',{name:'Fixture wallet',exact:false}).click();
-  await expect(page).toHaveURL(origin+'/app/evidence');
-  await expect(page.getByRole('heading',{name:'Your execution evidence'})).toBeVisible();
+  await expect(page).toHaveURL(origin+destination);
+  await expect(page.getByRole('heading',{name:destination.includes('?')?'Your agents':'Your execution evidence',exact:false})).toBeVisible();
 });
 
 

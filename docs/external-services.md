@@ -77,6 +77,6 @@ The public receipt exposes paid metadata and proof digest, not reports, private 
 
 ## Validation limits
 
-The integration tests exercise real PostgreSQL transitions with test doubles for chain proof and provider delivery; transport tests independently cover DNS pinning, redirect refusal, request bounds and response validation. Existing live receipts predate external-provider support. A new real external-provider paid testnet run must be recorded separately before claiming live external-provider settlement evidence.
+The integration tests exercise real PostgreSQL transitions with test doubles for chain proof and provider delivery; transport tests independently cover DNS pinning, redirect refusal, request bounds and response validation. A separate [live external-path testnet run](evidence/2026-09-11-external-marketplace.md) completed with both chain proofs and eight passing checks. Its reference HTTP provider is operated by Obolos; it proves real HTTPS dispatch and paid delivery, not independent third-party adoption.
 
 Token issuance/inflation is not part of this service-price mechanism. It requires a separately specified asset, beneficiaries and issuance rule.

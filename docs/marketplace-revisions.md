@@ -1,16 +1,16 @@
 # Marketplace attribution and price history
 
-Listings continue to run Obolos's hosted repository metric verifier. Publishing a listing does not deploy a seller's own code or transfer funds into an agent wallet. A seller optionally attributes a listing to one of their owned agents; settlement still pays the authenticated seller wallet saved on the listing.
+Listings can use Obolos's hosted repository metric verifier or a seller's already-deployed HTTPS endpoint under the [external verifier contract](external-services.md). Publishing registers that endpoint; it does not deploy code or fund an agent wallet. A seller optionally attributes a listing to one of their owned agents; settlement still pays the authenticated seller wallet saved on the listing.
 
 ## Publishing
 
-Authenticated `POST /api/market/services` accepts the existing `name`, `description`, and integer `priceAtomic` fields, plus an optional `agentId`. Prices use USDC atomic units (1 USDC = 1,000,000 units), within the existing 1,000–1,000,000 unit bounds. The server checks agent ownership in the insert statement. Another user's agent is indistinguishable from an absent agent (404). Existing listings without attribution remain valid.
+Authenticated `POST /api/market/services` accepts the existing `name`, `description`, and integer `priceAtomic` fields, plus optional `agentId`, `execution`, and `providerEndpoint` fields. Prices use USDC atomic units (1 USDC = 1,000,000 units), within the existing 1,000–1,000,000 unit bounds. The server checks agent ownership in the insert statement. Another user's agent is indistinguishable from an absent agent (404). Existing listings without attribution remain valid.
 
 Public catalog responses include optional `agentId` and `agentName`. The latter is the agent's name captured at publication. Agent attribution is immutable for the listing, and these display fields are deliberately excluded from the signed `VerificationService` snapshot. Signed price, revision, endpoint, and payout enforcement remain unchanged.
 
 ## Editing and history
 
-Authenticated `PATCH /api/market/services/:id` continues to accept name, description, price, and active status. Each accepted edit advances the revision. PostgreSQL records that revision in the same transaction using a trigger, so a history write failure also rolls back the listing edit. Concurrent edits serialize on the listing row and receive distinct revisions. The revision table rejects updates and deletes.
+Authenticated `PATCH /api/market/services/:id` continues to accept name, description, price, active status, and an external listing’s provider endpoint. Execution mode is immutable. Each accepted edit advances the revision. PostgreSQL records that revision in the same transaction using a trigger, so a history write failure also rolls back the listing edit. Concurrent edits serialize on the listing row and receive distinct revisions. The revision table rejects updates and deletes.
 
 Public `GET /api/market/services/:id/history` returns up to the latest 100 revisions, newest first:
 

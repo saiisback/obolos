@@ -24,7 +24,7 @@ export function WorkspaceShell({children}: {children: ReactNode}) {
     void api<{user: User | null; configured: boolean}>('/api/account', {signal: controller.signal}).then(account => {
       if (controller.signal.aborted) return;
       if (!account.configured) { setError('Account service needs configuration. Please try again later.'); return; }
-      if (!account.user) { router.replace(`/login?next=${encodeURIComponent(workspaceReturnPath(pathname))}`); return; }
+      if (!account.user) { router.replace(`/login?next=${encodeURIComponent(workspaceReturnPath(pathname + window.location.search))}`); return; }
       setUser(account.user);
     }).catch(caught => { if (!controller.signal.aborted) setError(errorMessage(caught)); })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });

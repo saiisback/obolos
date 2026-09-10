@@ -1,0 +1,88 @@
+{
+  "recordedLocalDate": "2026-09-11",
+  "timezone": "Asia/Kolkata",
+  "application": "https://obolos.app",
+  "implementationCommit": "8fa06fe4c702425754884878448a738c07d170e1",
+  "execution": "external-repo-verifier",
+  "providerEndpoint": "https://obolos.app/api/examples/verifier",
+  "providerOperator": "Obolos reference provider; not an independent third-party seller",
+  "agentId": "bbe7a55b-8cda-4352-9091-a41b0db0f094",
+  "serviceId": "13936142-3321-4de8-8e09-e57dcf7d1a82",
+  "jobId": "94f09b64-5c1f-4bde-bc80-fb836f096b56",
+  "status": "succeeded",
+  "receiptVerification": "chain-confirmed",
+  "receipts": [
+    {
+      "id": "hedera-94f09b64-5c1f-4bde-bc80-fb836f096b56:data",
+      "mode": "live",
+      "asset": "HBAR",
+      "units": 1,
+      "status": "settled",
+      "network": "hedera:testnet",
+      "provider": "repo-standard",
+      "requestId": "94f09b64-5c1f-4bde-bc80-fb836f096b56:data",
+      "timestamp": "2026-09-10T18:54:17.165Z",
+      "explorerUrl": "https://hashscan.io/testnet/transaction/0.0.7162784%401789066449.450617271",
+      "amountAtomic": 100000,
+      "transactionId": "0.0.7162784@1789066449.450617271"
+    },
+    {
+      "id": "arc-0x06ecfa2ae9cf7280bd9da0e21d27507e850b38c09890d355d88b6ba3e40bc777",
+      "mode": "live",
+      "asset": "USDC",
+      "units": 1,
+      "status": "settled",
+      "network": "arc:testnet",
+      "orderId": "ce7e75f7-d55f-4a20-b613-3705de59049d",
+      "provider": "arc-verifier",
+      "recipient": "0xd2137e6d65165400641aff0e34781d09a0215858",
+      "requestId": "94f09b64-5c1f-4bde-bc80-fb836f096b56:verify",
+      "timestamp": "2026-09-10T18:54:34.462Z",
+      "explorerUrl": "https://testnet.arcscan.app/tx/0x06ecfa2ae9cf7280bd9da0e21d27507e850b38c09890d355d88b6ba3e40bc777",
+      "amountAtomic": 50000,
+      "transactionId": "0x06ecfa2ae9cf7280bd9da0e21d27507e850b38c09890d355d88b6ba3e40bc777"
+    }
+  ],
+  "checks": [
+    {
+      "label": "Source coverage",
+      "detail": "1 distinct repository records are attached.",
+      "passed": true
+    },
+    {
+      "label": "Source attribution",
+      "detail": "Every record points to its exact GitHub API source.",
+      "passed": true
+    },
+    {
+      "label": "Valid observed counts",
+      "detail": "Stars, forks and issue counts are non-negative integers.",
+      "passed": true
+    },
+    {
+      "label": "Observation timestamps",
+      "detail": "Each observation includes fetch and last-push timestamps.",
+      "passed": true
+    },
+    {
+      "label": "Metrics: octocat/Hello-World",
+      "detail": "Exactly one stars, forks and openIssues row must match the submitted evidence.",
+      "passed": true
+    },
+    {
+      "label": "Evidence integrity and freshness",
+      "detail": "Unique GitHub evidence must be at most one hour old; its provenance is checked separately by paid delivery.",
+      "passed": true
+    },
+    {
+      "label": "Claim scope",
+      "detail": "Only canonical metric rows are certified against evidence. Free-text judgments are not certified; extra numeric metric claims are rejected.",
+      "passed": true
+    },
+    {
+      "label": "Example provider: repository identity",
+      "detail": "This independent HTTP provider checked repository identities in the paid evidence.",
+      "passed": true
+    }
+  ]
+}
