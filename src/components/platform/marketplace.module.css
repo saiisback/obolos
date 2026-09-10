@@ -1,0 +1,54 @@
+.market.market { padding-bottom: 64px; }
+.hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: 72px; align-items: center; padding: 64px 0 40px; }
+.hero h1 { font: 400 clamp(36px, 4.2vw, 56px)/1.16 var(--display); letter-spacing: -.03em; }
+.hero p { color: #c5c5cf; font-size: 15px; line-height: 1.75; max-width: 48ch; }
+.actions { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; margin-top: 24px; font-size: 13px; }
+.actions a:last-child { display: inline-flex; align-items: center; gap: 5px; }
+.context { display: flex; align-items: center; justify-content: space-between; gap: 16px; border-block: 1px solid #36363f; padding: 15px 0; color: #b9b9c5; font-size: 12px; }
+.context a,.funding>a { display: inline-flex; align-items: center; gap: 6px; color: #ffb39b; text-underline-offset: 4px; }
+.context a:hover,.funding>a:hover { text-decoration: underline; }
+.catalogHeading { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin: 32px 0 20px; }
+.catalogHeading h2 { font-size: 23px; letter-spacing: -.025em; font-weight: 500; scroll-margin-top: 24px; }
+.catalogHeading p { color: #aaaab5; font-size: 12px; margin-top: 8px; }
+.catalogTools { display: flex; align-items: center; gap: 10px; }
+.catalogTools>button { padding: 12px 16px; gap: 8px; font-size: 12px; }
+.search { display: flex; align-items: center; gap: 10px; padding: 0 13px; border: 1px solid #45454f; background: #111115; border-radius: 8px; color: #aaaab5; }
+.market .search input { background: transparent; border: 0; padding: 12px 0; margin: 0; width: 170px; min-width: 0; font-size: 13px; box-shadow: none; }
+.search:focus-within { outline: 2px solid #ff997a; outline-offset: 3px; }
+.market .search input:focus-visible { outline: none; }
+.grid { display: grid; gap: 14px; }
+.card { display: grid; grid-template-columns: minmax(0,1fr) 255px; border: 1px solid #45454f; border-radius: 14px; background: #131317; overflow: hidden; }
+.serviceInfo { padding: 26px 30px; min-width: 0; }
+.serviceType { display: flex; align-items: center; gap: 9px; color: #c0c0ca; font-size: 11px; }
+.serviceType>span:last-child { margin-left: auto; }
+.card h3 { font-size: 26px; line-height: 1.25; font-weight: 500; letter-spacing: -.025em; margin: 22px 0 10px; overflow-wrap: anywhere; }
+.serviceInfo>p { color: #b5b5c1; font-size: 14px; line-height: 1.7; max-width: 62ch; overflow-wrap: anywhere; }
+.card dl { display: flex; gap: 32px; margin-top: 24px; font-size: 12px; }
+.card dt { color: #a4a4b0; margin-bottom: 6px; }
+.card dd { margin: 0; }
+.card dd a { display: inline-flex; gap: 5px; align-items: center; text-decoration: underline; text-underline-offset: 4px; }
+.purchase { border-left: 1px solid #36363f; padding: 30px 24px; display: flex; flex-direction: column; justify-content: center; background: #18181e; }
+.price { display: flex; align-items: baseline; gap: 8px; font-variant-numeric: tabular-nums; }
+.price strong { font-size: 38px; letter-spacing: -.03em; font-weight: 500; }
+.price span { color: #c1c1cc; font-size: 12px; }
+.purchase p { color: #aaaab5; font-size: 11px; margin: 8px 0 24px; }
+.purchase a { font-size: 12px; gap: 6px; padding-inline: 12px; }
+.purchase small { color: #aaaab5; text-align: center; font-size: 10px; margin-top: 12px; }
+.loading { border: 1px solid #393942; border-radius: 14px; padding: 28px; background: #131317; }
+.loading>span { display: block; height: 15px; border-radius: 4px; background: #292930; max-width: 75%; margin-bottom: 14px; }
+.loading>span:first-child { width: 30%; height: 24px; }.loading>span:nth-child(3) { width: 55%; }.loading p { color: #aaaab5; font-size: 12px; margin-top: 20px; }
+.funding { margin: 22px 0 44px; padding: 18px 0; border-bottom: 1px solid #36363f; }
+.funding summary { list-style: none; display: flex; justify-content: space-between; gap: 16px; cursor: pointer; font-size: 13px; padding: 6px 0; }
+.funding summary::-webkit-details-marker { display: none; }.funding[open] summary svg { transform: rotate(180deg); }
+.funding>p { max-width: 75ch; font-size: 13px; line-height: 1.75; color: #b5b5c1; margin: 20px 0; }
+.roles { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; margin: 24px 0; }
+.roles strong { font-size: 13px; font-weight: 500; }.roles p { font-size: 12px; line-height: 1.7; color: #aaaab5; margin-top: 8px; }.funding>a { font-size: 12px; }
+.sellerSection { border-top: 1px solid #45454f; padding-top: 28px; }
+.sellerSection>div:first-child { margin-top: 0; }.sellerSection h2 { scroll-margin-top: 24px; }
+.signin { padding: 22px 0; color: #b5b5c1; font-size: 13px; line-height: 1.7; max-width: 65ch; }.signin strong { font-weight: 500; color: #f4f4f5; }.signin p { margin-top: 8px; }
+@media(max-width:1000px) { .hero { gap: 32px; }.catalogHeading { flex-wrap: wrap; }.catalogTools { flex: 1; }.search { flex: 1; }.market .search input { width: 100%; }.card { grid-template-columns: minmax(0,1fr) 235px; } }
+@media(max-width:760px) {
+ .hero { grid-template-columns: 1fr; gap: 20px; padding: 42px 0 28px; }.hero h1 { font-size: clamp(32px,8vw,44px); }.hero p { font-size: 14px; }.actions { gap: 18px; margin-top: 20px; }.actions>a:first-child { padding-inline: 18px; }
+ .context { flex-wrap: wrap; gap: 12px; font-size: 11px; }.catalogHeading { margin-top: 28px; gap: 18px; }.catalogHeading h2 { font-size: 22px; }.catalogTools { width: 100%; flex-basis: 100%; }.catalogTools>button span { display: none; }.catalogTools>button { border-radius: 8px; }
+ .card { grid-template-columns: 1fr; }.serviceInfo { padding: 22px; }.card h3 { font-size: 23px; margin-top: 20px; }.serviceInfo>p { font-size: 13px; }.card dl { flex-wrap: wrap; gap: 22px; }.purchase { border-left: 0; border-top: 1px solid #36363f; padding: 22px; }.price strong { font-size: 32px; }.purchase p { margin-bottom: 18px; }.purchase a { align-self: flex-start; padding-inline: 20px; }.purchase small { text-align: left; }.roles { grid-template-columns: 1fr; gap: 20px; }.sellerSection>div:first-child { flex-wrap: wrap; }.sellerSection h2 { font-size: 25px; }
+}
