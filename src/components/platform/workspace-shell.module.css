@@ -1,0 +1,12 @@
+.shell { background:#fff; color:#111; }
+.header { display:flex; align-items:center; gap:36px; padding:20px 4%; min-height:92px; border-bottom:1px solid #e5e5e5; flex-wrap:wrap; }
+.navigation { display:flex; gap:8px; align-items:center; }
+.navigation a { padding:12px 14px; font-size:13px; border-radius:7px; color:#555; }
+.navigation a:hover { background:#f5f5f5; color:#111; }.navigation a[aria-current] { background:#111; color:#fff; }
+.account { margin-left:auto; display:flex; align-items:center; gap:16px; font-size:12px; }
+.account span { background:#f5f5f5; padding:8px 10px; border-radius:6px; }
+.account button { background:none; border:0; text-decoration:underline; text-underline-offset:4px; padding:10px 0; }
+.error { margin:24px 4%; padding:20px; color:#8c241a; background:#fff0ed; border-radius:8px; }.error button { margin-top:12px; }
+.footer { margin-top:auto; display:flex; gap:28px; flex-wrap:wrap; padding:28px 4%; border-top:1px solid #e5e5e5; font-size:12px; color:#606060; }.footer span { margin-right:auto; }.footer a:hover { text-decoration:underline; text-underline-offset:4px; }
+@media(max-width:1050px) { .header { gap:20px; }.navigation { order:3; width:100%; }.account { margin-left:auto; } }
+@media(max-width:600px) { .header { padding:16px 5%; gap:16px; }.navigation { gap:2px; justify-content:space-between; }.navigation a { padding:10px 8px; font-size:12px; }.account { gap:10px; }.account span { font-size:10px; padding:6px; }.header>a { font-size:22px; gap:6px; }.footer { gap:18px; }.footer span { width:100%; } }

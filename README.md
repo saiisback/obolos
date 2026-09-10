@@ -8,6 +8,17 @@
 
 A self-service workspace for research agents with wallet accounts, scoped API access, and signed spending limits. User-owned runners execute through private local brokers; the original operator console remains available at `/demo`. Built for the **Ledger AI Agents x Ledger**, **Hedera AI & Agentic Payments**, and **Arc Best Agentic Economy Application with Circle Agent Stack** tracks at ETHOnline 2026.
 
+Signed-in navigation stays inside the workspace:
+
+- `/app`: owned agents, runner pairing and spending mandates.
+- `/app/marketplace`: live verifier catalog, the connected wallet’s seller desk and earnings.
+- `/app/evidence`: the selected owned agent’s latest 100 runs, reports, receipts and checks.
+- `/app/developers`: agent-scoped credential issue/revocation and API examples.
+
+The public `/marketplace`, `/evidence` and `/developers` pages remain separate; public evidence is a captured release record. Workspace sessions are checked before rendering account sections; every private API independently enforces ownership. Sign-in return destinations are restricted to the four workspace routes.
+
+To check workspace navigation and credential UI against isolated browser fixtures, run `npm run build`, `npm run start -- --port 3100`, then `npx playwright test --config tests/browser/playwright.config.ts`. These browser tests intercept API requests and do not issue real credentials or make payments.
+
 **Verified self-service testnet run:** the deployed account, agent, signed-mandate and isolated-runner path purchased one repository record for **0.001 HBAR**, generated a report and paid **0.05 USDC** for verification. Both payments were independently checked on chain. The bounded test used a generated EOA owner and an explicitly authorized funded broker with Speculos credential retrieval. See [run evidence](docs/evidence/2026-09-09-self-service-testnet.md), [self-service setup](docs/self-service-setup.md) and [private runner setup](docs/runner-setup.md).
 
 **Historical operator evidence:** a complete testnet run bought three records for **0.003 HBAR**, generated a report with GPT-5 nano and paid **0.05 USDC** for verification on Arc. A separate public HTTPS purchase settled **0.001 HBAR**. A real chat-approved Speculos mandate increase also settled **0.008 HBAR**, and its older Arc intent was recovered under explicit user authorization and settled for **0.05 USDC**. See the [evidence matrix](docs/submission.md) and [reconciliation record](docs/evidence/2026-09-08-arc-reconciliation.md).

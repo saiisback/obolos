@@ -63,3 +63,9 @@
 .cinematic :focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .cinematic button:disabled { opacity: .55; cursor: not-allowed; }
 .cinematic .earnings>div:first-child strong { font-family: Inter, sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
+
+/* Job results also render outside the agent setup panel. */
+.jobResult > summary { cursor: pointer; }
+.jobBody code,.jobBody p { overflow-wrap: anywhere; }
+.jobBody code { font-size: 11px; }
+.jobBody h4 { font-size: 17px; margin: 0 0 14px; }

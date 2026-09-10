@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api, errorMessage, type User } from './api';
 import s from './platform.module.css';
+import {workspaceReturnPath} from '@/lib/platform/workspace-navigation';
+const returnPath = () => workspaceReturnPath(new URLSearchParams(window.location.search).get('next'));
 
 type Provider = { request(args: { method: string; params?: unknown[] }): Promise<unknown> };
 type Wallet = { info: { uuid: string; name: string }; provider: Provider };
@@ -24,7 +26,7 @@ export function WalletLogin() {
     try {
       const result = await api<{ user: User | null; configured: boolean }>('/api/account');
       setConfigured(result.configured);
-      if (result.user) router.replace('/app');
+      if (result.user) router.replace(returnPath());
     } catch (e) { setError(errorMessage(e)); }
     finally { setLoading(false); }
   }
@@ -63,7 +65,7 @@ export function WalletLogin() {
       if (typeof signature !== 'string') throw new Error('Your wallet did not return a signature.');
       setStage('Verifying your signature…');
       await api('/api/auth/verify', { method: 'POST', body: JSON.stringify({ signature }) });
-      router.replace('/app');
+      router.replace(returnPath());
     } catch (e) {
       const code = typeof e === 'object' && e !== null && 'code' in e ? e.code : undefined;
       setError(code === 4001 ? 'You canceled the wallet request. Choose your wallet to try again.' : errorMessage(e));

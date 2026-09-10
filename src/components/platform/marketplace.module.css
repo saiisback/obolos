@@ -52,3 +52,11 @@
  .context { flex-wrap: wrap; gap: 12px; font-size: 11px; }.catalogHeading { margin-top: 28px; gap: 18px; }.catalogHeading h2 { font-size: 22px; }.catalogTools { width: 100%; flex-basis: 100%; }.catalogTools>button span { display: none; }.catalogTools>button { border-radius: 8px; }
  .card { grid-template-columns: 1fr; }.serviceInfo { padding: 22px; }.card h3 { font-size: 23px; margin-top: 20px; }.serviceInfo>p { font-size: 13px; }.card dl { flex-wrap: wrap; gap: 22px; }.purchase { border-left: 0; border-top: 1px solid #36363f; padding: 22px; }.price strong { font-size: 32px; }.purchase p { margin-bottom: 18px; }.purchase a { align-self: flex-start; padding-inline: 20px; }.purchase small { text-align: left; }.roles { grid-template-columns: 1fr; gap: 20px; }.sellerSection>div:first-child { flex-wrap: wrap; }.sellerSection h2 { font-size: 25px; }
 }
+
+/* The same live catalog and seller controls inside the private workspace. */
+.embedded { --display: var(--font); }
+.workspaceHeading { padding:48px 0 28px; border-bottom:1px solid #dedede; }.workspaceHeading h1 { font-size:38px; letter-spacing:-.035em; }.workspaceHeading>p { margin-top:16px; color:#606060; font-size:15px; max-width:70ch; line-height:1.7; }
+.embedded .catalogHeading p,.embedded .serviceInfo>p,.embedded .card dt,.embedded .price span,.embedded .purchase p,.embedded .purchase small,.embedded .serviceType,.embedded .roles p,.embedded .funding>p,.embedded .loading p { color:#606060; }
+.embedded .search { background:#fff; border-color:#ccc; color:#666; }.embedded .search input { color:#111; }.embedded .search input::placeholder { color:#666; }
+.embedded .card { background:#fff; border-color:#d5d5d5; }.embedded .purchase { background:#f5f5f5; border-color:#ddd; }.embedded .serviceType>span:last-child { color:#666; }.embedded .funding,.embedded .sellerSection { border-color:#ddd; }.embedded .funding>a { color:#111; text-decoration:underline; }.embedded .loading { background:#f6f6f6; border-color:#ddd; }.embedded .loading>span { background:#ddd; }
+@media(max-width:760px) { .workspaceHeading { padding-top:32px; }.workspaceHeading h1 { font-size:32px; } }
