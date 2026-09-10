@@ -41,9 +41,6 @@ small { font-size: 12px; }
 .text-link { display: inline-flex; align-items: center; gap: 6px; border: 0; padding: 0; background: none; font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
 .global-header { min-height: 92px; padding: 20px 36px; display: flex; align-items: center; gap: 26px; border-bottom: 1px solid #eee; }
 .brand { display: flex; align-items: center; gap: 11px; font-size: 22px; font-weight: 750; letter-spacing: -1px; white-space: nowrap; }
-.brand-mark { display: flex; align-items: flex-end; gap: 3px; height: 23px; transform: rotate(-12deg); }
-.brand-mark span { display: block; width: 6px; height: 18px; background: #111; border-radius: 1px; }
-.brand-mark span:nth-child(2) { height: 23px; }.brand-mark span:nth-child(3) { height: 20px; }
 .global-navigation { display: flex; gap: 4px; }
 .global-navigation button { border: 0; background: none; padding: 9px 11px; border-radius: 30px; font-size: 13px; }
 .global-navigation button:hover, .global-navigation button[aria-current] { background: #f1f1f1; }
@@ -101,7 +98,7 @@ small { font-size: 12px; }
 .workflow-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
 .workflow-strip > div { position: relative; padding: 25px 20px; background: #f5f5f5; border-radius: 6px; min-height: 170px; }
 .workflow-number { display: block; color: #666; font-size: 12px; margin-bottom: 24px; }.workflow-strip svg { position: absolute; right: 20px; top: 25px; }.workflow-strip strong { display: block; font-size: 15px; }.workflow-strip p { font-size: 12px; color: #666; margin-top: 6px; }
-.content-footer { display: flex; align-items: center; gap: 22px; color: #666; font-size: 12px; border-top: 1px solid var(--border); margin-top: 64px; padding: 26px 0; }.content-footer > span:last-child { margin-left: auto; }.footer-brand { font-weight: bold; color: #111; }.tiny-brand { margin-right: 7px; }
+.content-footer { display: flex; align-items: center; gap: 22px; color: #666; font-size: 12px; border-top: 1px solid var(--border); margin-top: 64px; padding: 26px 0; }.content-footer > span:last-child { margin-left: auto; }.footer-brand { font-weight: bold; color: #111; }
 .page-heading, .run-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 30px; margin-bottom: 35px; }.page-heading p, .run-heading p { color: #666; margin-top: 20px; overflow-wrap: anywhere; }.page-heading .button, .run-heading > .button { flex-shrink: 0; margin-top: 30px; }.run-heading h1 { font-size: clamp(36px, 4vw, 56px); }.inline-separator { padding: 0 12px; }
 .run-tabs { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }.run-tabs button { border: 0; background: none; border-radius: 30px; padding: 10px 18px; }.run-tabs .active { background: #111; color: white; }.run-tabs > div { margin-left: auto; }.tab-count { font-size: 11px; margin-left: 5px; }
 .status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; white-space: nowrap; color: #555; }.status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }.status-completed { color: #286339; }.status-awaiting_approval, .warning-text { color: #815500; }.status-failed { color: #ac2929; }.success-text { color: #286339; }
