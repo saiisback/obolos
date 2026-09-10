@@ -153,14 +153,15 @@ describe('report model compatibility',()=>{
         }
         if(model==='gpt-4.1-mini')expect(body.max_tokens).toBe(1000);
         expect(body.model).toBe(model);
-        return Response.json({choices:[{message:{content:'owner/repo: evidence-based report'}}]});
+        expect(body.response_format.json_schema.strict).toBe(true);
+        return Response.json({choices:[{message:{content:JSON.stringify({analysis:'Evidence-based qualitative report.',repositories:[{repo:'owner/repo',stars:sourceEvidence.stars,forks:sourceEvidence.forks,openIssues:sourceEvidence.openIssues}]})}}]});
       }
       return realFetch(input,init);
     });
     await withBroker({BROKER_DATA_DIR:join(j.path,'..'),INFERENCE_MODEL:model,INFERENCE_BASE_URL:'https://api.openai.com/v1'},async url=>{
       const response=await post(url+'/report',{runId:'report-check',evidence:[sourceEvidence]});
       expect(response.status).toBe(200);
-      expect(await response.json()).toEqual({summary:'owner/repo: evidence-based report'});
+      const result=await response.json(); expect(result.summary).toContain('Evidence-based qualitative report.'); expect(result.summary).toContain(`owner/repo | stars=${sourceEvidence.stars} | forks=${sourceEvidence.forks} | openIssues=${sourceEvidence.openIssues}`);
     });
     expect(modelCalls).toBe(1);
   });

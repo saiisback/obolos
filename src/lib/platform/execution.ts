@@ -1,3 +1,4 @@
+import type {Run} from '../contracts';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { verificationServiceSchema } from '../market/contracts';
@@ -127,6 +128,17 @@ const resultSchema=z.object({
  approval:z.object({signerMode:z.enum(['usb','speculos']).optional(),nonce:short,message:text,expiresAt:z.iso.datetime(),proposedMandate:engineMandateSchema,reason:text}).optional(),shockApplied:z.boolean(),error:text.optional(),authorizations:z.array(z.never()).max(0).optional(),
 }).strict();
 
+/** Only independently proven settlement can turn a verification-stage stop into
+ * a known negative result. Missing delivery or explicit uncertainty stays uncertain. */
+export function classifyRunnerStatus(r:Run,proofs?:unknown[]|null) {
+ if(r.status==='completed')return 'succeeded';
+ if(['awaiting_approval','paused'].includes(r.status))return 'blocked';
+ if(/uncertain|pending|reconcil|timeout|unknown|in.flight/i.test(r.error??''))return 'uncertain';
+ const confirmedNegative=r.status==='failed'&&r.stage==='verification'&&r.report?.verified===false&&r.report.checks.some(c=>!c.passed)&&
+  ['hedera:testnet','arc:testnet'].every(network=>r.receipts.some(receipt=>receipt.network===network&&receipt.status==='settled'&&!!receipt.transactionId)&&proofs?.some(proof=>typeof proof==='object'&&proof!==null&&'network' in proof&&proof.network===network));
+ return confirmedNegative?'failed':['purchase','verification'].includes(r.stage)?'uncertain':'failed';
+}
+
 export function validateRunnerResult(value:unknown,job:{id:string;repos:string[];mandate:SignedMandate}) {
  const r=resultSchema.parse(value),m=job.mandate;
  const invalid=()=>{throw new PlatformError(400,'INVALID_RESULT','Runner result does not match this job and its signed payment scope.');};
@@ -153,7 +165,7 @@ export function validateRunnerResult(value:unknown,job:{id:string;repos:string[]
  if(data!==r.dataSpentAtomic||verification!==r.verificationSpentAtomic||data>m.dataBudgetAtomic||verification>m.verificationBudgetAtomic)invalid();
  if(r.report&&(JSON.stringify(r.report.evidence)!==JSON.stringify(r.evidence)||!requests.has(`${job.id}:data`)))invalid();
  if(r.status==='completed'&&(r.stage!=='complete'||r.receipts.length!==2||!r.report?.verified||!r.report.checks.length||r.report.checks.some(c=>!c.passed)||r.evidence.length!==job.repos.length))invalid();
- const status=r.status==='completed'?'succeeded':['awaiting_approval','paused'].includes(r.status)?'blocked':(/uncertain|pending|reconcil|timeout|unknown|in.flight/i.test(r.error??'')||['purchase','verification'].includes(r.stage))?'uncertain':'failed';
+ const status=classifyRunnerStatus(r);
  return {result:r,status};
 }
 export async function saveRunnerResult(runner:{id:string;agentId:string},jobId:string,body:unknown) {
@@ -163,6 +175,7 @@ export async function saveRunnerResult(runner:{id:string;agentId:string},jobId:s
  if(!rows[0])throw new PlatformError(404,'RUN_NOT_FOUND','Run not found.');
  const job=rows[0],validated=validateRunnerResult(input.result,{id:jobId,repos:job.repos,mandate:signed(job)}),serialized=JSON.stringify(validated.result);
  const proofs=await verifyHostedSettlement({id:jobId,created_at:job.created_at},validated.result, signed(job));
+ const acceptedStatus=classifyRunnerStatus(validated.result,proofs);
  const claims=proofs?validated.result.receipts.map(receipt=>db`INSERT INTO platform_chain_receipts(network,transaction_id,job_id)
   SELECT ${receipt.network},${receipt.transactionId!},${jobId} FROM platform_jobs j
   WHERE j.id=${jobId} AND j.agent_id=${runner.agentId} AND j.runner_id=${runner.id} AND j.status='running' AND j.result IS NULL
@@ -173,7 +186,7 @@ export async function saveRunnerResult(runner:{id:string;agentId:string},jobId:s
  try {r=await db.transaction([
   db`SELECT id FROM platform_agents WHERE id=${runner.agentId} FOR UPDATE`,
   ...claims,
-  db`UPDATE platform_jobs SET receipt_verification=${verification},receipt_proofs=${proofs?JSON.stringify(proofs):null}::jsonb,result=${serialized}::jsonb,status=${validated.status},updated_at=now() WHERE id=${jobId} AND agent_id=${runner.agentId} AND runner_id=${runner.id} AND status='running' AND result IS NULL AND NOT EXISTS(SELECT 1 FROM platform_chain_receipts WHERE transaction_id=ANY(${hashes}::text[]) AND job_id<>${jobId}) AND EXISTS(SELECT 1 FROM platform_runners WHERE id=${runner.id} AND agent_id=${runner.agentId} AND revoked_at IS NULL) RETURNING *`,
+  db`UPDATE platform_jobs SET receipt_verification=${verification},receipt_proofs=${proofs?JSON.stringify(proofs):null}::jsonb,result=${serialized}::jsonb,status=${acceptedStatus},updated_at=now() WHERE id=${jobId} AND agent_id=${runner.agentId} AND runner_id=${runner.id} AND status='running' AND result IS NULL AND NOT EXISTS(SELECT 1 FROM platform_chain_receipts WHERE transaction_id=ANY(${hashes}::text[]) AND job_id<>${jobId}) AND EXISTS(SELECT 1 FROM platform_runners WHERE id=${runner.id} AND agent_id=${runner.agentId} AND revoked_at IS NULL) RETURNING *`,
   db`SELECT * FROM platform_jobs WHERE id=${jobId} AND agent_id=${runner.agentId} AND runner_id=${runner.id}`,
  ],{isolationLevel:'ReadCommitted'});}catch(error){
   if((error as {code?:string}).code==='23505')throw new PlatformError(409,'PAYMENT_REUSED','A payment is already assigned to another result; all new claims were rolled back.');

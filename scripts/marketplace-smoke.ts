@@ -9,7 +9,8 @@ import {privateKeyToAccount} from 'viem/accounts';
 import {loadRunnerConfig} from '../src/lib/runner/config';
 import {RunnerJournal} from '../src/lib/runner/journal';
 import {RunnerClient} from '../src/lib/runner/transport';
-const dir=resolve('data/market-release');
+async function main(){
+const dir=resolve(process.env.OBOLOS_RELEASE_DIR||'data/market-release');
 type State={origin:string;buyerKey:`0x${string}`;sellerKey:`0x${string}`;[k:string]:any};
 const state:State=JSON.parse(await readFile(resolve(dir,'state.json'),'utf8'));
 async function save(){await writeFile(resolve(dir,'state.json'),JSON.stringify(state),{mode:0o600});await chmod(resolve(dir,'state.json'),0o600);}
@@ -53,8 +54,11 @@ async function execute(){
   console.log(JSON.stringify({queuedJob:state.jobId}));await runner.pollOnce();
  }finally{await journal.close();}
  await inspect();
- const result=state.lastInspection.runs.find((j:any)=>j.id===state.jobId);assert.equal(result.status,'succeeded');assert.equal(result.receiptVerification,'chain-confirmed');assert.equal(state.lastInspection.earnings.totalAtomic,'50000');assert(result.result.receipts.find((r:any)=>r.orderId&&r.recipient.toLowerCase()===seller.account.address.toLowerCase()));
+ const result=state.lastInspection.runs.find((j:any)=>j.id===state.jobId);assert.equal(result.status,'succeeded');assert.equal(result.receiptVerification,'chain-confirmed');assert(state.lastInspection.earnings.orders.some((o:any)=>o.jobId===state.jobId&&o.amountAtomic===50000));assert(result.result.receipts.find((r:any)=>r.orderId&&r.recipient.toLowerCase()===seller.account.address.toLowerCase()));
  console.log('Paid marketplace release test passed.');
 }
 const mode=process.argv[2];
 try{if(mode==='prepare')await prepare();else if(mode==='execute')await execute();else if(mode==='inspect')await inspect();else throw Error('Use prepare, execute, or inspect');}catch(e){console.error(e instanceof Error?e.message:'Marketplace smoke failed');process.exitCode=1;}
+
+}
+main().catch(()=>{console.error("Marketplace test setup unavailable; check its private fixture files.");process.exitCode=1;});

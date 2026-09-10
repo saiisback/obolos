@@ -8,9 +8,17 @@ The native Vercel application authenticates owner EOA wallets through one-time s
 
 A user-owned runner polls outbound over HTTPS. It pins the owner, agent and application origin locally, verifies the wallet signature and every capability against that scope, and checks current server authorization before each paid step. The private loopback broker owns the signing credentials. Neither Neon nor the hosted application receives the Hedera key, Circle session, Ring password or inference key. A paired runner is a separate credential from an agent API key.
 
-The API serializes allowance reservations and claims with PostgreSQL row locks. A job is claimed once; a crashed claim is not leased out for another execution. The runner maintains a separate fsynced journal, retains uncertain intents and retries only delivery of an already saved result. Owners can inspect reports, evidence, reasons and runner-confirmed receipts. The workspace does not automatically certify uploaded receipts independently on chain.
+The API serializes allowance reservations and claims with PostgreSQL row locks. A job is claimed once; a crashed claim is not leased out for another execution. The runner maintains a separate fsynced journal, retains uncertain intents and retries only delivery of an already saved result. Owners can inspect reports, evidence, reasons and receipts. For v2 marketplace jobs, the workspace independently checks Hedera settlement and the fulfilled Arc order before accepting chain-confirmed results; legacy v1 receipts remain runner-confirmed.
 
 The native `/x402` service stores its price book and unique settlement intents in Neon. A duplicate native Hedera transaction cannot settle twice across Vercel instances. The public provider needs its recipient and facilitator, not a payer signing key. [The deployed bounded test](evidence/2026-09-09-self-service-testnet.md) confirmed this entire path and both chain transfers.
+
+## Seller marketplace
+
+Authenticated sellers publish a hosted metric-verifier listing with their own wallet as the immutable recipient. The seller controls price and active revision. Obolos supplies the verifier implementation; sellers cannot upload arbitrary code. Buyer v2 mandates bind the service ID, revision, exact endpoint, recipient and price. A changed or paused listing stops new order creation until the buyer signs current terms.
+
+The broker pins its owner and public marketplace origin privately. Every order binds a real running job, signed service snapshot, paid data transaction and report digest. Canonical data-source IDs and Arc hashes are unique across orders. Arc confirmation independently checks chain ID, token, payer, recipient, amount and block time before storing checks and earnings. Seller revenue is direct wallet settlement, not a platform balance or escrow. A paid negative verification is still a fulfilled service and is charged.
+
+Structured model output is rendered into exact metric rows without correcting the model’s numbers. The paid service compares those claims with purchased evidence; free-text recommendations remain outside its certification. A confirmed negative result is a failed report, while ambiguous payment submission remains uncertain. Repeating result delivery or confirmation never initiates another transfer.
 
 ## Operator demonstration and capability authority
 

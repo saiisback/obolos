@@ -8,7 +8,7 @@ const transport=vi.hoisted(()=>({query:undefined as unknown,verify:vi.fn()}));
 vi.mock('../src/lib/platform/db',()=>({sql:()=>transport.query,databaseConfigured:()=>true}));
 vi.mock('../src/lib/market/chain',()=>({verifyMarketTransfer:transport.verify}));
 // This suite tests SQL result acceptance; independent proof validation has its own tests.
-vi.mock('../src/lib/platform/settlement-proof',()=>({verifyHostedSettlement:async()=>[{network:'arc:testnet',verified:true}]}));
+vi.mock('../src/lib/platform/settlement-proof',()=>({verifyHostedSettlement:async()=>[{network:'hedera:testnet',verified:true},{network:'arc:testnet',verified:true}]}));
 import {issueChallenge,redeemChallenge,CHALLENGE_COOKIE} from '../src/lib/platform/auth';
 import {createAgent} from '../src/lib/platform/agents';
 import {pairRunner,prepareMandate,approveMandate,authenticateRunner,claimJob,queueRun,saveRunnerResult} from '../src/lib/platform/execution';
@@ -74,6 +74,11 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)('PostgreSQL marketplace',()=>{
   await expect(saveRunnerResult(f.runner,candidate.id,{result:uploadResult(candidate,f.report as Report,dataTx,arcTx)})).rejects.toMatchObject({code:'PAYMENT_REUSED'});expect(await claimCount()).toBe(before);
   expect((await pool.query('SELECT count(*)::int AS count FROM platform_chain_receipts WHERE transaction_id=$1',[dataTx])).rows[0].count).toBe(0);
   expect((await pool.query('SELECT status,result FROM platform_jobs WHERE id=$1',[candidate.id])).rows[0]).toMatchObject({status:'running',result:null});
+ });
+
+ it('persists a proven paid negative verification as failed rather than uncertain',async()=>{
+  const f=await setup(),job=await f.job(),run=uploadResult(job,f.report as Report,'0.0.123@1999999999.5',`0x${'f'.repeat(64)}`);run.stage='verification';run.error='The paid verification found invalid evidence. Review the recorded receipt and failed checks.';run.report!.checks=[{label:'Claim scope',passed:false,detail:'Duplicate quantitative claims'}];
+  const saved=await saveRunnerResult(f.runner,job.id,{result:run});expect(saved.run.status).toBe('failed');expect(saved.run.receiptVerification).toBe('chain-confirmed');expect((await pool.query('SELECT count(*)::int AS count FROM platform_chain_receipts WHERE job_id=$1',[job.id])).rows[0].count).toBe(2);
  });
 
 });

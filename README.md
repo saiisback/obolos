@@ -16,6 +16,8 @@ A self-service workspace for research agents with wallet accounts, scoped API ac
 
 The application and x402 service support native Vercel hosting with Neon. Paid execution still requires the owner’s local runner and funded broker to be online. A wallet signature does not prove physical Ledger use; Speculos is emulated development signing. Ledger acceptance and prior-paper eligibility remain external decisions.
 
+**Marketplace release:** signed-in sellers can publish hosted metric-verification services and receive Arc test USDC directly. Buyers select a seller in a v2 spending mandate; orders bind the purchased evidence, report, recipient and price. The public service verifies settlement, and the workspace checks both payment proofs before showing chain-confirmed results. [Open the marketplace](https://obolos.app/marketplace) · [Setup and API flow](docs/marketplace-setup.md).
+
 ## One workflow, three tracks
 
 A user asks: *Compare these three developer tools using current repository activity and produce a checked report.* Obolos discovers approved service quotes, buys repository evidence, generates a report and pays for source checks. A quote above the mandate pauses execution until a human authorizes the increase.
@@ -66,13 +68,18 @@ flowchart LR
   Data --> GitHub[Public GitHub evidence]
   Broker --> Model[Fixed inference provider]
   Broker --> Circle[Local Circle Agent Stack CLI]
-  Circle --> Arc[Arc testnet USDC verification payment]
+  Circle --> Arc[Arc testnet USDC to selected seller]
+  Seller[Seller wallet] -->|Publish price and recipient| Market[Hosted verifier marketplace]
+  UI -->|Signed service revision and price| Market
+  Broker -->|Evidence-bound order and receipt| Market
+  Market -->|Verify canonical transfer| Arc
+  Market -->|Persist orders and confirmed earnings| Neon
   Broker -->|Evidence, receipts and checks| Engine
 ```
 
-The on-chain part is payment settlement on Hedera and Arc. The model, planner, broker, facilitator, Circle infrastructure and local journal remain off-chain/trusted dependencies; this is not a fully decentralized agent runtime. Verification checks evidence structure, sources, timestamps and coverage, not the truth of every generated sentence. Self-service receipts are labeled runner-confirmed until independently checked on chain.
+The on-chain part is payment settlement on Hedera and Arc. The model, planner, broker, facilitator, Circle infrastructure and local journal remain off-chain/trusted dependencies; this is not a fully decentralized agent runtime. The marketplace verifier checks model metric claims against purchased evidence, sources, timestamps and coverage. It does not certify free-text recommendations. New v2 marketplace results are checked independently against Hedera settlement and fulfilled Arc orders; legacy v1 receipts retain their runner-confirmed label.
 
-The data service charges **per repository**, so one repository costs one unit and three cost three units. The planner selects the cheapest permitted quote. Price increases can trigger rerouting or require a new mandate. Verification is a separate fixed-fee job paid in Arc USDC. Network fees are **not included** in purchase allowances.
+The data service charges **per repository**, so one repository costs one unit and three cost three units. The planner selects the cheapest permitted quote. Price increases can trigger rerouting or require a new mandate. Verification is a separate job paid in Arc USDC at the selected seller’s signed price. Network fees are **not included** in purchase allowances.
 
 See [architecture and trust boundaries](docs/architecture.md), [Hedera setup](docs/hedera-setup.md) and [broker, Circle and Ledger setup](docs/broker-setup.md).
 
