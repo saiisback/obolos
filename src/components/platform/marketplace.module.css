@@ -60,3 +60,7 @@
 .embedded .search { background:#fff; border-color:#ccc; color:#666; }.embedded .search input { color:#111; }.embedded .search input::placeholder { color:#666; }
 .embedded .card { background:#fff; border-color:#d5d5d5; }.embedded .purchase { background:#f5f5f5; border-color:#ddd; }.embedded .serviceType>span:last-child { color:#666; }.embedded .funding,.embedded .sellerSection { border-color:#ddd; }.embedded .funding>a { color:#111; text-decoration:underline; }.embedded .loading { background:#f6f6f6; border-color:#ddd; }.embedded .loading>span { background:#ddd; }
 @media(max-width:760px) { .workspaceHeading { padding-top:32px; }.workspaceHeading h1 { font-size:32px; } }
+
+.embedded .workspaceHeading { border-bottom:0; }.embedded .catalogHeading { margin-top:0; }.embedded .sellerSection { border-top:0; padding-top:0; }.embedded .card h3 { font-size:21px; margin-top:16px; }.embedded .price strong { font-size:28px; }.embedded .serviceInfo { padding:24px; }.embedded .purchase { padding:24px; }.publishAction { display:flex; justify-content:space-between; gap:24px; align-items:center; margin:24px 0 32px; }.publishAction p { color:#666; font-size:13px; max-width:55ch; }.publishAction button { flex-shrink:0; }
+@media(max-width:1100px) { .embedded .card { grid-template-columns:minmax(0,1fr) 220px; } }
+@media(max-width:760px) { .embedded .card { grid-template-columns:minmax(0,1fr); }.publishAction { flex-direction:column; align-items:flex-start; gap:16px; } }

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import {usePathname, useRouter} from 'next/navigation';
 import {useEffect, useState, type ReactNode} from 'react';
 import {api, errorMessage, type User} from './api';
+import {Bot, Store, ReceiptText, Code2, LogOut} from 'lucide-react';
 import {workspaceLinks, workspaceReturnPath} from '@/lib/platform/workspace-navigation';
 import s from './platform.module.css';
 import w from './workspace-shell.module.css';
@@ -38,13 +39,22 @@ export function WorkspaceShell({children}: {children: ReactNode}) {
 
   return <div className={`${s.shell} ${w.shell}`}>
     <a className={s.skip} href="#main">Skip to content</a>
+    <aside className={w.sidebar}>
+      <Link className={s.brand} href="/app" aria-label="Obolos workspace"><img src="/brand/obolos-symbol-black.png" width={32} height={32} alt="" />obolos</Link>
+      <nav className={w.navigation} aria-label="Workspace navigation">{workspaceLinks.map((link, index) => {
+        const Icon = [Bot, Store, ReceiptText, Code2][index];
+        return <Link key={link.href} href={link.href} aria-label={link.label} aria-current={pathname === link.href ? 'page' : undefined}><Icon size={18} aria-hidden="true"/><span>{link.label}<small>{['Setup & execution', 'Verifiers & seller desk', 'Reports & receipts', 'Credentials & integration'][index]}</small></span></Link>;
+      })}</nav>
+      <div className={w.sidebarNote}><strong>Testnet workspace</strong><p>Hedera data payments<br/>Arc USDC settlement</p></div>
+    </aside>
+    <div className={w.content}>
     <header className={w.header}>
-      <Link className={s.brand} href="/app" aria-label="Obolos workspace"><img src="/brand/obolos-symbol-black.png" width={38} height={38} alt="" />obolos</Link>
-      <nav className={w.navigation} aria-label="Workspace navigation">{workspaceLinks.map(link => <Link key={link.href} href={link.href} aria-current={pathname === link.href ? 'page' : undefined}>{link.label}</Link>)}</nav>
-      {user && <div className={w.account}><span title={user.address}>{user.address.slice(0,6)}…{user.address.slice(-4)}</span><button onClick={logout} disabled={signingOut}>{signingOut ? 'Signing out…' : 'Sign out'}</button></div>}
+      <span>Workspace <span aria-hidden="true">/</span> <strong>{workspaceLinks.find(link => link.href === pathname)?.label || 'Agents'}</strong></span>
+      {user && <div className={w.account}><span title={user.address}>{user.address.slice(0,6)}…{user.address.slice(-4)}</span><button onClick={logout} disabled={signingOut}><LogOut size={15} aria-hidden="true"/>{signingOut ? 'Signing out…' : 'Sign out'}</button></div>}
     </header>
     {error && <div className={w.error} role="alert"><p>{error}</p><button className={s.secondary} onClick={() => setAttempt(value => value + 1)}>Try again</button></div>}
     {loading ? <main id="main" className={s.main}><p className={s.empty} role="status">Loading your workspace…</p></main> : user ? children : !error ? <main id="main" className={s.main}><p className={s.empty} role="status">Opening wallet sign-in…</p></main> : null}
-    <footer className={w.footer}><span>Your workspace · Hedera + Arc testnets</span><Link href="/app/evidence">Your execution evidence</Link><Link href="/app/developers">Your API credentials</Link></footer>
+    <footer className={w.footer}>Obolos · Testnet assets only. Spending requires your signed mandate.</footer>
+    </div>
   </div>;
 }

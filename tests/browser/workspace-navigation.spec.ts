@@ -24,6 +24,9 @@ async function fixture(page: Page, initialAuth = true) {
       return json({key:{id:'key-one',name:'Local fixture',prefix:'ob_test_fixture',createdAt:new Date().toISOString(),expiresAt:'2099-01-01T00:00:00Z',revokedAt:null},token:'ob_test_browser_fixture_not_a_real_key'});
     }
     if(path.endsWith('/keys/key-one') && method === 'DELETE') { mutations.push(path); return json({ok:true}); }
+    if(path.endsWith('/runner') && method === 'POST') return json({runner:{id:'runner-fixture',prefix:'ob_runner_fixture',createdAt:new Date().toISOString(),lastSeenAt:null,revokedAt:null,online:false},token:'ob_runner_browser_fixture_not_a_real_key'});
+    if(path.endsWith('/runner')) return json({runner:null});
+    if(path.endsWith('/mandate')) return json({mandate:null});
     if(path.endsWith('/runs')) return json({runs:path.includes(first.id) ? [{id:'job-one', status:'succeeded', repos:['owner-one/repo'], createdAt:'2026-09-10T00:00:00Z', result:null}] : []});
     throw new Error(`Unexpected API request: ${method} ${path}`);
   });
@@ -66,6 +69,8 @@ test('credentials stay scoped to the selected agent and one-time secrets leave w
   await expect(page.getByLabel('New API credential')).toBeVisible();
   await page.getByLabel('Agent',{exact:true}).selectOption(second.id);
   await expect(page.getByLabel('New API credential')).toHaveCount(0);
+  await page.getByRole('navigation',{name:'Developer sections'}).getByRole('link',{name:'API examples'}).click();
+  await expect(page.getByLabel('Shell · Selected agent code')).toBeVisible();
   await expect(page.getByLabel('Shell · Selected agent code')).toContainText(second.id);
   await expect(page.getByLabel('Shell · Selected agent code')).not.toContainText(first.id);
 });
@@ -81,4 +86,55 @@ test('login returns to the private section originally requested', async ({page})
   await page.getByRole('button',{name:'Fixture wallet',exact:false}).click();
   await expect(page).toHaveURL(origin+'/app/evidence');
   await expect(page.getByRole('heading',{name:'Your execution evidence'})).toBeVisible();
+});
+
+
+test('task views keep setup, execution, selling, and integration separate', async ({page}) => {
+  await fixture(page);
+  await page.goto(origin+'/app');
+  await page.getByRole('button',{name:'Manage agent',exact:true}).first().click();
+  await expect(page.getByRole('button',{name:'Pair a runner',exact:false})).toBeVisible();
+  await page.getByRole('button',{name:'Pair a runner',exact:false}).click();
+  await expect(page.getByLabel('One-time runner credential')).toBeVisible();
+  await expect(page.getByLabel('One-time runner credential')).toHaveValue('ob_runner_browser_fixture_not_a_real_key');
+  await expect(page.getByRole('button',{name:'1. Connect runner',exact:false})).toHaveAttribute('aria-pressed','true');
+  await expect(page.getByRole('button',{name:'Queue testnet run',exact:false})).not.toBeVisible();
+  await expect(page.getByLabel('Credential name')).toHaveCount(0);
+  await page.getByRole('button',{name:'2. Authorize spending',exact:false}).click();
+  await page.getByLabel('Allowed repositories').fill('fixture/repository');
+  await page.getByRole('button',{name:'3. Run research',exact:false}).click();
+  await expect(page.getByLabel('Repositories for this run')).toHaveValue('fixture/repository');
+  await expect(page.getByRole('button',{name:'Queue testnet run',exact:false})).toBeDisabled();
+  await page.getByRole('button',{name:'2. Authorize spending',exact:false}).click();
+  await expect(page.getByLabel('Allowed repositories')).toHaveValue('fixture/repository');
+  await page.goto(origin+'/app/marketplace');
+  await expect(page.getByRole('heading',{name:'Seller desk',exact:true})).not.toBeVisible();
+  await page.getByRole('navigation',{name:'Marketplace sections'}).getByRole('link',{name:'Your seller desk'}).click();
+  await expect(page.getByRole('heading',{name:'Seller desk',exact:true})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Available verifiers',exact:false})).not.toBeVisible();
+  await expect(page.getByRole('heading',{name:'New hosted verifier listing'})).not.toBeVisible();
+  await page.getByRole('button',{name:'Publish a service',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'New hosted verifier listing'})).toBeVisible();
+  await page.goto(origin+'/app/developers#runner');
+  await expect(page.getByRole('heading',{name:'Runner prerequisites'})).toBeVisible();
+  await expect(page.getByLabel('Credential name')).not.toBeVisible();
+  await page.getByRole('navigation',{name:'Developer sections'}).getByRole('link',{name:'API examples'}).click();
+  await expect(page.getByLabel('Shell · Selected agent code')).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Runner prerequisites'})).not.toBeVisible();
+});
+
+test('an empty workspace explains setup and keeps the runner guide accessible', async ({page}) => {
+  await fixture(page);
+  await page.route('**/api/agents', route => route.fulfill({json:{agents:[]}}));
+  await page.goto(origin+'/app');
+  await expect(page.getByRole('heading',{name:'Your first agent starts here.'})).toBeVisible();
+  await page.getByRole('button',{name:'Create your first agent'}).click();
+  await expect(page.getByLabel('Agent name')).toBeFocused();
+  await page.getByRole('button',{name:'Cancel',exact:true}).click();
+  await page.goto(origin+'/app/evidence');
+  await expect(page.getByRole('heading',{name:'No agents yet'})).toBeVisible();
+  await page.goto(origin+'/app/developers#runner');
+  await expect(page.getByRole('heading',{name:'Runner prerequisites'})).toBeVisible();
+  await page.getByRole('navigation',{name:'Developer sections'}).getByRole('link',{name:'API credentials'}).click();
+  await expect(page.getByRole('heading',{name:'Create an agent to get started'})).toBeVisible();
 });

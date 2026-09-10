@@ -11,9 +11,11 @@ A self-service workspace for research agents with wallet accounts, scoped API ac
 Signed-in navigation stays inside the workspace:
 
 - `/app`: owned agents, runner pairing and spending mandates.
-- `/app/marketplace`: live verifier catalog, the connected wallet’s seller desk and earnings.
+- `/app/marketplace`: separate **Browse verifiers** and **Your seller desk** views; publishing opens on demand beside listings and earnings.
 - `/app/evidence`: the selected owned agent’s latest 100 runs, reports, receipts and checks.
 - `/app/developers`: agent-scoped credential issue/revocation and API examples.
+
+Inside an opened agent, **Connect runner → Authorize spending → Run research** separates setup from daily execution. Recent runs stay beside the queue; full execution history lives in Evidence. Developers separates **API credentials**, **API examples**, and **Runner setup**, with shareable section anchors. Switching developer sections or agents hides unsaved one-time credentials.
 
 The public `/marketplace`, `/evidence` and `/developers` pages remain separate; public evidence is a captured release record. Workspace sessions are checked before rendering account sections; every private API independently enforces ownership. Sign-in return destinations are restricted to the four workspace routes.
 

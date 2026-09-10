@@ -3,12 +3,14 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api, errorMessage, type Agent } from './api';
+import {WorkspaceSections, useWorkspaceSection} from './workspace-sections';
 import { Credentials } from './agent-credentials';
 import { CodeBlock } from './code-block';
 import s from './platform.module.css';
 import d from './workspace-developers.module.css';
 
 export function WorkspaceDevelopers() {
+  const section = useWorkspaceSection(['credentials', 'integration', 'runner'], 'credentials');
   const [agents, setAgents] = useState<Agent[]>([]);
   const [selectedId, setSelectedId] = useState('');
   const [loading, setLoading] = useState(true);
@@ -53,16 +55,17 @@ export OBOLOS_API_KEY` : '';
   return <main id="main" className={`${s.main} ${d.page}`}>
     <header className={d.heading}>
       <div><h1>API credentials</h1><p>Manage your agents’ access and connect your integration.</p></div>
-      <Link href="/app" className={s.secondary}>Manage agents</Link>
     </header>
+    <WorkspaceSections current={section} label="Developer sections" items={[{id:'credentials',label:'API credentials'},{id:'integration',label:'API examples'},{id:'runner',label:'Runner setup'}]}/>
+    <div hidden={section === 'runner'}>
     {loading ? <div className={s.empty} role="status">Loading your agents…</div> : error ? <div className={s.error} role="alert"><p>{error}</p><button className={s.secondary} onClick={load}>Retry loading agents</button></div> : agents.length === 0 ? <div className={s.empty}><h2>Create an agent to get started</h2><p>Credentials belong to an agent. Create one in your workspace, then issue a key here.</p><Link className={s.primary} href="/app">Create an agent</Link></div> : selected ? <>
       <div className={d.selection}>
         <label htmlFor="credentials-agent">Agent<select aria-label="Agent" id="credentials-agent" value={selectedId} onChange={event => setSelectedId(event.target.value)}>{agents.map(agent => <option key={agent.id} value={agent.id}>{agent.name}</option>)}</select></label>
         <div><span>Agent ID</span><code>{selected.id}</code></div>
-        <p>Changing agents hides any unsaved one-time credential.</p>
+        <p>Changing agents or sections hides any unsaved one-time credential.</p>
       </div>
-      <Credentials key={selected.id} agent={selected} showIntegrationLink={false} />
-      <section className={d.integration} aria-labelledby="integration-heading">
+      <div id="credentials" hidden={section !== 'credentials'}>{section === 'credentials' && <Credentials key={selected.id} agent={selected} showIntegrationLink={false} />}</div>
+      <section id="integration" hidden={section !== 'integration'} className={d.integration} aria-labelledby="integration-heading">
         <div><h2 id="integration-heading">Connect {selected.name}</h2><p>These examples use your selected agent and this deployment. Keep the credential in your server environment; it is never added to these examples.</p></div>
         <div className={d.examples}>
           <section><h3>Set your environment</h3><p>Run this in Bash or Zsh and enter your saved credential at the prompt. Each credential expires after 30 days.</p>{environment && <CodeBlock key={`${selected.id}-environment`} code={environment} label="Shell · Selected agent" />}</section>
@@ -71,7 +74,8 @@ export OBOLOS_API_KEY` : '';
         </div>
       </section>
     </> : null}
-    <section id="runner" className={d.runner}>
+    </div>
+    <section hidden={section !== 'runner'} id="runner" className={d.runner}>
       <h2>Runner prerequisites</h2>
       <p>Your API key queues work; a separately funded private runner executes it. Prepare Hedera test HBAR, Arc test USDC, a Circle agent wallet session, and your Ledger Key Ring broker. Speculos is the supported development emulator and is not hardware-backed.</p>
       <ol><li>Use a dedicated checkout and OS user for your wallet broker. Keep keys, token files, and payment journals outside source control.</li><li>In <Link href="/app">Agents</Link>, choose <strong>Manage agent</strong>, pair a runner, and save the one-time runner credential. Copy that agent’s exact runner configuration into your private <code>.env.runner</code>.</li><li>Configure the broker and run <code>npm run agent:runner</code>. A heartbeat confirms connectivity, not funding.</li><li>Select a verifier, review the separate HBAR and USDC limits, and sign the spending mandate before queuing a run.</li></ol>

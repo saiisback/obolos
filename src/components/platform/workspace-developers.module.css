@@ -28,3 +28,8 @@
 }
 
 .runner { border-top:1px solid #ddd; padding-top:32px; margin-top:40px; max-width:78ch; scroll-margin-top:24px; }.runner h2 { font-size:25px; }.runner p,.runner li { font-size:14px; color:#555; line-height:1.8; margin:16px 0; }.runner ol { padding-left:22px; }.runner a { text-decoration:underline; text-underline-offset:4px; }.runner>a { font-size:13px; }.runner code { overflow-wrap:anywhere; }
+
+/* Keep account context compact and put reference material in its own task view. */
+.selection { gap:12px 24px; padding:0 0 24px; align-items:center; }.selection label { min-width:240px; }.selection>div { padding:0; }.selection>p { margin:0; font-size:11px; }
+.integration { margin-top:0; border-top:0; padding-top:8px; grid-template-columns:minmax(160px,1fr) minmax(0,2.6fr); gap:32px; }.runner { margin-top:0; padding-top:8px; border-top:0; }.runner li { margin:20px 0; }.runner h2 { font-size:21px; }
+@media(max-width:800px) { .selection label { width:100%; min-width:0; }.selection>div { display:none; }.integration { grid-template-columns:minmax(0,1fr); gap:20px; }.selection { gap:12px; } }

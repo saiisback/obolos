@@ -69,3 +69,4 @@
 .jobBody code,.jobBody p { overflow-wrap: anywhere; }
 .jobBody code { font-size: 11px; }
 .jobBody h4 { font-size: 17px; margin: 0 0 14px; }
+.jobBody .reportText { max-width:75ch; }
