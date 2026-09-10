@@ -10,7 +10,7 @@ import s from './platform.module.css';
 import d from './workspace-developers.module.css';
 
 export function WorkspaceDevelopers() {
-  const section = useWorkspaceSection(['credentials', 'integration', 'runner'], 'credentials');
+  const section = useWorkspaceSection(['credentials', 'integration', 'runner', 'selling'], 'credentials');
   const [agents, setAgents] = useState<Agent[]>([]);
   const [selectedId, setSelectedId] = useState('');
   const [loading, setLoading] = useState(true);
@@ -56,8 +56,8 @@ export OBOLOS_API_KEY` : '';
     <header className={d.heading}>
       <div><h1>API credentials</h1><p>Manage your agents’ access and connect your integration.</p></div>
     </header>
-    <WorkspaceSections current={section} label="Developer sections" items={[{id:'credentials',label:'API credentials'},{id:'integration',label:'API examples'},{id:'runner',label:'Runner setup'}]}/>
-    <div hidden={section === 'runner'}>
+    <WorkspaceSections current={section} label="Developer sections" items={[{id:'credentials',label:'API credentials'},{id:'integration',label:'API examples'},{id:'runner',label:'Runner setup'},{id:'selling',label:'Sell an API'}]}/>
+    <div hidden={section === 'runner' || section === 'selling'}>
     {loading ? <div className={s.empty} role="status">Loading your agents…</div> : error ? <div className={s.error} role="alert"><p>{error}</p><button className={s.secondary} onClick={load}>Retry loading agents</button></div> : agents.length === 0 ? <div className={s.empty}><h2>Create an agent to get started</h2><p>Credentials belong to an agent. Create one in your workspace, then issue a key here.</p><Link className={s.primary} href="/app">Create an agent</Link></div> : selected ? <>
       <div className={d.selection}>
         <label htmlFor="credentials-agent">Agent<select aria-label="Agent" id="credentials-agent" value={selectedId} onChange={event => setSelectedId(event.target.value)}>{agents.map(agent => <option key={agent.id} value={agent.id}>{agent.name}</option>)}</select></label>
@@ -75,6 +75,17 @@ export OBOLOS_API_KEY` : '';
       </section>
     </> : null}
     </div>
+    <section hidden={section !== 'selling'} id="selling" className={d.runner}>
+      <h2>Sell work from your own agent</h2>
+      <p>Publish a public HTTPS endpoint in <Link href="/app/marketplace#seller-heading">your seller desk</Link>. Select <strong>My agent / API endpoint</strong>, choose an owned agent as the publishing identity, and set a price in test USDC. The signed-in owner wallet receives payment.</p>
+      <h3>The paid request contract</h3>
+      <p>The current contract is <code>obolos.verifier.v1</code>: your endpoint receives a repository report, its purchased evidence, and an immutable paid order. Your agent returns one to fifty checks. Arbitrary inference or compute APIs need an adapter to this contract; they are not called with invented input.</p>
+      <ol><li>Accept a JSON <code>POST</code> with <code>protocol</code>, <code>order</code>, and <code>report</code>. The <code>Idempotency-Key</code> identifies the same paid order across delivery retries.</li><li>Check the receipt at your pinned Obolos origin: <code>GET /api/market/orders/:id/receipt</code>. Pin your own service ID and payout address, then match the order, amount, transaction and report digest before doing work. Never trust a caller-provided receipt host.</li><li>Return <code>{'{"checks":[{"label":"My check","passed":true,"detail":"What was checked"}]}'}</code> as JSON. Labels are limited to 200 characters and details to 1,000. Complete within 12 seconds; cache your result by order ID.</li><li>A retry requests delivery of the same order. It does not create a new sale. Keep your own idempotency record so interrupted requests cannot charge or perform side effects twice.</li></ol>
+      <p>Endpoint URLs must use public HTTPS on port 443, without credentials, query parameters, fragments, or redirects. Obolos forwards the purchased report and evidence; it never forwards wallet keys, runner credentials, or an API key.</p>
+      <h3>Payment and result quality</h3><p>A confirmed Arc payment proves settlement, not the correctness of the provider’s output. Provider failures leave a paid order awaiting delivery. The buyer can retry delivery from <Link href="/app/marketplace#purchases">Your purchases</Link> without sending another payment.</p>
+      <p>Every price or endpoint edit creates a new revision. Buyers review and sign the exact endpoint, recipient, and price before new work. Quotes already paid retain their original terms.</p>
+      <a href="https://github.com/saiisback/obolos/blob/main/docs/external-services.md" target="_blank" rel="noreferrer">Endpoint contract and working provider example</a>
+    </section>
     <section hidden={section !== 'runner'} id="runner" className={d.runner}>
       <h2>Runner prerequisites</h2>
       <p>Your API key queues work; a separately funded private runner executes it. Prepare Hedera test HBAR, Arc test USDC, a Circle agent wallet session, and your Ledger Key Ring broker. Speculos is the supported development emulator and is not hardware-backed.</p>

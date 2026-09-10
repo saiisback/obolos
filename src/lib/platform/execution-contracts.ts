@@ -14,12 +14,12 @@ export const mandateFieldsSchema = z.object({
 export type MandateFields=Omit<z.infer<typeof mandateFieldsSchema>,'allowedProviders'> & {allowedProviders:string[]};
 export type SignedMandate=MandateFields & {message:string;signature:string};
 export function mandateMessage(m:MandateFields) {
-  return [`Obolos isolated runner spending mandate ${m.verificationService?'v2':'v1'}`,`Origin: ${m.origin}`,`Mandate: ${m.id}`,`Agent: ${m.agentId}`,`Owner: ${m.owner.toLowerCase()}`,
+  return [`Obolos isolated runner spending mandate ${m.verificationService&&'execution' in m.verificationService?'v3':m.verificationService?'v2':'v1'}`,`Origin: ${m.origin}`,`Mandate: ${m.id}`,`Agent: ${m.agentId}`,`Owner: ${m.owner.toLowerCase()}`,
     'Signing provenance: wallet',`Repositories: ${JSON.stringify(m.repos)}`,`Allowed providers: ${JSON.stringify(m.allowedProviders)}`,
     `Maximum HBAR atomic units per repository: ${m.maxDataUnitPriceAtomic}`,`HBAR atomic units per run: ${m.dataBudgetAtomic}`,
     `USDC atomic units per run: ${m.verificationBudgetAtomic}`,`Maximum runs: ${m.maxRuns}`,
     `Total HBAR atomic units: ${m.dataBudgetAtomic*m.maxRuns}`,`Total USDC atomic units: ${m.verificationBudgetAtomic*m.maxRuns}`,
-    ...(m.verificationService?[`Verification service: ${JSON.stringify({id:m.verificationService.id,revision:m.verificationService.revision,name:m.verificationService.name,recipient:m.verificationService.recipient,priceAtomic:m.verificationService.priceAtomic,endpoint:m.verificationService.endpoint})}`]:[]),
+    ...(m.verificationService?[`Verification service: ${JSON.stringify({id:m.verificationService.id,revision:m.verificationService.revision,name:m.verificationService.name,recipient:m.verificationService.recipient,priceAtomic:m.verificationService.priceAtomic,endpoint:m.verificationService.endpoint,...('execution' in m.verificationService?{execution:m.verificationService.execution,providerEndpoint:m.verificationService.providerEndpoint}:{})})}`]:[]),
     `Expires: ${m.expiresAt}`,'Network scope: Hedera testnet and Arc testnet only.',
     'I authorize my paired runner to execute only this scope. This is spending approval, not an identity login.'].join('\n');
 }

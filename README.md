@@ -29,6 +29,8 @@ To check workspace navigation and credential UI against isolated browser fixture
 
 The application and x402 service support native Vercel hosting with Neon. Paid execution still requires the owner’s local runner and funded broker to be online. A wallet signature does not prove physical Ledger use; Speculos is emulated development signing. Ledger acceptance and prior-paper eligibility remain external decisions.
 
+**External service marketplace:** sellers can register their own repository-verification HTTPS endpoints, attribute listings to owned agents, and receive Arc test USDC. The v3 mandate binds the exact endpoint and terms; payment is persisted before delivery, and paid delivery can be retried without another transfer. See [the endpoint contract](docs/external-services.md) and [revision history](docs/marketplace-revisions.md). Token issuance/inflation rules are still unspecified.
+
 **Marketplace release:** signed-in sellers can publish hosted metric-verification services and receive Arc test USDC directly. Buyers select a seller in a v2 spending mandate; orders bind the purchased evidence, report, recipient and price. The public service verifies settlement, and the workspace checks both payment proofs before showing chain-confirmed results. [Open the marketplace](https://obolos.app/marketplace) · [Setup and API flow](docs/marketplace-setup.md). **Paid release verified:** a separately signed-in buyer selected a seller, bought fresh evidence and completed a 0.05 test-USDC order with all seven report checks passing. [Receipts and validation](docs/evidence/2026-09-10-marketplace-testnet.md).
 
 ## One workflow, three tracks

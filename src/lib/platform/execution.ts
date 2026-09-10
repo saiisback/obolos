@@ -81,6 +81,7 @@ export async function queueRun(agentId:string,body:unknown,key:string|null) {
     SELECT ${jobId},${agentId},${input.idempotencyKey},'queued',${repos}::jsonb,m.id
     FROM platform_mandates m WHERE m.agent_id=${agentId} AND m.approved_at IS NOT NULL AND m.revoked_at IS NULL AND m.expires_at>now() AND m.reserved_runs<m.max_runs
       AND m.fields->'repos' @> ${repos}::jsonb
+      AND (m.fields->'verificationService' IS NULL OR EXISTS(SELECT 1 FROM platform_market_services s WHERE s.id::text=m.fields->'verificationService'->>'id' AND s.active=true AND s.revision=(m.fields->'verificationService'->>'revision')::integer AND s.price_atomic=(m.fields->'verificationService'->>'priceAtomic')::integer AND s.recipient=lower(m.fields->'verificationService'->>'recipient')))
       AND EXISTS(SELECT 1 FROM platform_runners WHERE agent_id=${agentId} AND revoked_at IS NULL AND last_seen_at>now()-interval '2 minutes')
     ON CONFLICT(agent_id,idempotency_key) DO NOTHING RETURNING mandate_id
    ) UPDATE platform_mandates SET reserved_runs=reserved_runs+1 WHERE id IN(SELECT mandate_id FROM inserted)`,
@@ -90,7 +91,7 @@ export async function queueRun(agentId:string,body:unknown,key:string|null) {
  if(job){if(JSON.stringify(job.repos)!==repos)throw new PlatformError(409,'IDEMPOTENCY_CONFLICT','This Idempotency-Key was already used with different repositories.');return {run:publicJob(job),replayed:job.id!==jobId};}
  const runners=await db`SELECT id FROM platform_runners WHERE agent_id=${agentId} AND revoked_at IS NULL AND last_seen_at>now()-interval '2 minutes'`;
  if(!runners[0])runnerRequired();
- throw new PlatformError(409,'MANDATE_REQUIRED','A current signed mandate with matching repositories and an available run allowance is required.');
+ throw new PlatformError(409,'MANDATE_REQUIRED','A current signed mandate with matching repositories, unchanged active service terms, and an available run allowance is required.');
 }
 export async function authenticateRunner(authorization:string|null) {
  const token=authorization?.match(/^Bearer (ob_runner_[A-Za-z0-9_-]{43})$/)?.[1];
@@ -124,7 +125,7 @@ const resultSchema=z.object({
  providers:z.array(z.object({id:short,name:short,description:short,network:short,asset:z.enum(['HBAR','USDC']),unit:short,unitPriceAtomic:atomic})).max(20),selectedProvider:short.optional(),dataSpentAtomic:atomic,verificationSpentAtomic:atomic,evidence:z.array(evidenceSchema).max(3),
  receipts:z.array(z.object({id:short,requestId:short,mode:z.literal('live'),network:z.enum(['hedera:testnet','arc:testnet']),asset:z.enum(['HBAR','USDC']),amountAtomic:z.number().int().positive().max(100000000),units:z.number().int().min(1).max(3),provider:short,status:z.literal('settled'),timestamp:z.iso.datetime(),transactionId:short,explorerUrl:short.optional(),orderId:z.uuid().optional(),recipient:z.string().regex(/^0x[0-9a-fA-F]{40}$/).optional()})).max(2),
  events:z.array(z.object({id:short,timestamp:z.iso.datetime(),actor:z.enum(['supervisor','planner','broker','worker','verifier']),kind:z.enum(['info','success','warning','blocked']),title:short,detail:text,previousHash:short,hash:short})).max(100),
- report:z.object({title:short,summary:text,recommendation:text,evidence:z.array(evidenceSchema).max(3),generatedBy:z.literal('model'),createdAt:z.iso.datetime(),checks:z.array(z.object({label:short,passed:z.boolean(),detail:text})).max(50),verified:z.boolean()}).optional(),
+ report:z.object({title:short,summary:text,recommendation:text,evidence:z.array(evidenceSchema).max(3),generatedBy:z.literal('model'),createdAt:z.iso.datetime(),checks:z.array(z.object({label:short,passed:z.boolean(),detail:text})).max(54),verified:z.boolean()}).optional(),
  approval:z.object({signerMode:z.enum(['usb','speculos']).optional(),nonce:short,message:text,expiresAt:z.iso.datetime(),proposedMandate:engineMandateSchema,reason:text}).optional(),shockApplied:z.boolean(),error:text.optional(),authorizations:z.array(z.never()).max(0).optional(),
 }).strict();
 

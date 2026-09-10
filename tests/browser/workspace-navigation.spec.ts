@@ -17,6 +17,7 @@ async function fixture(page: Page, initialAuth = true) {
     if(path === '/api/auth/logout') { authed = false; return json({ok:true}); }
     if(path === '/api/agents') return json({agents:[first, second]});
     if(path === '/api/market/services') return json({services:[]});
+    if(path === '/api/market/purchases') return json({orders:[]});
     if(path === '/api/market/earnings') return json({orders:[],totalAtomic:'0'});
     if(path.endsWith('/keys') && method === 'GET') return json({keys:[]});
     if(path.endsWith('/keys') && method === 'POST') {
@@ -137,4 +138,32 @@ test('an empty workspace explains setup and keeps the runner guide accessible', 
   await expect(page.getByRole('heading',{name:'Runner prerequisites'})).toBeVisible();
   await page.getByRole('navigation',{name:'Developer sections'}).getByRole('link',{name:'API credentials'}).click();
   await expect(page.getByRole('heading',{name:'Create an agent to get started'})).toBeVisible();
+});
+
+
+test('seller endpoint publishing and delivery-only recovery use distinct actions',async({page})=>{
+  await fixture(page);
+  const calls:{path:string;body:unknown}[]=[];
+  await page.route('**/api/market/services',async route=>{
+    if(route.request().method()==='POST'){calls.push({path:new URL(route.request().url()).pathname,body:route.request().postDataJSON()});return route.fulfill({json:{service:{id:'service-fixture'}}});}
+    return route.fulfill({json:{services:[]}});
+  });
+  const orderId='33333333-3333-4333-8333-333333333333';
+  let delivered=false;
+  await page.route('**/api/market/purchases',route=>route.fulfill({json:{orders:[{id:orderId,jobId:'job',serviceId:'service',serviceName:'External provider',agentName:'First agent',amountAtomic:50000,status:delivered?'fulfilled':'paid',createdAt:'2026-09-10T00:00:00Z',chainConfirmed:true,transactionHash:`0x${'a'.repeat(64)}`} ]}}));
+  await page.route(`**/api/market/orders/${orderId}/delivery`,route=>{calls.push({path:new URL(route.request().url()).pathname,body:route.request().postDataJSON()});delivered=true;return route.fulfill({json:{order:{id:orderId,status:'fulfilled'}}});});
+  await page.goto(origin+'/app/marketplace#seller-heading');
+  await page.getByRole('button',{name:'Publish a service',exact:true}).click();
+  await page.getByLabel('Service execution').selectOption('external-repo-verifier');
+  await page.getByLabel('Public HTTPS endpoint',{exact:false}).fill('https://provider.obolos.app/verify');
+  await page.getByLabel('Publishing identity',{exact:false}).selectOption(first.id);
+  await page.getByLabel('Name',{exact:true}).fill('External provider');
+  await page.getByLabel('Description',{exact:true}).fill('Checks the paid report with my agent.');
+  await page.getByRole('button',{name:'Publish service',exact:true}).click();
+  expect(calls[0]).toMatchObject({path:'/api/market/services',body:{execution:'external-repo-verifier',providerEndpoint:'https://provider.obolos.app/verify',agentId:first.id}});
+  await page.getByRole('navigation',{name:'Marketplace sections'}).getByRole('link',{name:'Your purchases'}).click();
+  await expect(page.getByText('Paid · delivery pending',{exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Retry delivery only'}).click();
+  await expect(page.getByText('Paid & delivered',{exact:true})).toBeVisible();
+  expect(calls.map(call=>call.path)).toEqual(['/api/market/services',`/api/market/orders/${orderId}/delivery`]);
 });

@@ -1,6 +1,6 @@
 # Use the hosted verification marketplace
 
-Obolos provides a public marketplace of repository-metric verification listings on Arc testnet. Obolos runs the same deterministic hosted verifier for every listing; a seller chooses the listing name, description, test-USDC price, and receives payments directly in the EVM wallet used to sign in. Sellers do not upload or execute custom code.
+Obolos provides a public marketplace of repository-metric verification listings on Arc testnet. Obolos runs the same deterministic hosted verifier for every listing; a seller chooses the listing name, description, test-USDC price, and receives payments directly in the EVM wallet used to sign in. Sellers can also register a separately operated HTTPS verification endpoint. That mode runs seller code outside Obolos using the [external service contract](external-services.md).
 
 The verifier checks the report's canonical repository metric lines for repository name, stars, forks, and open issues against the evidence purchased for that job. It also checks evidence integrity and freshness. Free-text analysis and recommendations remain outside that certification. The verification fee pays for execution even when one or more checks return a negative result. It is not escrow, a guarantee, or a refundable success fee.
 
@@ -11,7 +11,7 @@ The verifier checks the report's canonical repository metric lines for repositor
 3. Keep the listing active for buyers. Changing its terms or pausing it creates a new revision. Existing signed mandates retain their exact snapshot but cannot create a new order after the listing changes; buyers must review and sign the current active revision.
 4. Fund the buyer runner's separate Circle agent wallet when testing your own listing. Seller proceeds go directly to the listing wallet and are not held in an Obolos balance.
 
-The seller desk shows confirmed orders and a total derived from fulfilled marketplace orders. A listing records hosted-verifier commerce, not arbitrary seller execution.
+The seller desk shows confirmed orders and a total derived from fulfilled marketplace orders. Listings explicitly distinguish built-in checks from seller-operated APIs. External endpoints must implement the repository-verification contract; arbitrary inference APIs need an adapter.
 
 ## Buyer and runner setup
 

@@ -13,3 +13,7 @@
 .evidenceDetail { border-top:1px solid #e0e0e0; padding:16px 0; margin:16px 0; }.evidenceDetail>summary { cursor:pointer; font-size:13px; font-weight:600; }.evidenceDetail>ol { margin-top:16px; }
 .selectedOverview { display:flex; gap:40px; padding:16px 0 24px; }.selectedOverview>div:first-child,.selectedOverview>div:last-child { display:none; }
 @media(max-width:600px) { .selectedOverview { gap:32px; }.pageHeading>button { font-size:12px; min-height:40px; padding:10px 16px; } }
+.priceAlert { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; padding:20px; margin-bottom:24px; border:1px solid #e9c9a9; background:#fff8ef; border-radius:12px; }.priceAlert h4 { color:#5c3517; }.priceAlert p { color:#6e4c31; font-size:13px; max-width:75ch; margin-top:8px; }.priceAlert button { flex-shrink:0; font-size:12px; }
+@media(max-width:800px) { .priceAlert { flex-direction:column; gap:16px; } }
+.selectionHint { padding:16px 20px; background:#f5f5f5; margin-bottom:24px; border-radius:8px; font-size:13px; line-height:1.7; color:#555; }
+.sectionNav { flex-wrap:wrap; gap:0 20px; }

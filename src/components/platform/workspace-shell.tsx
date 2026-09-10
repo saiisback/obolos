@@ -40,12 +40,12 @@ export function WorkspaceShell({children}: {children: ReactNode}) {
   return <div className={`${s.shell} ${w.shell}`}>
     <a className={s.skip} href="#main">Skip to content</a>
     <aside className={w.sidebar}>
-      <Link className={s.brand} href="/app" aria-label="Obolos workspace"><img src="/brand/obolos-symbol-black.png" width={32} height={32} alt="" />obolos</Link>
+      <Link className={s.brand} href="/app" aria-label="Obolos workspace"><img src="/brand/obolos-symbol-white.png" width={32} height={32} alt="" />obolos</Link>
       <nav className={w.navigation} aria-label="Workspace navigation">{workspaceLinks.map((link, index) => {
         const Icon = [Bot, Store, ReceiptText, Code2][index];
-        return <Link key={link.href} href={link.href} aria-label={link.label} aria-current={pathname === link.href ? 'page' : undefined}><Icon size={18} aria-hidden="true"/><span>{link.label}<small>{['Setup & execution', 'Verifiers & seller desk', 'Reports & receipts', 'Credentials & integration'][index]}</small></span></Link>;
+        return <Link key={link.href} href={link.href} aria-label={link.label} aria-current={pathname === link.href ? 'page' : undefined}><Icon size={18} aria-hidden="true"/><span>{link.label}</span></Link>;
       })}</nav>
-      <div className={w.sidebarNote}><strong>Testnet workspace</strong><p>Hedera data payments<br/>Arc USDC settlement</p></div>
+      <div className={w.sidebarNote}><span className={w.networkDot} aria-hidden="true"/><strong>Testnet</strong><p>Hedera · Arc</p></div>
     </aside>
     <div className={w.content}>
     <header className={w.header}>
