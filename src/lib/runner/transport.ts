@@ -26,7 +26,7 @@ export function createLocalGateway(config:RunnerConfig,fetcher:typeof fetch=fetc
    },
    purchaseData:input=>broker('/data',input),
    async generateReport(evidence,runId){const result=await broker<{summary:string}>('/report',{evidence,runId});return z.string().min(1).max(12000).parse(result.summary);},
-   verify:input=>broker('/verify',input),
+   verify:input=>broker('/verify',{...input,...(input.market?{market:{...input.market,runnerToken:config.token}}:{})}),
   },
  };
 }

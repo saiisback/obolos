@@ -76,14 +76,14 @@ export function runnerRequired(): never {
 
 export async function listAgentRuns(agentId: string) {
   return sql()`SELECT id, agent_id AS "agentId", status, repos, created_at AS "createdAt", updated_at AS "updatedAt", mandate_id AS "mandateId", runner_id AS "runnerId", result,
-      CASE WHEN result IS NULL THEN NULL ELSE 'runner-confirmed' END AS "receiptVerification"
+      COALESCE(receipt_verification,CASE WHEN result IS NULL THEN NULL ELSE 'runner-confirmed' END) AS "receiptVerification"
     FROM platform_jobs WHERE agent_id = ${agentId} ORDER BY created_at DESC, id DESC LIMIT 100`;
 }
 
 export async function getAgentRun(agentId: string, runId: string) {
   assertUuid(runId);
   const rows = await sql()`SELECT id, agent_id AS "agentId", status, repos, created_at AS "createdAt", updated_at AS "updatedAt", mandate_id AS "mandateId", runner_id AS "runnerId", result,
-      CASE WHEN result IS NULL THEN NULL ELSE 'runner-confirmed' END AS "receiptVerification"
+      COALESCE(receipt_verification,CASE WHEN result IS NULL THEN NULL ELSE 'runner-confirmed' END) AS "receiptVerification"
     FROM platform_jobs WHERE agent_id = ${agentId} AND id = ${runId}`;
   if (!rows[0]) throw new PlatformError(404, 'RUN_NOT_FOUND', 'Run not found.');
   return rows[0];

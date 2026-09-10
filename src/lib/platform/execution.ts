@@ -1,5 +1,8 @@
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { z } from 'zod';
+import { verificationServiceSchema } from '../market/contracts';
+import { getVerificationService } from './marketplace';
+import { verifyHostedSettlement } from './settlement-proof';
 import { sql } from './db';
 import { verifyAudit } from '../policy';
 import { appOrigin, PlatformError } from './http';
@@ -8,7 +11,7 @@ import { mandateMessage, repositoryScope, validateSignedMandate, type MandateFie
 
 type Row=Record<string, unknown>;
 const hash=(value:string)=>createHash('sha256').update(value).digest('hex');
-export function publicJob(row:Row) { return {id:row.id,agentId:row.agent_id,repos:row.repos,status:row.status,createdAt:row.created_at,updatedAt:row.updated_at,mandateId:row.mandate_id,runnerId:row.runner_id,result:row.result??null,receiptVerification:row.result?'runner-confirmed':null}; }
+export function publicJob(row:Row) { return {id:row.id,agentId:row.agent_id,repos:row.repos,status:row.status,createdAt:row.created_at,updatedAt:row.updated_at,mandateId:row.mandate_id,runnerId:row.runner_id,result:row.result??null,receiptVerification:row.receipt_verification??(row.result?'runner-confirmed':null),receiptProofs:row.receipt_proofs??null}; }
 function publicRunner(row:Row|undefined) {return row?{id:row.id,agentId:row.agent_id,prefix:row.prefix,createdAt:row.created_at,lastSeenAt:row.last_seen_at,revokedAt:row.revoked_at,online:!row.revoked_at&&!!row.last_seen_at&&Date.parse(String(row.last_seen_at))>Date.now()-120000}:null;}
 function publicMandate(row:Row|undefined) {return row?{...(row.fields as MandateFields),message:row.message,signature:row.signature,approvedAt:row.approved_at,revokedAt:row.revoked_at,reservedRuns:row.reserved_runs,createdAt:row.created_at}:null;}
 function signed(row:Row):SignedMandate {return {...(row.fields as MandateFields),message:row.message as string,signature:row.signature as string};}
@@ -39,12 +42,14 @@ export async function getMandate(userId:string,agentId:string) {
 }
 export async function prepareMandate(user:{id:string;address:string},agentId:string,body:unknown) {
  await requireOwnedAgent(user.id,agentId);
- const input=z.object({phase:z.literal('prepare'),repos:repositoryScope,maxDataUnitPriceAtomic:z.number().int().min(1).max(100000000),maxRuns:z.number().int().min(1).max(10),expiresAt:z.iso.datetime()}).strict().parse(body);
+ const input=z.object({phase:z.literal('prepare'),repos:repositoryScope,maxDataUnitPriceAtomic:z.number().int().min(1).max(100000000),maxRuns:z.number().int().min(1).max(10),expiresAt:z.iso.datetime(),verificationServiceId:z.uuid().optional()}).strict().parse(body);
  const expiry=Date.parse(input.expiresAt);if(expiry<=Date.now()||expiry>Date.now()+86400000)throw new PlatformError(400,'INVALID_EXPIRY','Mandates must expire within the next 24 hours.');
  const db=sql(),agents=await db`SELECT data_budget_atomic,verification_budget_atomic FROM platform_agents WHERE id=${agentId} AND user_id=${user.id}`;
  if(agents[0] && (!agents[0].data_budget_atomic || !agents[0].verification_budget_atomic))throw new PlatformError(400,'INVALID_MANDATE','Create an agent with positive HBAR and USDC budgets before authorizing execution.');
  if(!agents[0])throw new PlatformError(404,'AGENT_NOT_FOUND','Agent not found.');
- const fields:MandateFields={id:randomUUID(),agentId,owner:user.address,origin:appOrigin(),repos:input.repos,allowedProviders:['repo-standard','repo-economy'],dataBudgetAtomic:agents[0].data_budget_atomic,verificationBudgetAtomic:agents[0].verification_budget_atomic,maxDataUnitPriceAtomic:input.maxDataUnitPriceAtomic,maxRuns:input.maxRuns,expiresAt:input.expiresAt};
+ const selectedService=input.verificationServiceId?await getVerificationService(input.verificationServiceId):undefined;
+ if(selectedService&&selectedService.priceAtomic>Number(agents[0].verification_budget_atomic))throw new PlatformError(400,'VERIFICATION_BUDGET','The selected service exceeds this agent’s USDC allowance.');
+ const fields:MandateFields={id:randomUUID(),agentId,owner:user.address,origin:appOrigin(),repos:input.repos,allowedProviders:['repo-standard','repo-economy'],dataBudgetAtomic:agents[0].data_budget_atomic,verificationBudgetAtomic:agents[0].verification_budget_atomic,maxDataUnitPriceAtomic:input.maxDataUnitPriceAtomic,maxRuns:input.maxRuns,expiresAt:input.expiresAt,...(selectedService?{verificationService:selectedService}:{})};
  const message=mandateMessage(fields);
  await db.transaction([db`SELECT id FROM platform_agents WHERE id=${agentId} FOR UPDATE`,db`UPDATE platform_mandates SET revoked_at=now() WHERE agent_id=${agentId} AND approved_at IS NULL AND revoked_at IS NULL`,db`INSERT INTO platform_mandates(id,agent_id,fields,message,max_runs,expires_at) VALUES(${fields.id},${agentId},${JSON.stringify(fields)}::jsonb,${message},${fields.maxRuns},${fields.expiresAt})`],{isolationLevel:'ReadCommitted'});
  return {mandate:fields,message};
@@ -112,11 +117,11 @@ export async function claimJob(runner:{id:string;agentId:string}) {
 
 const text=z.string().max(20000),short=z.string().max(1000),atomic=z.number().int().min(0).max(100000000);
 const evidenceSchema=z.object({repo:short,description:text,stars:atomic,forks:atomic,openIssues:atomic,pushedAt:short,language:short,license:short,sourceUrl:short,fetchedAt:z.iso.datetime()});
-const engineMandateSchema=z.object({dataBudgetAtomic:atomic,verificationBudgetAtomic:atomic,maxDataUnitPriceAtomic:atomic,allowedProviders:z.array(short).max(2),expiresAt:z.iso.datetime(),version:z.number().int().positive()}).strict();
+const engineMandateSchema=z.object({dataBudgetAtomic:atomic,verificationBudgetAtomic:atomic,maxDataUnitPriceAtomic:atomic,allowedProviders:z.array(short).max(2),expiresAt:z.iso.datetime(),version:z.number().int().positive(),verificationService:verificationServiceSchema.optional()}).strict();
 const resultSchema=z.object({
  id:z.uuid(),mode:z.literal('live'),title:short,repos:repositoryScope,status:z.enum(['completed','failed','awaiting_approval','paused']),stage:z.enum(['mandate','discovery','purchase','report','verification','complete']),createdAt:z.iso.datetime(),updatedAt:z.iso.datetime(),mandate:engineMandateSchema,
  providers:z.array(z.object({id:short,name:short,description:short,network:short,asset:z.enum(['HBAR','USDC']),unit:short,unitPriceAtomic:atomic})).max(20),selectedProvider:short.optional(),dataSpentAtomic:atomic,verificationSpentAtomic:atomic,evidence:z.array(evidenceSchema).max(3),
- receipts:z.array(z.object({id:short,requestId:short,mode:z.literal('live'),network:z.enum(['hedera:testnet','arc:testnet']),asset:z.enum(['HBAR','USDC']),amountAtomic:z.number().int().positive().max(100000000),units:z.number().int().min(1).max(3),provider:short,status:z.literal('settled'),timestamp:z.iso.datetime(),transactionId:short,explorerUrl:short.optional()})).max(2),
+ receipts:z.array(z.object({id:short,requestId:short,mode:z.literal('live'),network:z.enum(['hedera:testnet','arc:testnet']),asset:z.enum(['HBAR','USDC']),amountAtomic:z.number().int().positive().max(100000000),units:z.number().int().min(1).max(3),provider:short,status:z.literal('settled'),timestamp:z.iso.datetime(),transactionId:short,explorerUrl:short.optional(),orderId:z.uuid().optional(),recipient:z.string().regex(/^0x[0-9a-fA-F]{40}$/).optional()})).max(2),
  events:z.array(z.object({id:short,timestamp:z.iso.datetime(),actor:z.enum(['supervisor','planner','broker','worker','verifier']),kind:z.enum(['info','success','warning','blocked']),title:short,detail:text,previousHash:short,hash:short})).max(100),
  report:z.object({title:short,summary:text,recommendation:text,evidence:z.array(evidenceSchema).max(3),generatedBy:z.literal('model'),createdAt:z.iso.datetime(),checks:z.array(z.object({label:short,passed:z.boolean(),detail:text})).max(50),verified:z.boolean()}).optional(),
  approval:z.object({signerMode:z.enum(['usb','speculos']).optional(),nonce:short,message:text,expiresAt:z.iso.datetime(),proposedMandate:engineMandateSchema,reason:text}).optional(),shockApplied:z.boolean(),error:text.optional(),authorizations:z.array(z.never()).max(0).optional(),
@@ -126,6 +131,7 @@ export function validateRunnerResult(value:unknown,job:{id:string;repos:string[]
  const r=resultSchema.parse(value),m=job.mandate;
  const invalid=()=>{throw new PlatformError(400,'INVALID_RESULT','Runner result does not match this job and its signed payment scope.');};
  if(r.id!==job.id||JSON.stringify(r.repos)!==JSON.stringify(job.repos)||r.mandate.version!==1||r.mandate.dataBudgetAtomic!==m.dataBudgetAtomic||r.mandate.verificationBudgetAtomic!==m.verificationBudgetAtomic||r.mandate.maxDataUnitPriceAtomic!==m.maxDataUnitPriceAtomic||r.mandate.expiresAt!==m.expiresAt||JSON.stringify(r.mandate.allowedProviders)!==JSON.stringify(m.allowedProviders)||r.shockApplied)invalid();
+ if(JSON.stringify(r.mandate.verificationService)!==JSON.stringify(m.verificationService?verificationServiceSchema.parse(m.verificationService):undefined))invalid();
  if(!verifyAudit(r.events))invalid();
  if(r.selectedProvider&&!m.allowedProviders.includes(r.selectedProvider))invalid();
  if(r.evidence.some(e=>!job.repos.includes(e.repo)||e.sourceUrl!==`https://api.github.com/repos/${e.repo}`)||new Set(r.evidence.map(e=>e.repo)).size!==r.evidence.length)invalid();
@@ -136,7 +142,9 @@ export function validateRunnerResult(value:unknown,job:{id:string;repos:string[]
    if(receipt.asset!=='HBAR'||receipt.requestId!==`${job.id}:data`||!m.allowedProviders.includes(receipt.provider)||receipt.provider!==r.selectedProvider||receipt.units!==job.repos.length||receipt.amountAtomic%receipt.units!==0||receipt.amountAtomic>m.maxDataUnitPriceAtomic*job.repos.length||!/^0\.0\.\d+@\d+\.\d+$/.test(receipt.transactionId))invalid();
    data+=receipt.amountAtomic;receipt.explorerUrl=`https://hashscan.io/testnet/transaction/${encodeURIComponent(receipt.transactionId)}`;
   }else{
-   if(receipt.amountAtomic!==50000||receipt.asset!=='USDC'||receipt.requestId!==`${job.id}:verify`||receipt.provider!=='arc-verifier'||receipt.units!==1||!/^0x[0-9a-fA-F]{64}$/.test(receipt.transactionId))invalid();
+   if(receipt.amountAtomic!==(m.verificationService?.priceAtomic??50000)||receipt.asset!=='USDC'||receipt.requestId!==`${job.id}:verify`||receipt.provider!=='arc-verifier'||receipt.units!==1||!/^0x[0-9a-fA-F]{64}$/.test(receipt.transactionId))invalid();
+   if(m.verificationService&&(!receipt.orderId||receipt.recipient?.toLowerCase()!==m.verificationService.recipient.toLowerCase()))invalid();
+   receipt.transactionId=receipt.transactionId.toLowerCase();
    verification+=receipt.amountAtomic;receipt.explorerUrl=`https://testnet.arcscan.app/tx/${receipt.transactionId}`;
   }
  }
@@ -154,15 +162,27 @@ export async function saveRunnerResult(runner:{id:string;agentId:string},jobId:s
  const rows=await db`SELECT j.*,m.fields,m.message,m.signature FROM platform_jobs j JOIN platform_mandates m ON m.id=j.mandate_id WHERE j.id=${jobId} AND j.agent_id=${runner.agentId} AND j.runner_id=${runner.id}`;
  if(!rows[0])throw new PlatformError(404,'RUN_NOT_FOUND','Run not found.');
  const job=rows[0],validated=validateRunnerResult(input.result,{id:jobId,repos:job.repos,mandate:signed(job)}),serialized=JSON.stringify(validated.result);
- const r=await db.transaction([
+ const proofs=await verifyHostedSettlement({id:jobId,created_at:job.created_at},validated.result, signed(job));
+ const claims=proofs?validated.result.receipts.map(receipt=>db`INSERT INTO platform_chain_receipts(network,transaction_id,job_id)
+  SELECT ${receipt.network},${receipt.transactionId!},${jobId} FROM platform_jobs j
+  WHERE j.id=${jobId} AND j.agent_id=${runner.agentId} AND j.runner_id=${runner.id} AND j.status='running' AND j.result IS NULL
+  AND EXISTS(SELECT 1 FROM platform_runners WHERE id=${runner.id} AND agent_id=${runner.agentId} AND revoked_at IS NULL)`):[];
+ const hashes=validated.result.receipts.map(receipt=>receipt.transactionId!);
+ const verification=proofs&&proofs.length?'chain-confirmed':null;
+ let r;
+ try {r=await db.transaction([
   db`SELECT id FROM platform_agents WHERE id=${runner.agentId} FOR UPDATE`,
-  db`UPDATE platform_jobs SET result=${serialized}::jsonb,status=${validated.status},updated_at=now() WHERE id=${jobId} AND agent_id=${runner.agentId} AND runner_id=${runner.id} AND status='running' AND result IS NULL AND EXISTS(SELECT 1 FROM platform_runners WHERE id=${runner.id} AND agent_id=${runner.agentId} AND revoked_at IS NULL) RETURNING *`,
+  ...claims,
+  db`UPDATE platform_jobs SET receipt_verification=${verification},receipt_proofs=${proofs?JSON.stringify(proofs):null}::jsonb,result=${serialized}::jsonb,status=${validated.status},updated_at=now() WHERE id=${jobId} AND agent_id=${runner.agentId} AND runner_id=${runner.id} AND status='running' AND result IS NULL AND NOT EXISTS(SELECT 1 FROM platform_chain_receipts WHERE transaction_id=ANY(${hashes}::text[]) AND job_id<>${jobId}) AND EXISTS(SELECT 1 FROM platform_runners WHERE id=${runner.id} AND agent_id=${runner.agentId} AND revoked_at IS NULL) RETURNING *`,
   db`SELECT * FROM platform_jobs WHERE id=${jobId} AND agent_id=${runner.agentId} AND runner_id=${runner.id}`,
- ],{isolationLevel:'ReadCommitted'});
- const stored=r[2][0];
+ ],{isolationLevel:'ReadCommitted'});}catch(error){
+  if((error as {code?:string}).code==='23505')throw new PlatformError(409,'PAYMENT_REUSED','A payment is already assigned to another result; all new claims were rolled back.');
+  throw error;
+ }
+ const stored=r.at(-1)![0];
  if(!stored?.result)throw new PlatformError(409,'RESULT_CONFLICT','The runner was revoked or the job no longer accepts a result.');
  // Repeating the exact upload is safe; a different terminal outcome is never overwritten.
- if(JSON.stringify(stored.result)!==serialized&&JSON.stringify(resultSchema.parse(stored.result))!==serialized)throw new PlatformError(409,'RESULT_CONFLICT','A different result is already recorded for this job.');
+ if(JSON.stringify(stored.result)!==serialized&&JSON.stringify(resultSchema.parse(stored.result))!==JSON.stringify(resultSchema.parse(validated.result)))throw new PlatformError(409,'RESULT_CONFLICT','A different result is already recorded for this job.');
  return {run:publicJob(stored)};
 }
 
@@ -171,7 +191,8 @@ export async function authorizeRunnerJob(runner:{id:string;agentId:string},jobId
  const rows=await sql()`SELECT j.id FROM platform_jobs j
   JOIN platform_runners r ON r.id=j.runner_id JOIN platform_mandates m ON m.id=j.mandate_id
   WHERE j.id=${jobId} AND j.agent_id=${runner.agentId} AND j.runner_id=${runner.id} AND j.status='running'
-   AND r.agent_id=j.agent_id AND m.agent_id=j.agent_id AND r.revoked_at IS NULL AND m.revoked_at IS NULL AND m.approved_at IS NOT NULL AND m.expires_at>clock_timestamp()`;
+   AND r.agent_id=j.agent_id AND m.agent_id=j.agent_id AND r.revoked_at IS NULL AND m.revoked_at IS NULL AND m.approved_at IS NOT NULL AND m.expires_at>clock_timestamp()
+   AND (m.fields->'verificationService' IS NULL OR EXISTS(SELECT 1 FROM platform_market_services s WHERE s.id::text=m.fields->'verificationService'->>'id' AND s.active=true AND s.revision=(m.fields->'verificationService'->>'revision')::integer AND s.price_atomic=(m.fields->'verificationService'->>'priceAtomic')::integer AND s.recipient=lower(m.fields->'verificationService'->>'recipient')))`;
  if(!rows[0])throw new PlatformError(403,'EXECUTION_NOT_AUTHORIZED','This job is no longer authorized. Stop execution and reconcile any work already started.');
  return {authorized:true};
 }

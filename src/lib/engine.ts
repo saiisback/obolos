@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { verifyMessage } from 'viem';
 import { z } from 'zod';
+import { verificationServiceSchema } from './market/contracts';
 import type { AuditEvent, Mandate, Receipt, Run, Provider } from './contracts';
 import { appendAudit,assessQuote } from './policy';
 import { checkReport,DEFAULT_PROVIDERS,type Gateway } from './gateway';
@@ -9,7 +10,7 @@ const atomic=z.number().int().positive().max(100000000);
 const inputSchema=z.object({
  repos:z.array(z.string().trim().regex(/^[A-Za-z0-9_.-]{1,100}\/[A-Za-z0-9_.-]{1,100}$/)).min(1).max(3).refine(x=>new Set(x.map(s=>s.toLowerCase())).size===x.length,'Use distinct repositories.'),
  mode:z.enum(['rehearsal','live']),
- mandate:z.object({dataBudgetAtomic:atomic,maxDataUnitPriceAtomic:atomic,verificationBudgetAtomic:atomic,allowedProviders:z.array(z.enum(['repo-standard','repo-economy'])).min(1),expiresAt:z.iso.datetime()}).partial().optional()
+ mandate:z.object({dataBudgetAtomic:atomic,maxDataUnitPriceAtomic:atomic,verificationBudgetAtomic:atomic,allowedProviders:z.array(z.enum(['repo-standard','repo-economy'])).min(1),expiresAt:z.iso.datetime(),verificationService:verificationServiceSchema.optional()}).partial().optional()
 });
 export function createRun(raw:unknown):Run{
  const input=inputSchema.parse(raw),now=new Date().toISOString();
@@ -67,7 +68,7 @@ export async function advanceRun(run:Run,gateway:Gateway):Promise<Run>{
    run.report={title:run.title,summary,recommendation:'Use these observations as a starting point. Validate framework suitability against your project requirements; popularity is not a quality guarantee.',evidence:run.evidence,generatedBy:run.mode==='rehearsal'?'template':'model',createdAt:new Date().toISOString(),checks:[],verified:false};run.stage='verification';
    log(run,'worker','success','Report drafted',`${run.mode==='rehearsal'?'Template rehearsal':'Model-generated analysis'} grounded in ${run.evidence.length} purchased records. Source-integrity and structural checks are still pending.`);
   }else if(run.stage==='verification'){
-   const amount=50000;
+   const amount=run.mandate.verificationService?.priceAtomic??50000;
    if(run.verificationSpentAtomic+amount>run.mandate.verificationBudgetAtomic)throw new Error('Verification would exceed the USDC allowance. No payment was made.');
    if(!run.report)throw new Error('No report is ready to verify.');
    const requestId=`${run.id}:verify`,result=await gateway.verify({runId:run.id,requestId,maxAmountAtomic:amount,report:run.report,mandateExpiresAt:run.mandate.expiresAt});

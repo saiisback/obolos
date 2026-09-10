@@ -29,7 +29,7 @@ export async function circleAgentReady(env:BrokerEnv):Promise<boolean> {
   } catch {return false;}
 }
 /** Caller must persist a pending intent BEFORE invoking this function. */
-export async function purchaseCircleVerification(input:{runId:string;requestId:string;amountAtomic:number;mandateExpiresAt:string},env:BrokerEnv):Promise<Receipt> {
+export async function purchaseCircleVerification(input:{runId:string;requestId:string;amountAtomic:number;mandateExpiresAt:string;onSubmitted?:(hash:string)=>Promise<void>},env:BrokerEnv):Promise<Receipt> {
   const transfer={sender:env.CIRCLE_WALLET_ADDRESS||'',recipient:env.ARC_VERIFIER_ADDRESS||'',amountAtomic:input.amountAtomic};
   validate(transfer);
   const assertExpiry=()=>{
@@ -47,6 +47,7 @@ export async function purchaseCircleVerification(input:{runId:string;requestId:s
     const {stdout}=await runFile(env.CIRCLE_CLI||'circle',circleTransferArgs(transfer,key),{shell:false,encoding:'utf8',timeout:180_000,maxBuffer:256*1024,env:cliEnv(env)});
     const tx=JSON.parse(stdout).data;
     if(tx?.idempotencyKey!==key||tx.blockchain!=='ARC-TESTNET'||typeof tx.txHash!=='string'||!/^0x[0-9a-fA-F]{64}$/.test(tx.txHash)||tx.sourceAddress?.toLowerCase()!==transfer.sender.toLowerCase()||tx.destinationAddress?.toLowerCase()!==transfer.recipient.toLowerCase()) throw Error();
+    if(input.onSubmitted)await input.onSubmitted(tx.txHash);
     const client=createPublicClient({transport:http(env.ARC_RPC_URL||'https://rpc.testnet.arc.network',{timeout:20_000,retryCount:0})});
     const chainId=await client.getChainId();
     const receipt=await client.waitForTransactionReceipt({hash:tx.txHash as `0x${string}`,confirmations:1,timeout:60_000});

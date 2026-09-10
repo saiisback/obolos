@@ -37,8 +37,8 @@ export function createMandatedGateway(input:RunnerJob,inputPins:RunnerPins,base:
   },
   async verify(request){
    await allowed(true);identity(request.runId,request.requestId,'verify',request.mandateExpiresAt);
-   if(verificationStarted||!reportStarted||!purchased||JSON.stringify(request.report.evidence)!==JSON.stringify(purchased)||request.maxAmountAtomic!==50000||request.maxAmountAtomic>m.verificationBudgetAtomic)throw new Error('Verification exceeds or differs from the signed scope, or was already attempted.');
-   verificationStarted=true;return base.verify(request);
+   if(verificationStarted||!reportStarted||!purchased||JSON.stringify(request.report.evidence)!==JSON.stringify(purchased)||request.maxAmountAtomic!==(m.verificationService?.priceAtomic??50000)||request.maxAmountAtomic>m.verificationBudgetAtomic)throw new Error('Verification exceeds or differs from the signed scope, or was already attempted.');
+   verificationStarted=true;return base.verify({...request,...(m.verificationService?{market:{mandate:m,runnerToken:''}}:{})});
   },
  };
 }
@@ -47,7 +47,7 @@ export async function executeJob(input:RunnerJob,options:{pins:RunnerPins;journa
  // A duplicate may be an expired job whose completed result still needs delivery.
  if(options.journal.existing(job))return;
  await validateJob(job,options.pins);
- const run=createRun({repos:job.repos,mode:'live',mandate:{dataBudgetAtomic:job.mandate.dataBudgetAtomic,verificationBudgetAtomic:job.mandate.verificationBudgetAtomic,maxDataUnitPriceAtomic:job.mandate.maxDataUnitPriceAtomic,allowedProviders:job.mandate.allowedProviders,expiresAt:job.mandate.expiresAt}});
+ const run=createRun({repos:job.repos,mode:'live',mandate:{dataBudgetAtomic:job.mandate.dataBudgetAtomic,verificationBudgetAtomic:job.mandate.verificationBudgetAtomic,maxDataUnitPriceAtomic:job.mandate.maxDataUnitPriceAtomic,allowedProviders:job.mandate.allowedProviders,expiresAt:job.mandate.expiresAt,...(job.mandate.verificationService?{verificationService:job.mandate.verificationService}:{})}});
  run.id=job.id;
  await options.journal.start(job,run);
  const gateway=createMandatedGateway(job,options.pins,options.gateway,options.authorize);

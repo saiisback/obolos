@@ -1,9 +1,11 @@
+import type { VerificationService } from './market/contracts';
+import type { SignedMandate } from './platform/execution-contracts';
 export type Mode = 'rehearsal' | 'live';
 export type RunStatus = 'ready' | 'running' | 'awaiting_approval' | 'paused' | 'completed' | 'failed';
 export type Stage = 'mandate' | 'discovery' | 'purchase' | 'report' | 'verification' | 'complete';
 export interface Mandate {
   dataBudgetAtomic: number; maxDataUnitPriceAtomic: number; verificationBudgetAtomic: number;
-  allowedProviders: string[]; expiresAt: string; version: number;
+  allowedProviders: string[]; expiresAt: string; version: number; verificationService?: VerificationService;
 }
 export interface Provider {
   id: string; name: string; description: string; network: string; asset: 'HBAR' | 'USDC';
@@ -16,7 +18,7 @@ export interface RepoEvidence {
 export interface Receipt {
   id: string; requestId: string; mode: Mode; network: 'hedera:testnet' | 'arc:testnet';
   asset: 'HBAR' | 'USDC'; amountAtomic: number; units: number; provider: string;
-  status: 'simulated' | 'settled'; timestamp: string; transactionId?: string; explorerUrl?: string;
+  status: 'simulated' | 'settled'; timestamp: string; transactionId?: string; explorerUrl?: string; orderId?: string; recipient?: string;
 }
 export interface Report {
   title: string; summary: string; recommendation: string; evidence: RepoEvidence[];
@@ -54,7 +56,7 @@ export interface DataPurchase {
   runId: string; requestId: string; repos: string[]; providerId: string;
   maxAmountAtomic: number; unitPriceAtomic: number; mandateExpiresAt: string;
 }
-export interface VerificationPurchase {runId: string; requestId: string; maxAmountAtomic: number; report: Report; mandateExpiresAt: string}
+export interface VerificationPurchase {runId: string; requestId: string; maxAmountAtomic: number; report: Report; mandateExpiresAt: string; market?: {mandate:SignedMandate;runnerToken:string}}
 export interface BrokerHealth {ready: boolean; integrations: IntegrationStatus[]}
 // All routes return these envelopes. The browser must never receive signing or API credentials.
 export type ApiResult<T> = {data: T} | {error: string};

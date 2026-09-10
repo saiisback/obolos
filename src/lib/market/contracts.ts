@@ -1,0 +1,8 @@
+import {z} from 'zod';
+export const addressSchema=z.string().regex(/^0x[0-9a-fA-F]{40}$/);
+export const verificationServiceSchema=z.object({id:z.uuid(),revision:z.number().int().positive(),name:z.string().trim().min(1).max(80),recipient:addressSchema,priceAtomic:z.number().int().min(1000).max(1000000),endpoint:z.url()}).strict();
+export type VerificationService=z.infer<typeof verificationServiceSchema>;
+export interface MarketService extends VerificationService {description:string;active:boolean;execution:'hosted-metric-verifier';createdAt:string}
+export interface MarketOrder {id:string;jobId:string;serviceId:string;revision:number;payer:string;recipient:string;amountAtomic:number;reportDigest:string;createdAt:string;expiresAt:string;status:'quoted'|'fulfilled';transactionHash?:string;result?:{checks:{label:string;passed:boolean;detail:string}[]};chainConfirmed?:boolean}
+const count=z.number().int().min(0).max(100000000);
+export const marketReportSchema=z.object({title:z.string().max(1000),summary:z.string().max(20000),recommendation:z.string().max(20000),generatedBy:z.literal('model'),createdAt:z.iso.datetime(),checks:z.array(z.object({label:z.string().max(1000),passed:z.boolean(),detail:z.string().max(20000)})).max(50),verified:z.boolean(),evidence:z.array(z.object({repo:z.string().regex(/^[A-Za-z0-9][A-Za-z0-9-]{0,38}\/[A-Za-z0-9_.-]{1,100}$/),description:z.string().max(20000),stars:count,forks:count,openIssues:count,pushedAt:z.string().max(1000),language:z.string().max(1000),license:z.string().max(1000),sourceUrl:z.string().max(1000),fetchedAt:z.iso.datetime()}).strict()).min(1).max(3)}).strict();
