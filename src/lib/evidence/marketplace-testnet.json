@@ -1,0 +1,295 @@
+{
+  "testedAt": "2026-09-10T05:25:58.776Z",
+  "deploymentCommit": "00fc166c5ada131748ebac3de7fa62bed832e367",
+  "testIdentity": "Generated separate buyer and seller EOA fixtures; funded private testnet broker; not organic usage.",
+  "job": {
+    "id": "5dd85c8c-1fc6-4d71-8117-134a0f6e98aa",
+    "agentId": "73083358-9968-4e5b-a935-6e0485b48f13",
+    "status": "succeeded",
+    "receiptVerification": "chain-confirmed",
+    "result": {
+      "id": "5dd85c8c-1fc6-4d71-8117-134a0f6e98aa",
+      "mode": "live",
+      "repos": [
+        "octocat/Hello-World"
+      ],
+      "stage": "complete",
+      "title": "Compare Hello-World",
+      "events": [
+        {
+          "id": "968288ce-8da8-4ac7-aaba-216f45935b16",
+          "hash": "198c7b4403d522e08da623362c2ea189bedad738c5ddc28703b3f9ce9e723285",
+          "kind": "info",
+          "actor": "supervisor",
+          "title": "Mandate created",
+          "detail": "Up to 0.001 HBAR for evidence and 0.05 USDC for verification. Expires 2026-09-10T06:22:13.896Z.",
+          "timestamp": "2026-09-10T05:24:16.181Z",
+          "previousHash": "genesis"
+        },
+        {
+          "id": "a4703539-a26c-42ec-990a-1c8dab5952d1",
+          "hash": "45d6df3f5d27329529c2fe700c671cd6bad497313e5f0c43b29db6ffafa34260",
+          "kind": "success",
+          "actor": "broker",
+          "title": "Mandate accepted",
+          "detail": "Only named services can receive requests. Wallet and provider credentials remain outside the agent.",
+          "timestamp": "2026-09-10T05:24:16.211Z",
+          "previousHash": "198c7b4403d522e08da623362c2ea189bedad738c5ddc28703b3f9ce9e723285"
+        },
+        {
+          "id": "da9e083d-0a9e-490e-945b-ac3bf3feb42c",
+          "hash": "7fb769b30aca9657ef89fef46073ff4a9c97687d526540739ba1c1c121db14b0",
+          "kind": "success",
+          "actor": "planner",
+          "title": "Services discovered",
+          "detail": "Selected Repository Standard at 0.001 HBAR per repository from 2 approved quotes.",
+          "timestamp": "2026-09-10T05:24:17.263Z",
+          "previousHash": "45d6df3f5d27329529c2fe700c671cd6bad497313e5f0c43b29db6ffafa34260"
+        },
+        {
+          "id": "ba3dfe74-f053-4699-a3ba-54527d35efa7",
+          "hash": "428515ddf677f5e7e223ceea6bff124a20714d1e086536ad8520141d7bdc5cb6",
+          "kind": "info",
+          "actor": "broker",
+          "title": "Payment authorized",
+          "detail": "Request 5dd85c8c-1fc6-4d71-8117-134a0f6e98aa:data: 100000 tinybar for 1 repository units. A failed or uncertain transfer is never automatically repeated.",
+          "timestamp": "2026-09-10T05:24:17.669Z",
+          "previousHash": "7fb769b30aca9657ef89fef46073ff4a9c97687d526540739ba1c1c121db14b0"
+        },
+        {
+          "id": "7218b2b2-9d16-4878-8ab7-ef01b1a57727",
+          "hash": "5307ca1d23220c5c6b572a63e2f649fbf5f58bf8bae21a24dc2583257c83ab35",
+          "kind": "success",
+          "actor": "broker",
+          "title": "Hedera payment settled",
+          "detail": "0.001 HBAR purchased 1 source records. 0.0.7162784@1789017858.924455961",
+          "timestamp": "2026-09-10T05:24:28.421Z",
+          "previousHash": "428515ddf677f5e7e223ceea6bff124a20714d1e086536ad8520141d7bdc5cb6"
+        },
+        {
+          "id": "ffb7e92b-2cd1-4b73-809c-3373c1bf77cf",
+          "hash": "25223d8587044b9885a89a7484cde1a6879044f592eade4325ed335e89865afa",
+          "kind": "success",
+          "actor": "worker",
+          "title": "Report drafted",
+          "detail": "Model-generated analysis grounded in 1 purchased records. Source-integrity and structural checks are still pending.",
+          "timestamp": "2026-09-10T05:24:32.066Z",
+          "previousHash": "5307ca1d23220c5c6b572a63e2f649fbf5f58bf8bae21a24dc2583257c83ab35"
+        },
+        {
+          "id": "12381de8-86a1-42fb-8cd3-37cf65926980",
+          "hash": "5e490f01a736a350fd9433ee3f5f92e99a81c0543c96fd370d32f7c0659cea72",
+          "kind": "success",
+          "actor": "verifier",
+          "title": "Evidence checked · job complete",
+          "detail": "7 structural/source checks passed. Narrative judgment is not independently certified. Arc USDC settlement confirmed.",
+          "timestamp": "2026-09-10T05:24:46.997Z",
+          "previousHash": "25223d8587044b9885a89a7484cde1a6879044f592eade4325ed335e89865afa"
+        }
+      ],
+      "report": {
+        "title": "Compare Hello-World",
+        "checks": [
+          {
+            "label": "Source coverage",
+            "detail": "1 distinct repository records are attached.",
+            "passed": true
+          },
+          {
+            "label": "Source attribution",
+            "detail": "Every record points to its exact GitHub API source.",
+            "passed": true
+          },
+          {
+            "label": "Valid observed counts",
+            "detail": "Stars, forks and issue counts are non-negative integers.",
+            "passed": true
+          },
+          {
+            "label": "Observation timestamps",
+            "detail": "Each observation includes fetch and last-push timestamps.",
+            "passed": true
+          },
+          {
+            "label": "Metrics: octocat/Hello-World",
+            "detail": "Exactly one stars, forks and openIssues row must match the submitted evidence.",
+            "passed": true
+          },
+          {
+            "label": "Evidence integrity and freshness",
+            "detail": "Unique GitHub evidence must be at most one hour old; its provenance is checked separately by paid delivery.",
+            "passed": true
+          },
+          {
+            "label": "Claim scope",
+            "detail": "Only canonical metric rows are certified against evidence. Free-text judgments are not certified; extra numeric metric claims are rejected.",
+            "passed": true
+          }
+        ],
+        "summary": "The supplied snapshot shows a single repository entry with substantial star and fork counts alongside many open issues, suggesting long-term popularity and active engagement historically. The data indicates a well-known, classic repository that has stayed relevant enough to accumulate a large number of forks and stars, though the high open issue count may reflect legacy usage or broad community involvement. Maintenance signals include the presence of a recent pushedAt timestamp, but without other context such as recent commits or activity, it is hard to assess current vitality beyond historical popularity. These metrics cannot establish security guarantees; they only reflect usage and maintenance signal, not code quality, vulnerability history, or secure practices.\n\noctocat/Hello-World | stars=3807 | forks=6740 | openIssues=7132\n\nSource: https://api.github.com/repos/octocat/Hello-World",
+        "evidence": [
+          {
+            "repo": "octocat/Hello-World",
+            "forks": 6740,
+            "stars": 3807,
+            "license": "Not specified",
+            "language": "Not specified",
+            "pushedAt": "2024-08-20T23:54:42Z",
+            "fetchedAt": "2026-09-10T05:24:24.019Z",
+            "sourceUrl": "https://api.github.com/repos/octocat/Hello-World",
+            "openIssues": 7132,
+            "description": "My first repository on GitHub!"
+          }
+        ],
+        "verified": true,
+        "createdAt": "2026-09-10T05:24:32.066Z",
+        "generatedBy": "model",
+        "recommendation": "Use these observations as a starting point. Validate framework suitability against your project requirements; popularity is not a quality guarantee."
+      },
+      "status": "completed",
+      "mandate": {
+        "version": 1,
+        "expiresAt": "2026-09-10T06:22:13.896Z",
+        "allowedProviders": [
+          "repo-standard",
+          "repo-economy"
+        ],
+        "dataBudgetAtomic": 100000,
+        "verificationService": {
+          "id": "fbf7c34a-5f95-4882-9a1a-b81326f311e3",
+          "name": "Obolos Metric Check",
+          "endpoint": "https://obolos.app/api/market/services/fbf7c34a-5f95-4882-9a1a-b81326f311e3",
+          "revision": 1,
+          "recipient": "0xd2137e6d65165400641aff0e34781d09a0215858",
+          "priceAtomic": 50000
+        },
+        "maxDataUnitPriceAtomic": 100000,
+        "verificationBudgetAtomic": 50000
+      },
+      "evidence": [
+        {
+          "repo": "octocat/Hello-World",
+          "forks": 6740,
+          "stars": 3807,
+          "license": "Not specified",
+          "language": "Not specified",
+          "pushedAt": "2024-08-20T23:54:42Z",
+          "fetchedAt": "2026-09-10T05:24:24.019Z",
+          "sourceUrl": "https://api.github.com/repos/octocat/Hello-World",
+          "openIssues": 7132,
+          "description": "My first repository on GitHub!"
+        }
+      ],
+      "receipts": [
+        {
+          "id": "hedera-5dd85c8c-1fc6-4d71-8117-134a0f6e98aa:data",
+          "mode": "live",
+          "asset": "HBAR",
+          "units": 1,
+          "status": "settled",
+          "network": "hedera:testnet",
+          "provider": "repo-standard",
+          "requestId": "5dd85c8c-1fc6-4d71-8117-134a0f6e98aa:data",
+          "timestamp": "2026-09-10T05:24:28.391Z",
+          "explorerUrl": "https://hashscan.io/testnet/transaction/0.0.7162784%401789017858.924455961",
+          "amountAtomic": 100000,
+          "transactionId": "0.0.7162784@1789017858.924455961"
+        },
+        {
+          "id": "arc-0x62b803379e5701367937eeba0a542b8101e62f0d5d3a718a2a02a3993cc5accb",
+          "mode": "live",
+          "asset": "USDC",
+          "units": 1,
+          "status": "settled",
+          "network": "arc:testnet",
+          "orderId": "5ac9b13e-cea9-4424-8c84-e5cc79a32c12",
+          "provider": "arc-verifier",
+          "recipient": "0xd2137e6d65165400641aff0e34781d09a0215858",
+          "requestId": "5dd85c8c-1fc6-4d71-8117-134a0f6e98aa:verify",
+          "timestamp": "2026-09-10T05:24:46.166Z",
+          "explorerUrl": "https://testnet.arcscan.app/tx/0x62b803379e5701367937eeba0a542b8101e62f0d5d3a718a2a02a3993cc5accb",
+          "amountAtomic": 50000,
+          "transactionId": "0x62b803379e5701367937eeba0a542b8101e62f0d5d3a718a2a02a3993cc5accb"
+        }
+      ],
+      "createdAt": "2026-09-10T05:24:16.173Z",
+      "providers": [
+        {
+          "id": "repo-standard",
+          "name": "Repository Standard",
+          "unit": "repository",
+          "asset": "HBAR",
+          "network": "hedera:testnet",
+          "description": "Current public GitHub repository metadata, paid per repository.",
+          "unitPriceAtomic": 100000
+        },
+        {
+          "id": "repo-economy",
+          "name": "Repository Economy",
+          "unit": "repository",
+          "asset": "HBAR",
+          "network": "hedera:testnet",
+          "description": "Current public GitHub repository metadata, paid per repository.",
+          "unitPriceAtomic": 120000
+        }
+      ],
+      "updatedAt": "2026-09-10T05:24:46.998Z",
+      "shockApplied": false,
+      "dataSpentAtomic": 100000,
+      "selectedProvider": "repo-standard",
+      "verificationSpentAtomic": 50000
+    }
+  },
+  "order": {
+    "id": "5ac9b13e-cea9-4424-8c84-e5cc79a32c12",
+    "serviceId": "fbf7c34a-5f95-4882-9a1a-b81326f311e3",
+    "recipient": "0xd2137e6d65165400641aff0e34781d09a0215858",
+    "priceAtomic": 50000,
+    "status": "fulfilled",
+    "reportDigest": "9b557b90f8a3943cc7c75d4fbe1e1931a44cbbc8c0007fd2d95773ecf01b3f90"
+  },
+  "independentProofs": [
+    {
+      "network": "hedera:testnet",
+      "transactionId": "0.0.7162784@1789017858.924455961",
+      "payTo": "0.0.10425234",
+      "amountAtomic": 100000,
+      "consensusTimestamp": "1789017864.749756423"
+    },
+    {
+      "network": "arc:testnet",
+      "transactionId": "0x62b803379e5701367937eeba0a542b8101e62f0d5d3a718a2a02a3993cc5accb",
+      "orderId": "5ac9b13e-cea9-4424-8c84-e5cc79a32c12",
+      "serviceId": "fbf7c34a-5f95-4882-9a1a-b81326f311e3",
+      "recipient": "0xd2137e6d65165400641aff0e34781d09a0215858",
+      "amountAtomic": 50000,
+      "proof": {
+        "payer": "0x90602880dbee4158d96fddbdffe300c03d68e46c",
+        "token": "0x3600000000000000000000000000000000000000",
+        "chainId": 5042002,
+        "blockHash": "0x8876f7cca97a20c7adbdc4d77a9938a4d758fe89114cb6f13db7717afa53f6b9",
+        "recipient": "0xd2137e6d65165400641aff0e34781d09a0215858",
+        "timestamp": "1789017881",
+        "blockNumber": "61348125",
+        "amountAtomic": 50000,
+        "transactionHash": "0x62b803379e5701367937eeba0a542b8101e62f0d5d3a718a2a02a3993cc5accb"
+      }
+    }
+  ],
+  "arcFreshProof": {
+    "chainId": 5042002,
+    "transactionHash": "0x62b803379e5701367937eeba0a542b8101e62f0d5d3a718a2a02a3993cc5accb",
+    "blockHash": "0x8876f7cca97a20c7adbdc4d77a9938a4d758fe89114cb6f13db7717afa53f6b9",
+    "blockNumber": "61348125",
+    "timestamp": "1789017881",
+    "token": "0x3600000000000000000000000000000000000000",
+    "payer": "0x90602880dbee4158d96fddbdffe300c03d68e46c",
+    "recipient": "0xd2137e6d65165400641aff0e34781d09a0215858",
+    "amountAtomic": 50000
+  },
+  "sellerBalanceAtomic": "100000",
+  "confirmationReplay": {
+    "repeats": 2,
+    "additionalTransfers": 0
+  }
+}

@@ -1,5 +1,6 @@
 import { PlatformShell } from '@/components/platform/shell';
-import record from '../../../docs/evidence/2026-09-10-marketplace-testnet.json';
+// Public release snapshot is bundled with the app; docs/ is excluded from deployment.
+import record from '@/lib/evidence/marketplace-testnet.json';
 import s from './evidence.module.css';
 
 export const metadata = {
