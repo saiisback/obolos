@@ -47,6 +47,27 @@ describe('economy finalized event indexer',()=>{
   expect(snapshot.metrics.gapAtomic).toBeNull();expect(snapshot.metrics.moneyVelocityBps).toBeNull();expect(snapshot.metrics.utilizationBps).toBeNull();expect(snapshot.policyHistory).toHaveLength(1);
   expect(await indexEconomy(f.db,deployment,f.client)).toEqual({changed:false});expect(f.events).toHaveLength(1);
  });
+ it('collects block-pinned balances once for shared active executors and retains exact order source timestamps',async()=>{
+  const f=harness(),orderId=`0x${'3'.repeat(64)}`,agentId=`0x${'1'.repeat(64)}`,serviceHash=`0x${'4'.repeat(64)}`,inputHash=`0x${'5'.repeat(64)}`,outputHash=`0x${'6'.repeat(64)}`;
+  for(const [id,executor]of [[agentId,address('c')],[`0x${'2'.repeat(64)}`,address('c')]])f.events.push({event_name:'AgentRegistered',payload:{agentId:id,owner:address('b'),executor},transaction_hash:zeroHash,block_timestamp:'100',block_number:'10',log_index:f.events.length+1});
+  for(const [name,timestamp,payload]of [['OrderPaid','172700',{orderId,agentId,seller:address('d'),category:'1',unitHash:zeroHash,quantity:'1',amount:'100',serviceHash,inputHash}],['OrderSettled','172700',{orderId,payer:address('c'),sellerAmount:'90',reserveAmount:'6',reviewAmount:'4',rebateAmount:'0'}],['DeliveryAttested','172750',{orderId,outputHash}],['BuyerAcknowledged','172799',{orderId,outputHash}]] as const)f.events.push({event_name:name,payload,transaction_hash:zeroHash,block_timestamp:timestamp,block_number:'10',log_index:f.events.length+1});
+  const reads:Record<string,unknown>[]=[];
+  const client={...f.client,readContract:async(args:{functionName:string;address:string;blockNumber:bigint;args?:string[]})=>{if(args.functionName==='agents')return[address('b'),address('c'),true];if(args.functionName==='executorOwners')return '0x0000000000000000000000000000000000000000';if(args.functionName==='balanceOf'){reads.push(args);return 500n;}return f.client!.readContract(args as never);}} as unknown as Parameters<typeof indexEconomy>[2];
+  await indexEconomy(f.db,deployment,client);
+  const snapshot=f.state()?.snapshot as {orders:Record<string,unknown>[];measurements:{capital:{balanceAtomic:string|null;complete:boolean}}};
+  expect(reads).toHaveLength(1);expect(reads[0]).toMatchObject({address:'0x3600000000000000000000000000000000000000',blockNumber:10n,args:[address('c')]});
+  expect(snapshot.orders[0]).toMatchObject({serviceHash,inputHash,outputHash,payer:address('c'),owner:address('b'),deliveredAt:172750,acknowledgedAt:172799,settledAt:172700,reserveAtomic:'6',reviewAtomic:'4',rebateAtomic:'0'});
+  expect(snapshot.measurements.capital).toMatchObject({complete:true,totalAtomic:'500',executorCount:1});
+ });
+ it('advances finalized indexing when one active-wallet balance fails and retries the same block collection',async()=>{
+  const f=harness();for(const digit of ['1','2'])f.events.push({event_name:'AgentRegistered',payload:{agentId:`0x${digit.repeat(64)}`,owner:address('b'),executor:address(digit)},transaction_hash:zeroHash,block_timestamp:'100',block_number:'10',log_index:f.events.length+1});
+  let fail=true;const reads:string[]=[];
+  const client={...f.client,readContract:async(args:{functionName:string;args?:string[]})=>{if(args.functionName==='agents')return[address('b'),args.args?.[0]===`0x${'1'.repeat(64)}`?address('1'):address('2'),true];if(args.functionName==='executorOwners')return '0x0000000000000000000000000000000000000000';if(args.functionName==='balanceOf'){reads.push(args.args![0]);if(fail&&args.args?.[0]===address('2'))throw Error('RPC failed');return 500n;}return f.client!.readContract(args as never);}} as unknown as Parameters<typeof indexEconomy>[2];
+  expect(await indexEconomy(f.db,deployment,client)).toMatchObject({changed:true,blockNumber:'10',caughtUp:true});
+  expect((f.state()?.snapshot as {measurements:{capital:{complete:boolean}}}).measurements.capital).toMatchObject({complete:false,totalAtomic:null,knownBalanceAtomic:'500',missingExecutorAddresses:[address('2')]});
+  fail=false;expect(await indexEconomy(f.db,deployment,client)).toMatchObject({changed:true,blockNumber:'10'});
+  expect((f.state()?.snapshot as {measurements:{capital:{complete:boolean}}}).measurements.capital.complete).toBe(true);expect(reads).toHaveLength(4);
+ });
  it('rejects a finalized cursor reorg and rolls back without advancing state',async()=>{
   const f=harness();await indexEconomy(f.db,deployment,f.client);
   const changed={...f.client,getBlock:async()=>({number:10n,hash:zeroHash,timestamp:172800n})} as unknown as Parameters<typeof indexEconomy>[2];

@@ -4,6 +4,9 @@ import Link from 'next/link';
 import {useEffect, useState, type ReactNode} from 'react';
 import {ArrowUpRight, RefreshCw} from 'lucide-react';
 import {formatUnits, keccak256, toHex} from 'viem';
+import type {EconomyMeasurements} from '@/lib/economy/measurements';
+import {EconomyMeasurementsView} from './economy-measurements';
+import {EconomyAccounting} from './economy-accounting';
 import type {EconomyMetrics} from '@/lib/economy/model';
 import {api, errorMessage} from './api';
 import {WorkspaceSections, useWorkspaceSection} from './workspace-sections';
@@ -17,6 +20,9 @@ type Snapshot = {
   deployment: {chainId: number; policy: string; ledger: string; settlement: string; controller: string; approver: string; reserve: string; reviewPool: string};
   blockNumber: string; indexedAt: string; chainTimestamp: number; caughtUp: boolean;
   metrics: JsonNumbers<EconomyMetrics>;
+  measurements?: JsonNumbers<EconomyMeasurements>;
+  currentAccounting?: JsonNumbers<EconomyMetrics>;
+  currentAccountingCoverage?: {eligibleOrderCount:number;currentRevenueOrderCount:number;currentInputAccountCount:number;currentCostAccountCount:number;currentValuedOutputCount:number};
   policy: {enabled: boolean; reserveBps: Integer; reviewBps: Integer; policyVersion: Integer; feeVersion: Integer; categories: {name: string; enabled: boolean; perOrderCap: string; windowCap: string; windowSeconds: Integer; delaySeconds: Integer}[]};
   services: {serviceHash: string; seller: string; unitHash: string; unitPrice: string; quantity: string; endpointHash: string; category: string; transactionHash: string}[];
   reputation: {seller: string; paid: string; delivered: string; acknowledged: string; acceptanceBps: string | null; qualityScore: string | null}[];
@@ -49,29 +55,29 @@ function DataTable({label, children}: {label: string; children: ReactNode}) {
 }
 
 function Prices({snapshot}: {snapshot: Snapshot}) {
-  const m = snapshot.metrics;
-  const rows = [
-    ['Resource price index (ARPI)', decimal(m.arpiBps, 2), m.arpiBps === null ? 'Needs a complete, fixed-weight resource basket with comparable prices.' : 'Fixed-weight resource prices; baseline = 100.'],
-    ['Period inflation', percent(m.inflationBps), m.inflationBps === null ? 'Needs a previous comparable index for the same basket.' : 'Change from the previous comparable period.'],
-    ['Change from baseline', percent(m.baselineChangeBps), 'Cumulative price change from the basket baseline.'],
-    ['Gross payments', money(m.grossPaymentsAtomic), 'Principal settled during this closed day. Payment does not prove useful output.'],
-    ['Seller revenue', money(m.sellerRevenueAtomic), 'Seller allocation after reserve and review-pool fees.'],
-    ['Gross Agent Product (GAP)', money(m.gapAtomic), 'Needs attested output values and intermediate-input accounting.'],
-    ['Agent surplus', money(m.surplusAtomic), 'Needs complete, attested output and resource-input values.'],
-    ['Productivity', percent(m.productivityBps), 'Needs comparable, independently valued output and input evidence.'],
-    ['Money velocity', decimal(m.moneyVelocityBps, 4, '×'), 'Eligible value added divided by measured capital; needs both inputs.'],
-    ['Payment turnover', decimal(m.paymentTurnoverBps, 4, '×'), 'Gross payments divided by measured capital. A separate spending diagnostic.'],
-    ['Utilization', percent(m.utilizationBps), 'Needs historical productive and deployable-agent counts.'],
+  const m = snapshot.currentAccounting ?? snapshot.metrics;
+  const coverage=snapshot.currentAccountingCoverage;
+  const accountingRows = (m:JsonNumbers<EconomyMetrics>,current=false) => [
+    ['Gross Agent Product (GAP)', m.gapAtomic===null?'Input accounting pending':money(m.gapAtomic), m.methodology==='obolos-agentgdp-v2'?'Paper equations 8–9: observed seller revenue minus complete intermediate inputs.':'Historical v1 calculation; refresh to load corrected v2 accounting.'],
+    ['Agent surplus', m.surplusAtomic===null?'Cost accounting pending':money(m.surplusAtomic), m.methodology==='obolos-agentgdp-v2'?'Paper equation 2: observed seller revenue minus complete resource cost.':'Historical v1 calculation; refresh to load corrected v2 accounting.'],
+    ['Productivity', m.productivityBps===null?(current?'After UTC close and output assessment':'Output assessment pending'):percent(m.productivityBps), 'Paper equation 3: verified output value divided by consumed resource cost.'],
+    ['Money velocity', m.moneyVelocityBps===null?(current?'After UTC close and capital accounting':'Value-added / capital pending'):decimal(m.moneyVelocityBps,4,'×'), 'Paper equation 14: GAP divided by attested accounting capital for the same scope. Active executor balances are a separate measurement.'],
   ];
+  const rows=accountingRows(m,Boolean(snapshot.currentAccounting));
   return <>
-    <div className={e.sectionHeading}><h2>Prices &amp; activity</h2><p>Closed UTC day · {date(m.start)} to {date(m.end)}. All amounts are test USDC; HBAR is measured separately.</p></div>
-    <DataTable label="Closed-day economic metrics"><thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Evidence and meaning</th></tr></thead><tbody>{rows.map(([label, value, detail]) => <tr key={label}><th scope="row">{label}</th><td className={value === 'Unavailable' ? e.unavailable : e.value}>{value}</td><td className={e.explanation}>{detail}</td></tr>)}</tbody></DataTable>
+    {snapshot.measurements ? <EconomyMeasurementsView value={snapshot.measurements}/> : <p className={e.empty}>The new measurement collector is awaiting its first finalized refresh.</p>}
+    <section className={e.section}><div className={e.sectionHeading}><h2>Production accounting</h2><p>{date(m.start)} to {date(m.end-1)} · {snapshot.currentAccounting?'Today through the indexed block':'Closed UTC day'}. Gross seller allocations are revenue observations before refund adjustments; they are not independent output valuations.</p></div>
+    {coverage&&<p className={e.caption}>{coverage.currentRevenueOrderCount} of {coverage.eligibleOrderCount} eligible orders have recognized revenue; {coverage.currentInputAccountCount} have complete input accounts; {coverage.currentCostAccountCount} have complete cost accounts; {coverage.currentValuedOutputCount} have assessed output values.</p>}
+    <DataTable label="Production accounting metrics"><thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Formula and source</th></tr></thead><tbody>{rows.map(([label,value,detail])=><tr key={label}><th scope="row">{label}</th><td className={e.value}>{value}</td><td className={e.explanation}>{detail}</td></tr>)}</tbody></DataTable>
+    <p className={e.caption}>Independent output assessments and economic-capital attestations are recorded after a UTC day closes. Their completed results appear under Previous closed UTC day below.</p>
+    <EconomyAccounting/>
+    </section>
+    <details className={e.details}><summary>Previous closed UTC day</summary><p>{date(snapshot.metrics.start)} to {date(snapshot.metrics.end)} (end exclusive). Today's transactions are outside this window. This is the latest indexed accounting projection as of finalized block {snapshot.blockNumber}; later evidence can revise it. Seller allocations and accounting results are before separate refund adjustments.</p><dl className={e.addresses}><div><dt>Gross payments</dt><dd>{money(snapshot.metrics.grossPaymentsAtomic)}</dd></div><div><dt>Seller allocations</dt><dd>{money(snapshot.metrics.sellerRevenueAtomic)}</dd></div><div><dt>Settlements</dt><dd>{snapshot.metrics.settlementCount}</dd></div><div><dt>Eligible orders</dt><dd>{snapshot.metrics.settlementCount-snapshot.metrics.excludedSelfPayments}</dd></div><div><dt>Assessed outputs</dt><dd>{snapshot.metrics.valuedSettlementCount}</dd></div></dl><p>Methodology: {snapshot.metrics.methodology}. Values require complete evidence for this closed day.</p><DataTable label="Closed-day economics"><thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Formula and source</th></tr></thead><tbody>{accountingRows(snapshot.metrics).map(([label,value,detail])=><tr key={label}><th scope="row">{label}</th><td className={e.value}>{value}</td><td className={e.explanation}>{detail}</td></tr>)}</tbody></DataTable>{snapshot.metrics.limitations.length>0&&<ul>{snapshot.metrics.limitations.map((limitation,index)=><li key={index}>{limitation}</li>)}</ul>}</details>
     <details className={e.details}><summary>Measurement limitations</summary><p>Settlement, seller delivery claims and buyer acknowledgments are separate evidence. None independently proves useful output or excludes collusion.</p>{m.limitations.length > 0 && <ul>{m.limitations.map((limitation, index) => <li key={index}>{limitation}</li>)}</ul>}</details>
-    <section className={e.section}><h2>On-chain observations</h2><p>Attestations for the recorded windows below are separate from the closed UTC-day metrics above. Selected-quote ARPI uses selected immutable service quotes, not market-clearing prices. Its presence does not fill missing closed-day evidence.</p>{!snapshot.observations?.length ? <p className={e.empty}>No on-chain observations have been indexed yet.</p> : <DataTable label="On-chain metric observation evidence"><thead><tr><th scope="col">Measure / observation</th><th scope="col">Value / baseline</th><th scope="col">Recorded UTC window</th><th scope="col">Input / methodology</th><th scope="col">Evidence</th></tr></thead><tbody>{[...snapshot.observations].reverse().map(observation => {
+    <section className={e.section}><h2>On-chain observations</h2><p>These historical attestations retain their original recorded windows and methodology. Selected-quote ARPI uses selected immutable service quotes, not market-clearing prices. Its presence does not fill missing closed-day evidence.</p>{!snapshot.observations?.length ? <p className={e.empty}>No on-chain observations have been indexed yet.</p> : <DataTable label="On-chain metric observation evidence"><thead><tr><th scope="col">Measure / observation</th><th scope="col">Value / baseline</th><th scope="col">Recorded UTC window</th><th scope="col">Input / methodology</th><th scope="col">Evidence</th></tr></thead><tbody>{[...snapshot.observations].reverse().map(observation => {
       const isArpi = observation.metricId.toLowerCase() === arpiMetricId;
       return <tr key={observation.observationHash}><th scope="row"><span title={observation.metricId}>{isArpi ? 'Selected-quote ARPI' : short(observation.metricId)}</span><code className={e.subline} title={observation.observationHash}>{short(observation.observationHash)}</code></th><td className={e.value}>{isArpi ? indexValue(observation.value) : `${observation.value} (raw)`}<span className={e.subline}>Baseline: {isArpi ? indexValue(observation.baseline) : observation.baseline}</span></td><td>{date(Number(observation.windowStart))}<span className={e.subline}>to {date(Number(observation.windowEnd))}</span></td><td><code title={observation.inputRoot}>Input: {short(observation.inputRoot)}</code><code className={e.subline} title={observation.methodologyHash}>Method: {short(observation.methodologyHash)}</code></td><td><Explorer value={observation.transactionHash} kind="tx">Observation</Explorer></td></tr>;
     })}</tbody></DataTable>}</section>
-    <section className={e.section}><h2>Purchasing power</h2><p>Standardized resource units purchasable per test USDC, for the configured basket.</p>{m.purchasingPower.length === 0 ? <p className={e.empty}>Unavailable until a resource price basket is configured.</p> : <DataTable label="Purchasing power by resource"><thead><tr><th scope="col">Resource</th><th scope="col">Unit reference</th><th scope="col">Units per USDC</th></tr></thead><tbody>{m.purchasingPower.map(component => <tr key={component.componentId}><th scope="row">{component.componentId}</th><td><code title={component.unit}>{component.unit.startsWith('0x') ? short(component.unit) : component.unit}</code></td><td className={e.value}>{decimal(component.tasksPerCurrencyMillionths, 6)}</td></tr>)}</tbody></DataTable>}</section>
     <section className={e.section}><h2>Registered service terms</h2><p>Immutable registrations through the indexed block. Each new price or endpoint creates a separate service hash; these are not executable quotes.</p>{snapshot.services.length === 0 ? <p className={e.empty}>No service registrations have been indexed. <Link href="/app/marketplace">Browse the marketplace</Link> for published endpoints.</p> : <DataTable label="Registered service terms"><thead><tr><th scope="col">Category / service</th><th scope="col">Seller</th><th scope="col">Unit price</th><th scope="col">Quantity / unit</th><th scope="col">Evidence</th></tr></thead><tbody>{[...snapshot.services].reverse().map(service => <tr key={service.serviceHash}><th scope="row"><span className={e.capitalize}>{service.category}</span><code className={e.subline} title={service.serviceHash}>{short(service.serviceHash)}</code></th><td><Explorer value={service.seller}/></td><td className={e.value}>{money(service.unitPrice)}</td><td>{service.quantity}<code className={e.subline} title={service.unitHash}>{short(service.unitHash)}</code></td><td><Explorer value={service.transactionHash} kind="tx">Registration</Explorer></td></tr>)}</tbody></DataTable>}</section>
     <EconomyServicePublishing deployment={snapshot.deployment} reserveBps={snapshot.policy.reserveBps} reviewBps={snapshot.policy.reviewBps}/>
   </>;
@@ -119,6 +125,8 @@ export function EconomyWorkspace() {
       .finally(() => {if (!controller.signal.aborted) setLoading(false);});
     return () => controller.abort();
   }, [attempt]);
+
+  useEffect(()=>{const controller=new AbortController();const timer=window.setInterval(()=>{void api<EconomyResponse>('/api/economy',{signal:controller.signal}).then(value=>{if(!controller.signal.aborted){setResult(value);setError('');}}).catch(caught=>{if(!controller.signal.aborted)setError(errorMessage(caught));});},60000);return()=>{window.clearInterval(timer);controller.abort();};},[]);
 
   const snapshot = result?.snapshot;
   return <main id="main" className={`${s.main} ${e.page}`}>

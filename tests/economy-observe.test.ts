@@ -15,6 +15,8 @@ describe('economy observation operator',()=>{
   expect(result.metrics.inflationBps).toBeNull();
   expect(result.metrics.gapAtomic).toBeNull();
   expect(result.metrics.moneyVelocityBps).toBeNull();
+  expect(result.publicInputs.methodology).toBe('obolos-agentgdp-v2');
+  expect(result.record.parameters[6]).toBe(keccak256(toHex('obolos-agentgdp-v2')));
   expect(result.quoteMeaning).toMatch(/selected registered quote/i);
   expect(result.record.parameters).toHaveLength(7);
  });
@@ -25,9 +27,10 @@ describe('economy observation operator',()=>{
  });
  it('only reports inflation for a contiguous observation with the same basket',async()=>{
   const first=await prepareObservation(input,chain);
-  const previous={methodology:'obolos-agentgdp-v1' as const,asset:'USDC' as const,end:1000,basketIdentity:String(first.metrics.basketIdentity),arpiBps:'9000'};
+  const previous={methodology:'obolos-agentgdp-v2' as const,asset:'USDC' as const,end:1000,basketIdentity:String(first.metrics.basketIdentity),arpiBps:'9000'};
   expect((await prepareObservation({...input,previousObservation:previous},chain)).metrics.inflationBps).toBe('1111');
   expect((await prepareObservation({...input,previousObservation:{...previous,end:999}},chain)).metrics.inflationBps).toBeNull();
+  expect((await prepareObservation({...input,previousObservation:{...previous,methodology:'obolos-agentgdp-v1'}},chain)).metrics.inflationBps).toBeNull();
  });
  it('persists evidence before dispatch and then binds the confirmed event',async()=>{
   const prepared=await prepareObservation(input,chain);const order:string[]=[];

@@ -5,7 +5,9 @@ import {afterAll,beforeAll,describe,expect,it,vi} from 'vitest';
 import {privateKeyToAccount} from 'viem/accounts';
 import {canonicalJson,canonicalJsonHash} from '../src/lib/economy/service-contract';
 import {ingestEvidence} from '../src/lib/economy/evidence';
-import {indexEconomy} from '../src/lib/economy/indexer';
+import {indexEconomy as indexEconomyOnce} from '../src/lib/economy/indexer';
+// Isolated schemas share PostgreSQL advisory locks; retry the documented busy result.
+async function indexEconomy(...args:Parameters<typeof indexEconomyOnce>){for(let i=0;i<100;i++){const result=await indexEconomyOnce(...args);if(!('busy' in result&&result.busy))return result;await new Promise(resolve=>setTimeout(resolve,10));}throw Error('Test index lock stayed busy');}
 import {readRecoveryEvidence} from '../src/lib/economy/recovery-projection';
 const address=(n:string)=>`0x${n.repeat(40)}` as `0x${string}`,hash=(n:string)=>`0x${n.repeat(64)}` as `0x${string}`;
 const deployment={chainId:5042002 as const,policy:address('1'),ledger:address('2'),settlement:address('3'),fromBlock:'1',controller:address('4'),approver:address('5'),reserve:address('6'),reviewPool:address('7')};
@@ -13,7 +15,7 @@ const signer=privateKeyToAccount(`0x${'12'.repeat(32)}`),trust={[signer.address.
 const base={protocol:'obolos.evidence.v1' as const,chainId:5042002 as const,policy:deployment.policy,ledger:deployment.ledger,settlement:deployment.settlement,asset:'USDC' as const,windowStart:86400,windowEnd:172800,issuedAt:172801,signer:signer.address.toLowerCase(),sourceReference:'ipfs://test-only-attestation',sourceHash:hash('a')};
 const order={...base,kind:'order' as const,orderId:hash('a'),agentId:hash('b'),payer:address('b'),seller:address('c'),inputHash:hash('c'),outputHash:hash('d'),transactionHash:hash('e'),finalOutputAtomic:'300',intermediateInputAtomic:'20',resourceCostAtomic:'110',costBreakdown:{paymentAtomic:'100',gasAtomic:'5',inferenceAtomic:'5',otherAtomic:'0',conversionReference:'test-only-conversion',allResourcesIncluded:true as const}};
 async function signed(payload:unknown){return {payload,signature:await signer.signMessage({message:`Obolos economic evidence v1\n${canonicalJson(payload)}`})};}
-const chain={getChainId:async()=>5042002,getBlock:async({blockNumber}:{blockNumber?:bigint})=>({number:blockNumber??10n,hash:hash('f'),timestamp:blockNumber===9n?172799n:172800n}),getLogs:async()=>[],readContract:async({functionName}:{functionName:string})=>functionName==='executorOwners'?'0x0000000000000000000000000000000000000000':functionName==='agents'?[address('b'),address('d'),true]:functionName==='categories'?[true,1000n,10000n,86400n,0n]:functionName==='reputation'?[1n,1n,1n]:functionName==='marketEnabled'?true:1n} as unknown as Parameters<typeof indexEconomy>[2];
+const chain={getChainId:async()=>5042002,getBlock:async({blockNumber}:{blockNumber?:bigint})=>({number:blockNumber??10n,hash:hash('f'),timestamp:blockNumber===9n?172799n:172802n}),getLogs:async()=>[],readContract:async({functionName}:{functionName:string})=>functionName==='executorOwners'?'0x0000000000000000000000000000000000000000':functionName==='agents'?[address('b'),address('d'),true]:functionName==='categories'?[true,1000n,10000n,86400n,0n]:functionName==='reputation'?[1n,1n,1n]:functionName==='marketEnabled'?true:1n} as unknown as Parameters<typeof indexEconomy>[2];
 describe.skipIf(!process.env.TEST_DATABASE_URL)('PostgreSQL signed economic evidence',()=>{
  let admin:pg.Client,db:pg.Client;const schema=`obolos_evidence_${randomUUID().replaceAll('-','')}`;
  beforeAll(async()=>{
@@ -61,7 +63,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)('PostgreSQL signed economic evid
  it('refreshes a stationary chain cursor with real valuations, costs and denominators',{timeout:30000},async()=>{
   await indexEconomy(db,deployment,chain);
   const snapshot=(await db.query('SELECT snapshot FROM economy_index_state')).rows[0].snapshot;
-  expect(snapshot.metrics).toMatchObject({gapAtomic:'280',surplusAtomic:'190',productivityBps:'27272',moneyVelocityBps:'2800',utilizationBps:'10000',arpiBps:null});
+  expect(snapshot.metrics).toMatchObject({gapAtomic:'70',surplusAtomic:'-20',productivityBps:'27272',moneyVelocityBps:'700',utilizationBps:'10000',arpiBps:null});
   const components=[{id:'compute',category:'compute',unit:hash('2'),baselineAtomic:'100',weightBps:'10000',baselineServiceHash:hash('1'),quoteServiceHash:hash('1')}];
   const basket={...base,kind:'basket',basketId:canonicalJsonHash(components.map(({quoteServiceHash:_quote,...component})=>component)),components};
   await ingestEvidence(db,await signed(basket),deployment,chain,trust,172802);

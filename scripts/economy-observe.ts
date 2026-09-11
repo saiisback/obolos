@@ -11,13 +11,13 @@ import {configuration,executeCircle} from './economy-circle';
 
 const bytes32=z.string().regex(/^0x[0-9a-fA-F]{64}$/).transform(v=>v.toLowerCase() as Hex);
 const component=z.object({id:z.string().min(1).max(100),category:z.enum(['data','compute','inference','verification','storage']),unit:z.string().min(1).max(80),weightBps:z.string().regex(/^\d+$/),baselineServiceHash:bytes32,currentServiceHash:bytes32,sourceReference:z.string().min(1).max(500)}).strict();
-const previous=z.object({methodology:z.literal('obolos-agentgdp-v1'),asset:z.literal('USDC'),end:z.number().int().nonnegative(),basketIdentity:z.string(),arpiBps:z.string().regex(/^\d+$/)}).strict();
+const previous=z.object({methodology:z.enum(['obolos-agentgdp-v1','obolos-agentgdp-v2']),asset:z.literal('USDC'),end:z.number().int().nonnegative(),basketIdentity:z.string(),arpiBps:z.string().regex(/^\d+$/)}).strict();
 export const observationInputSchema=z.object({protocol:z.literal('obolos.observation-input.v1'),operationName:z.string().regex(/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,100}$/),asset:z.literal('USDC'),start:z.number().int().nonnegative(),end:z.number().int().positive(),components:z.array(component).min(1).max(100),previousObservation:previous.nullable().default(null)}).strict();
 export type ObservationInput=z.input<typeof observationInputSchema>;
 export type RegisteredQuote={seller:Address;category:number;unitHash:Hex;quantity:bigint;unitPrice:bigint;endpointHash:Hex;blockNumber:bigint;blockTimestamp:number;transactionHash:Hex};
 export interface ObservationChain {finalizedBlock():Promise<{number:bigint;timestamp:number}>;service(hash:Hex,finalizedBlock:bigint):Promise<RegisteredQuote>}
 const categories=['data','compute','inference','verification','storage'] as const;
-const methodology='obolos-agentgdp-v1';
+const methodology='obolos-agentgdp-v2';
 const stringify=(value:unknown)=>JSON.stringify(serializable(value),null,2)+'\n';
 
 export async function prepareObservation(raw:ObservationInput,chain:ObservationChain){

@@ -1,6 +1,6 @@
 import type {EconomicSettlement,EconomyMetrics,MetricWindow,PriceComponent} from './model';
 const bps=10000n;
-const methodology='obolos-agentgdp-v1' as const;
+const methodology='obolos-agentgdp-v2' as const;
 function basketIdentity(components:PriceComponent[]):string|null {
   if(!components.length)return null;
   return JSON.stringify([...components].sort((a,b)=>a.id.localeCompare(b.id)).map(p=>[p.id,p.category,p.unit,p.asset,p.baselineAtomic.toString(),p.weightBps.toString(),p.sourceReference??p.id]));
@@ -16,19 +16,30 @@ export function calculateEconomyMetrics(events:EconomicSettlement[],basket:Price
   const arpiBps=components.length&&components.every(p=>p.currentAtomic!==null)?components.reduce((v,p)=>v+p.weightBps*p.currentAtomic!*bps/p.baselineAtomic,0n)/bps:null;
   const selected=events.filter(e=>e.asset===window.asset&&e.timestamp>=window.start&&e.timestamp<window.end);
   const eligible=selected.filter(e=>!e.sameOwner);
-  const valued=eligible.filter(e=>e.delivered&&e.buyerAcknowledged&&e.valuationReference&&e.verifiedFinalOutputAtomic!==null&&e.verifiedIntermediateInputAtomic!==null);
-  const complete=eligible.length>0&&valued.length===eligible.length;
-  const revenue=valued.reduce((v,e)=>v+e.verifiedFinalOutputAtomic!,0n),inputs=valued.reduce((v,e)=>v+e.verifiedIntermediateInputAtomic!,0n);
-  if(valued.some(e=>e.verifiedFinalOutputAtomic!<0n||e.verifiedIntermediateInputAtomic!<0n)||eligible.some(e=>e.verifiedResourceCostAtomic!==null&&e.verifiedResourceCostAtomic!==undefined&&e.verifiedResourceCostAtomic<0n))throw Error('Invalid economic valuation');
-  const costComplete=complete&&valued.every(e=>e.verifiedResourceCostAtomic!==null&&e.verifiedResourceCostAtomic!==undefined);
-  const gross=selected.reduce((v,e)=>v+e.principalAtomic,0n),resourceCost=costComplete?valued.reduce((v,e)=>v+e.verifiedResourceCostAtomic!,0n):null;
-  const gap=complete?revenue-inputs:null,capital=window.capitalAtomic;
+  const fulfilled=eligible.filter(e=>e.delivered&&e.buyerAcknowledged);
+  const hasCostEvidence=(e:EconomicSettlement)=>Boolean(e.costEvidenceReference??e.valuationReference);
+  const gapValued=fulfilled.filter(e=>hasCostEvidence(e)&&e.observedRevenueAtomic!==null&&e.observedRevenueAtomic!==undefined&&e.verifiedIntermediateInputAtomic!==null);
+  const surplusValued=fulfilled.filter(e=>hasCostEvidence(e)&&e.observedRevenueAtomic!==null&&e.observedRevenueAtomic!==undefined&&e.verifiedResourceCostAtomic!==null&&e.verifiedResourceCostAtomic!==undefined);
+  const productivityValued=fulfilled.filter(e=>Boolean(e.valuationReference)&&hasCostEvidence(e)&&e.verifiedFinalOutputAtomic!==null&&e.verifiedResourceCostAtomic!==null&&e.verifiedResourceCostAtomic!==undefined);
+  const gapComplete=eligible.length>0&&gapValued.length===eligible.length;
+  const surplusComplete=eligible.length>0&&surplusValued.length===eligible.length;
+  const productivityComplete=eligible.length>0&&productivityValued.length===eligible.length;
+  if(eligible.some(e=>(e.observedRevenueAtomic!==null&&e.observedRevenueAtomic!==undefined&&e.observedRevenueAtomic<0n)||(e.verifiedFinalOutputAtomic!==null&&e.verifiedFinalOutputAtomic<0n)||(e.verifiedIntermediateInputAtomic!==null&&e.verifiedIntermediateInputAtomic<0n)||(e.verifiedResourceCostAtomic!==null&&e.verifiedResourceCostAtomic!==undefined&&e.verifiedResourceCostAtomic<0n)))throw Error('Invalid economic valuation');
+  const gross=selected.reduce((v,e)=>v+e.principalAtomic,0n);
+  const gapRevenue=gapComplete?gapValued.reduce((v,e)=>v+e.observedRevenueAtomic!,0n):null;
+  const inputs=gapComplete?gapValued.reduce((v,e)=>v+e.verifiedIntermediateInputAtomic!,0n):null;
+  const surplusRevenue=surplusComplete?surplusValued.reduce((v,e)=>v+e.observedRevenueAtomic!,0n):null;
+  const surplusCost=surplusComplete?surplusValued.reduce((v,e)=>v+e.verifiedResourceCostAtomic!,0n):null;
+  const outputValue=productivityComplete?productivityValued.reduce((v,e)=>v+e.verifiedFinalOutputAtomic!,0n):null;
+  const productivityCost=productivityComplete?productivityValued.reduce((v,e)=>v+e.verifiedResourceCostAtomic!,0n):null;
+  const gap=gapRevenue!==null&&inputs!==null?gapRevenue-inputs:null,capital=window.capitalAtomic;
   if(capital!==null&&capital<0n)throw Error('Invalid capital observation');
   const active=new Set(window.activeAgentIds),productive=new Set(eligible.filter(e=>e.delivered&&e.buyerAcknowledged&&active.has(e.agentId)).map(e=>e.agentId));
   const limitations=['Delivery and buyer acknowledgment do not independently prove real-world usefulness.','Known same-owner payments are excluded from value-added and utilization; undisclosed common control and circular trade may remain.'];
-  if(!complete)limitations.push('GAP requires explicit final-output and intermediate-input valuations for every eligible order in this window.');
-  if(!costComplete)limitations.push('Surplus and productivity require an explicit all-resource cost attestation for every eligible valued order.');
-  if(resourceCost===0n)limitations.push('Productivity is unavailable because attested total resource cost is zero; surplus remains defined.');
+  if(!gapComplete)limitations.push('GAP requires explicit observed revenue and intermediate inputs for every eligible fulfilled order.');
+  if(!surplusComplete)limitations.push('Surplus requires explicit observed revenue and all-resource cost for every eligible fulfilled order.');
+  if(!productivityComplete)limitations.push('Productivity requires explicit verified output value and all-resource cost for every eligible fulfilled order.');
+  if(productivityCost===0n)limitations.push(surplusComplete?'Productivity is unavailable because attested total resource cost is zero; surplus remains defined.':'Productivity is unavailable because attested total resource cost is zero.');
   if(arpiBps===null)limitations.push('ARPI requires every fixed-basket component with comparable currency and unit prices.');
   const previous=window.previousArpi;
   const comparablePrevious=previous!==null&&previous.methodology===methodology&&previous.asset===window.asset&&previous.end===window.start&&previous.basketIdentity===identity&&previous.arpiBps>0n;
@@ -36,9 +47,9 @@ export function calculateEconomyMetrics(events:EconomicSettlement[],basket:Price
   return {methodology,asset:window.asset,start:window.start,end:window.end,basketIdentity:identity,arpiBps,
     inflationBps:arpiBps!==null&&comparablePrevious?(arpiBps-previous.arpiBps)*bps/previous.arpiBps:null,
     baselineChangeBps:arpiBps!==null?arpiBps-bps:null,grossPaymentsAtomic:gross,sellerRevenueAtomic:selected.reduce((v,e)=>v+e.sellerAtomic,0n),gapAtomic:gap,
-    surplusAtomic:resourceCost!==null?revenue-resourceCost:null,productivityBps:resourceCost!==null&&resourceCost>0n?revenue*bps/resourceCost:null,
+    surplusAtomic:surplusRevenue!==null&&surplusCost!==null?surplusRevenue-surplusCost:null,productivityBps:outputValue!==null&&productivityCost!==null&&productivityCost>0n?outputValue*bps/productivityCost:null,
     moneyVelocityBps:gap!==null&&capital!==null&&capital>0n?gap*bps/capital:null,paymentTurnoverBps:capital!==null&&capital>0n?gross*bps/capital:null,
     utilizationBps:active.size?BigInt(productive.size)*bps/BigInt(active.size):null,
     purchasingPower:components.map(p=>({componentId:p.id,unit:p.unit,tasksPerCurrencyMillionths:p.currentAtomic? (window.asset==='USDC'?1000000n:100000000n)*1000000n/p.currentAtomic:null})),
-    settlementCount:selected.length,valuedSettlementCount:valued.length,excludedSelfPayments:selected.length-eligible.length,limitations};
+    settlementCount:selected.length,valuedSettlementCount:fulfilled.filter(e=>e.valuationReference&&e.verifiedFinalOutputAtomic!==null).length,excludedSelfPayments:selected.length-eligible.length,limitations};
 }
