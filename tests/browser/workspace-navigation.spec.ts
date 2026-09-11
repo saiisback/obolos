@@ -16,6 +16,10 @@ async function fixture(page: Page, initialAuth = true) {
     if(path === '/api/auth/verify') { authed = true; return json({user}); }
     if(path === '/api/auth/logout') { authed = false; return json({ok:true}); }
     if(path === '/api/agents') return json({agents:[first, second]});
+    if(path.endsWith('/economy') && path.startsWith('/api/agents/')) return json({agentId:'0x'+'1'.repeat(64),policy:{status:'not_registered'},orders:[],indexedAt:null});
+    if(path === '/api/economy/services') return json({services:[]});
+    if(path === '/api/economy/purchases') return json({orders:[]});
+    if(path === '/api/economy/provider/status') return json({status:'unavailable',endpoints:[],lastSeen:null});
     if(path === '/api/market/services') return json({services:[]});
     if(path === '/api/market/purchases') return json({orders:[]});
     if(path === '/api/market/earnings') return json({orders:[],totalAtomic:'0'});
@@ -94,6 +98,7 @@ test('task views keep setup, execution, selling, and integration separate', asyn
   await fixture(page);
   await page.goto(origin+'/app');
   await page.getByRole('button',{name:'Manage agent',exact:true}).first().click();
+  await page.getByText('Repository research setup and runs',{exact:true}).click();
   await expect(page.getByRole('button',{name:'Pair a runner',exact:false})).toBeVisible();
   await page.getByRole('button',{name:'Pair a runner',exact:false}).click();
   await expect(page.getByLabel('One-time runner credential')).toBeVisible();
@@ -109,10 +114,10 @@ test('task views keep setup, execution, selling, and integration separate', asyn
   await page.getByRole('button',{name:'2. Authorize spending',exact:false}).click();
   await expect(page.getByLabel('Allowed repositories')).toHaveValue('fixture/repository');
   await page.goto(origin+'/app/marketplace');
-  await expect(page.getByRole('heading',{name:'Seller desk',exact:true})).not.toBeVisible();
+  await expect(page.getByRole('heading',{name:'Repository-verifier seller desk',exact:true})).not.toBeVisible();
   await page.getByRole('navigation',{name:'Marketplace sections'}).getByRole('link',{name:'Your seller desk'}).click();
-  await expect(page.getByRole('heading',{name:'Seller desk',exact:true})).toBeVisible();
-  await expect(page.getByRole('heading',{name:'Available verifiers',exact:false})).not.toBeVisible();
+  await expect(page.getByRole('heading',{name:'Repository-verifier seller desk',exact:true})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Repository verifiers',exact:false})).not.toBeVisible();
   await expect(page.getByRole('heading',{name:'New hosted verifier listing'})).not.toBeVisible();
   await page.getByRole('button',{name:'Publish a service',exact:true}).click();
   await expect(page.getByRole('heading',{name:'New hosted verifier listing'})).toBeVisible();

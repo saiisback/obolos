@@ -1,0 +1,737 @@
+{
+  "checkedAt": "2026-09-11T19:31:45.385Z",
+  "deploymentId": "dpl_GEweNHYZdJQJGphMk3wCBHfyMTJ3",
+  "deploymentUrl": "https://obolos-qkrpcw7ur-saiisbacks-projects.vercel.app",
+  "origin": "https://obolos.app",
+  "chainId": 5042002,
+  "owner": "0x1f21897512e5ad2d9aa087a0c8e818a3e2dd22fd",
+  "sameOwnerOperated": true,
+  "newPrincipalAtomic": "5000",
+  "testnetAsset": "USDC",
+  "newAgents": [
+    {
+      "name": "Atlas \u2014 Repository Scout",
+      "category": "data",
+      "platformAgentId": "0690aa5d-69bc-4ba7-9ef8-99d7f38a9f2c"
+    },
+    {
+      "name": "Vector \u2014 Compute Analyst",
+      "category": "compute",
+      "platformAgentId": "671707b0-5a68-41b7-9323-aa79cfd9eca1"
+    },
+    {
+      "name": "Sage \u2014 Research Writer",
+      "category": "inference",
+      "platformAgentId": "1f00f561-b1e6-44b1-9e1e-4b433879fa5b"
+    },
+    {
+      "name": "Sentinel \u2014 Integrity Verifier",
+      "category": "verification",
+      "platformAgentId": "eb0c15c7-bc7f-40ad-9995-40f7740d2f2c"
+    },
+    {
+      "name": "Vault \u2014 Artifact Archivist",
+      "category": "storage",
+      "platformAgentId": "47e90710-27c4-4bb2-b175-c4cd0705388b"
+    }
+  ],
+  "jobs": [
+    {
+      "category": "data",
+      "name": "Atlas \u2014 Repository Scout",
+      "platformAgentId": "0690aa5d-69bc-4ba7-9ef8-99d7f38a9f2c",
+      "orderId": "0x3e23d8d74e14e8ce78000f089d4c981cf51196119be4dbc9d90912af7b282286",
+      "paymentHash": "0x534010844f41613916597f7c836b2e1db1f6770cfadee3b59784a7c6b4ad1b3d",
+      "acknowledgmentHash": "0xfd1bca6836919e2300eefe2f4af42e546f022dda1adfa6e98902c91cdd258ccb",
+      "outputHash": "0xf31c968a29222f2109bb5863169bee422c3179c1b21b25bd4f6828ebc313e0d2",
+      "output": {
+        "repo": "saiisback/obolos",
+        "forks": 0,
+        "stars": 0,
+        "pushedAt": "2026-09-11T13:36:31Z",
+        "fetchedAt": "2026-09-11T19:17:12.504Z",
+        "sourceUrl": "https://api.github.com/repos/saiisback/obolos",
+        "openIssues": 0
+      }
+    },
+    {
+      "category": "compute",
+      "name": "Vector \u2014 Compute Analyst",
+      "platformAgentId": "671707b0-5a68-41b7-9323-aa79cfd9eca1",
+      "orderId": "0x294e5b9ce0278d818a92cfadc63d8d875ba56391515bdb1b85254b5604dcff03",
+      "paymentHash": "0x9880593dceabc48719771d470edabd16f6fad59addecc8a06418fab2ec67507d",
+      "acknowledgmentHash": "0xf53a0cf2cc4483cd37718d2fa5f018e622754a33c7e408b7dddf9fccfe4d1994",
+      "outputHash": "0x66fb80c32036df31f461229fb5168bc38317de7d898a30d88cf017d71f45a9e6",
+      "output": {
+        "bytes": 195,
+        "words": 1,
+        "sha256": "fcbd1a2174b36bb1ed680c39040b5b589dd51193b33f5f18c1c0b2791738574b",
+        "characters": 195
+      }
+    },
+    {
+      "category": "inference",
+      "name": "Sage \u2014 Research Writer",
+      "platformAgentId": "1f00f561-b1e6-44b1-9e1e-4b433879fa5b",
+      "orderId": "0x5deed47338cb1ad93ee118c919d23d984f519a2c6588ded5e803dfec431ade65",
+      "paymentHash": "0xbbc056a54f5243488dec9d95f7e879cc33f1d02551b65f459cee98c8a879013a",
+      "acknowledgmentHash": "0x2b1aacc83fd89304bd8a2cd443ba0294efdaaa5a9aa7dc9e892f36b1fc6fb998",
+      "outputHash": "0x594ccdc53c7b9731f5df838faa2eb1ebc257138f4074049eebe37442530e8007",
+      "output": {
+        "text": "Repository status note\n\n- Repository: saiisback/obolos\n- Open issues: 0\n- Forks: 0\n- Stars: 0\n- Last push (pushedAt): 2026-09-11T13:36:31Z\n- Data fetched at: 2026-09-11T19:17:12.504Z\n- Source URL: https://api.github.com/repos/saiisback/obolos\n- Integrity (bytes/words/sha256/characters): 195 bytes, 1 word, sha256 fcbd1a2174b36bb1ed680c39040b5b589dd51193b33f5f18c1c0b2791738574b, 195 characters\n\nNotes:\n- Counts (forks, stars, open issues) do not prove code quality or completeness.\n- No additional behavior or content beyond the provided fields is assumed or inferred.",
+        "model": "gpt-5-nano-2025-08-07",
+        "requestId": "chatcmpl-EN165QRzVrbsqwaDFQa8YxMTjCbh7",
+        "promptTokens": 201,
+        "completionTokens": 207
+      }
+    },
+    {
+      "category": "verification",
+      "name": "Sentinel \u2014 Integrity Verifier",
+      "platformAgentId": "eb0c15c7-bc7f-40ad-9995-40f7740d2f2c",
+      "orderId": "0x3f53b93df0306a56bb2ec7249787045f58dba0b8a86a2986aed1e05aed82bf62",
+      "paymentHash": "0x4cdb3956f8641623011961253a6b1ff0112e76b562d16c38cd3f7a18fe09ba20",
+      "acknowledgmentHash": "0x3055a393cabc898ecbed4334cb0397daa8617bf67d05c488fc61d8c6483a14b1",
+      "outputHash": "0x3803895fd7039064fb82ac86bbe1fa60b1e152231b97ffe6c550b46a18f91591",
+      "output": {
+        "check": "SHA-256 content integrity; no claim of narrative quality",
+        "passed": true,
+        "sha256": "e36411dfd95b1cc17a88e98c179e6a5e37786675937e781f6d8b92cc7b33a990"
+      }
+    },
+    {
+      "category": "storage",
+      "name": "Vault \u2014 Artifact Archivist",
+      "platformAgentId": "47e90710-27c4-4bb2-b175-c4cd0705388b",
+      "orderId": "0x9724e14c2607dd63341acdaf6948f325aecec12ea51af76d07ad756a2dac6165",
+      "paymentHash": "0xf61cf2ecf6ea8914087ceb2693b53e25f7708ea219c674c1c62469506263e2d2",
+      "acknowledgmentHash": "0x4fd6a310ed4538cf35cbcc73dbe7a14fb063508c7d0b03441ba5de629a5a43a2",
+      "outputHash": "0x8f4da309abafbde912932d52fe82a5ff6db1d6921f2951f228e2545c796ec9d8",
+      "output": {
+        "bytes": 569,
+        "sha256": "e36411dfd95b1cc17a88e98c179e6a5e37786675937e781f6d8b92cc7b33a990",
+        "objectId": "0x9724e14c2607dd63341acdaf6948f325aecec12ea51af76d07ad756a2dac6165",
+        "expiresAt": "2026-09-11T20:24:34.000Z"
+      }
+    }
+  ],
+  "policies": [
+    {
+      "category": "data",
+      "platformAgentId": "0690aa5d-69bc-4ba7-9ef8-99d7f38a9f2c",
+      "agentId": "0xe75034eb2939777424a3c36efebd33eec606d33f583cca93029038b6ec21d263",
+      "policy": {
+        "status": "registered",
+        "owner": "0x1f21897512e5ad2d9aa087a0c8e818a3e2dd22fd",
+        "executor": "0x90602880dbee4158d96fddbdffe300c03d68e46c",
+        "active": true,
+        "totalCapAtomic": "2000",
+        "spentAtomic": "1000",
+        "windowCapAtomic": "2000",
+        "windowSeconds": "86400",
+        "blockNumber": "61614451",
+        "timestamp": 1789155091
+      },
+      "indexedAt": "2026-09-11T19:31:19.000Z",
+      "orders": [
+        {
+          "orderId": "0x3e23d8d74e14e8ce78000f089d4c981cf51196119be4dbc9d90912af7b282286",
+          "category": "data",
+          "amountAtomic": "1000",
+          "providerState": "fulfilled",
+          "createdAt": "2026-09-11T19:17:08.000Z",
+          "transactionHash": "0x534010844f41613916597f7c836b2e1db1f6770cfadee3b59784a7c6b4ad1b3d",
+          "deliveryAttempts": 3,
+          "outputHash": "0xf31c968a29222f2109bb5863169bee422c3179c1b21b25bd4f6828ebc313e0d2",
+          "outputSummary": "stars: 0 \u00b7 forks: 0 \u00b7 openIssues: 0",
+          "sellerAttestation": {
+            "transactionHash": "0x82942bacf34434797e1f29c2369d0b80c328d58cd50ec35195ed3d187167c4e8",
+            "outputHash": "0xf31c968a29222f2109bb5863169bee422c3179c1b21b25bd4f6828ebc313e0d2",
+            "outputMatches": true
+          },
+          "buyerAcknowledgment": {
+            "transactionHash": "0xfd1bca6836919e2300eefe2f4af42e546f022dda1adfa6e98902c91cdd258ccb",
+            "outputHash": "0xf31c968a29222f2109bb5863169bee422c3179c1b21b25bd4f6828ebc313e0d2",
+            "outputMatches": true
+          }
+        }
+      ]
+    },
+    {
+      "category": "compute",
+      "platformAgentId": "671707b0-5a68-41b7-9323-aa79cfd9eca1",
+      "agentId": "0xce62b9b9d83f1671df59de48088f56f05997fea9485c28d7b63ab0e65bb04953",
+      "policy": {
+        "status": "registered",
+        "owner": "0x1f21897512e5ad2d9aa087a0c8e818a3e2dd22fd",
+        "executor": "0x90602880dbee4158d96fddbdffe300c03d68e46c",
+        "active": true,
+        "totalCapAtomic": "2000",
+        "spentAtomic": "1000",
+        "windowCapAtomic": "2000",
+        "windowSeconds": "86400",
+        "blockNumber": "61614452",
+        "timestamp": 1789155092
+      },
+      "indexedAt": "2026-09-11T19:31:19.000Z",
+      "orders": [
+        {
+          "orderId": "0x294e5b9ce0278d818a92cfadc63d8d875ba56391515bdb1b85254b5604dcff03",
+          "category": "compute",
+          "amountAtomic": "1000",
+          "providerState": "fulfilled",
+          "createdAt": "2026-09-11T19:18:37.000Z",
+          "transactionHash": "0x9880593dceabc48719771d470edabd16f6fad59addecc8a06418fab2ec67507d",
+          "deliveryAttempts": 4,
+          "outputHash": "0x66fb80c32036df31f461229fb5168bc38317de7d898a30d88cf017d71f45a9e6",
+          "outputSummary": "characters: 195 \u00b7 words: 1 \u00b7 bytes: 195",
+          "sellerAttestation": {
+            "transactionHash": "0x20c8304749c20b9d2515eff908001f8eb3203fd3707455e3cf068626d8c28c01",
+            "outputHash": "0x66fb80c32036df31f461229fb5168bc38317de7d898a30d88cf017d71f45a9e6",
+            "outputMatches": true
+          },
+          "buyerAcknowledgment": {
+            "transactionHash": "0xf53a0cf2cc4483cd37718d2fa5f018e622754a33c7e408b7dddf9fccfe4d1994",
+            "outputHash": "0x66fb80c32036df31f461229fb5168bc38317de7d898a30d88cf017d71f45a9e6",
+            "outputMatches": true
+          }
+        }
+      ]
+    },
+    {
+      "category": "inference",
+      "platformAgentId": "1f00f561-b1e6-44b1-9e1e-4b433879fa5b",
+      "agentId": "0xfd62046ce6a02b67279b4eaf4e82c71e965433afe213815d0fc917ab31ab0e93",
+      "policy": {
+        "status": "registered",
+        "owner": "0x1f21897512e5ad2d9aa087a0c8e818a3e2dd22fd",
+        "executor": "0x90602880dbee4158d96fddbdffe300c03d68e46c",
+        "active": true,
+        "totalCapAtomic": "2000",
+        "spentAtomic": "1000",
+        "windowCapAtomic": "2000",
+        "windowSeconds": "86400",
+        "blockNumber": "61614452",
+        "timestamp": 1789155092
+      },
+      "indexedAt": "2026-09-11T19:31:19.000Z",
+      "orders": [
+        {
+          "orderId": "0x5deed47338cb1ad93ee118c919d23d984f519a2c6588ded5e803dfec431ade65",
+          "category": "inference",
+          "amountAtomic": "1000",
+          "providerState": "fulfilled",
+          "createdAt": "2026-09-11T19:20:55.000Z",
+          "transactionHash": "0xbbc056a54f5243488dec9d95f7e879cc33f1d02551b65f459cee98c8a879013a",
+          "deliveryAttempts": 5,
+          "outputHash": "0x594ccdc53c7b9731f5df838faa2eb1ebc257138f4074049eebe37442530e8007",
+          "outputSummary": "promptTokens: 201 \u00b7 completionTokens: 207",
+          "sellerAttestation": {
+            "transactionHash": "0x2d58fd77c653a9769b3623e4e3a1ab4c1a90cba5210a87c5f4fa408c82787b42",
+            "outputHash": "0x594ccdc53c7b9731f5df838faa2eb1ebc257138f4074049eebe37442530e8007",
+            "outputMatches": true
+          },
+          "buyerAcknowledgment": {
+            "transactionHash": "0x2b1aacc83fd89304bd8a2cd443ba0294efdaaa5a9aa7dc9e892f36b1fc6fb998",
+            "outputHash": "0x594ccdc53c7b9731f5df838faa2eb1ebc257138f4074049eebe37442530e8007",
+            "outputMatches": true
+          }
+        }
+      ]
+    },
+    {
+      "category": "verification",
+      "platformAgentId": "eb0c15c7-bc7f-40ad-9995-40f7740d2f2c",
+      "agentId": "0xff042e3df6bf7edaee838a1f3ae3e3c96e5d231c0e17dfd9bf7a0e2b13a8ba8d",
+      "policy": {
+        "status": "registered",
+        "owner": "0x1f21897512e5ad2d9aa087a0c8e818a3e2dd22fd",
+        "executor": "0x90602880dbee4158d96fddbdffe300c03d68e46c",
+        "active": true,
+        "totalCapAtomic": "2000",
+        "spentAtomic": "1000",
+        "windowCapAtomic": "2000",
+        "windowSeconds": "86400",
+        "blockNumber": "61614453",
+        "timestamp": 1789155092
+      },
+      "indexedAt": "2026-09-11T19:31:19.000Z",
+      "orders": [
+        {
+          "orderId": "0x3f53b93df0306a56bb2ec7249787045f58dba0b8a86a2986aed1e05aed82bf62",
+          "category": "verification",
+          "amountAtomic": "1000",
+          "providerState": "fulfilled",
+          "createdAt": "2026-09-11T19:22:51.000Z",
+          "transactionHash": "0x4cdb3956f8641623011961253a6b1ff0112e76b562d16c38cd3f7a18fe09ba20",
+          "deliveryAttempts": 3,
+          "outputHash": "0x3803895fd7039064fb82ac86bbe1fa60b1e152231b97ffe6c550b46a18f91591",
+          "outputSummary": "passed: true",
+          "sellerAttestation": {
+            "transactionHash": "0xd77bd245970509ae0af8de831f94e9a75eed879b3e96dc12500c237efd5e41c9",
+            "outputHash": "0x3803895fd7039064fb82ac86bbe1fa60b1e152231b97ffe6c550b46a18f91591",
+            "outputMatches": true
+          },
+          "buyerAcknowledgment": {
+            "transactionHash": "0x3055a393cabc898ecbed4334cb0397daa8617bf67d05c488fc61d8c6483a14b1",
+            "outputHash": "0x3803895fd7039064fb82ac86bbe1fa60b1e152231b97ffe6c550b46a18f91591",
+            "outputMatches": true
+          }
+        }
+      ]
+    },
+    {
+      "category": "storage",
+      "platformAgentId": "47e90710-27c4-4bb2-b175-c4cd0705388b",
+      "agentId": "0x185316bd442fd61d654b6f3b2f1b2c445093f1885561b219ed92e97c9db3bbb6",
+      "policy": {
+        "status": "registered",
+        "owner": "0x1f21897512e5ad2d9aa087a0c8e818a3e2dd22fd",
+        "executor": "0x90602880dbee4158d96fddbdffe300c03d68e46c",
+        "active": true,
+        "totalCapAtomic": "2000",
+        "spentAtomic": "1000",
+        "windowCapAtomic": "2000",
+        "windowSeconds": "86400",
+        "blockNumber": "61614455",
+        "timestamp": 1789155093
+      },
+      "indexedAt": "2026-09-11T19:31:19.000Z",
+      "orders": [
+        {
+          "orderId": "0x9724e14c2607dd63341acdaf6948f325aecec12ea51af76d07ad756a2dac6165",
+          "category": "storage",
+          "amountAtomic": "1000",
+          "providerState": "fulfilled",
+          "createdAt": "2026-09-11T19:24:30.000Z",
+          "transactionHash": "0xf61cf2ecf6ea8914087ceb2693b53e25f7708ea219c674c1c62469506263e2d2",
+          "deliveryAttempts": 3,
+          "outputHash": "0x8f4da309abafbde912932d52fe82a5ff6db1d6921f2951f228e2545c796ec9d8",
+          "outputSummary": "bytes: 569",
+          "sellerAttestation": {
+            "transactionHash": "0x8f555894bc908829f808f4975e89eadc6fa6a1d27c227254703730f0822a00d9",
+            "outputHash": "0x8f4da309abafbde912932d52fe82a5ff6db1d6921f2951f228e2545c796ec9d8",
+            "outputMatches": true
+          },
+          "buyerAcknowledgment": {
+            "transactionHash": "0x4fd6a310ed4538cf35cbcc73dbe7a14fb063508c7d0b03441ba5de629a5a43a2",
+            "outputHash": "0x8f4da309abafbde912932d52fe82a5ff6db1d6921f2951f228e2545c796ec9d8",
+            "outputMatches": true
+          }
+        }
+      ]
+    }
+  ],
+  "guards": {
+    "crossAgentCredentialRejected": true,
+    "unauthenticatedAgentsRejected": true,
+    "overBudgetRejected": true,
+    "wrongCategoryRejected": true,
+    "rejectedOrderConsumed": false,
+    "paymentSubmitted": false,
+    "method": "read-only eth_call against deployed policy"
+  },
+  "checks": [
+    "agent collection and policy/order detail at desktop/mobile",
+    "resource catalog all five categories, seven offers, five exact provider heartbeat matches; eleven acknowledged purchases",
+    "/app/economy rendered",
+    "/app/evidence rendered",
+    "/app/developers rendered",
+    "seller cannot read buyer agent or purchases",
+    "stored report retrieved byte-for-byte"
+  ],
+  "applicationTests": 561,
+  "browserTests": 26,
+  "pageErrors": [],
+  "productionPurchaseCount": 11,
+  "freshness": {
+    "status": "fresh",
+    "indexAgeSeconds": 16,
+    "chainAgeSeconds": 26,
+    "caughtUp": true
+  },
+  "blockNumber": "61614428",
+  "activeAgentCount": 6,
+  "measurements": {
+    "asOf": 1789155079,
+    "asset": "USDC",
+    "today": {
+      "start": 1789084800,
+      "orderIds": [
+        "0x6aad115e565064b9bdd53bdee020c8be83b81747b89d9666c817302b9ddbc55d",
+        "0x34bf7e0722ab118b85fe04d5d9f766acba0559d77ce4e515ecdf3b5b3a7aa549",
+        "0x5b967a49d8def6058215cc2cf9932424a226c3fb0866d516129be79de3b3bfff",
+        "0x3e7439fd4f023ca3f0dd3beabe734321d595ed39de66287edbc475b26116cbe0",
+        "0xc2f6db3581a38ac18f9eaaf59866c2f3b125103bde07dcdf8cf00e6bbb2f7218",
+        "0x2d6ac527c7b4a54cb761ed52290194cd9beadd001979bcd883971e793d71dc58",
+        "0x3e23d8d74e14e8ce78000f089d4c981cf51196119be4dbc9d90912af7b282286",
+        "0x294e5b9ce0278d818a92cfadc63d8d875ba56391515bdb1b85254b5604dcff03",
+        "0x5deed47338cb1ad93ee118c919d23d984f519a2c6588ded5e803dfec431ade65",
+        "0x3f53b93df0306a56bb2ec7249787045f58dba0b8a86a2986aed1e05aed82bf62",
+        "0x9724e14c2607dd63341acdaf6948f325aecec12ea51af76d07ad756a2dac6165"
+      ],
+      "refundCount": 1,
+      "endInclusive": 1789155079,
+      "refundAtomic": "1000",
+      "deliveredCount": 11,
+      "settlementCount": 11,
+      "acknowledgedCount": 11,
+      "deliveredOrderIds": [
+        "0x6aad115e565064b9bdd53bdee020c8be83b81747b89d9666c817302b9ddbc55d",
+        "0x34bf7e0722ab118b85fe04d5d9f766acba0559d77ce4e515ecdf3b5b3a7aa549",
+        "0x5b967a49d8def6058215cc2cf9932424a226c3fb0866d516129be79de3b3bfff",
+        "0x3e7439fd4f023ca3f0dd3beabe734321d595ed39de66287edbc475b26116cbe0",
+        "0xc2f6db3581a38ac18f9eaaf59866c2f3b125103bde07dcdf8cf00e6bbb2f7218",
+        "0x2d6ac527c7b4a54cb761ed52290194cd9beadd001979bcd883971e793d71dc58",
+        "0x3e23d8d74e14e8ce78000f089d4c981cf51196119be4dbc9d90912af7b282286",
+        "0x294e5b9ce0278d818a92cfadc63d8d875ba56391515bdb1b85254b5604dcff03",
+        "0x5deed47338cb1ad93ee118c919d23d984f519a2c6588ded5e803dfec431ade65",
+        "0x3f53b93df0306a56bb2ec7249787045f58dba0b8a86a2986aed1e05aed82bf62",
+        "0x9724e14c2607dd63341acdaf6948f325aecec12ea51af76d07ad756a2dac6165"
+      ],
+      "grossPaymentsAtomic": "11000",
+      "sellerRevenueAtomic": "10450",
+      "acknowledgedOrderIds": [
+        "0x6aad115e565064b9bdd53bdee020c8be83b81747b89d9666c817302b9ddbc55d",
+        "0x34bf7e0722ab118b85fe04d5d9f766acba0559d77ce4e515ecdf3b5b3a7aa549",
+        "0x5b967a49d8def6058215cc2cf9932424a226c3fb0866d516129be79de3b3bfff",
+        "0x3e7439fd4f023ca3f0dd3beabe734321d595ed39de66287edbc475b26116cbe0",
+        "0xc2f6db3581a38ac18f9eaaf59866c2f3b125103bde07dcdf8cf00e6bbb2f7218",
+        "0x2d6ac527c7b4a54cb761ed52290194cd9beadd001979bcd883971e793d71dc58",
+        "0x3e23d8d74e14e8ce78000f089d4c981cf51196119be4dbc9d90912af7b282286",
+        "0x294e5b9ce0278d818a92cfadc63d8d875ba56391515bdb1b85254b5604dcff03",
+        "0x5deed47338cb1ad93ee118c919d23d984f519a2c6588ded5e803dfec431ade65",
+        "0x3f53b93df0306a56bb2ec7249787045f58dba0b8a86a2986aed1e05aed82bf62",
+        "0x9724e14c2607dd63341acdaf6948f325aecec12ea51af76d07ad756a2dac6165"
+      ]
+    },
+    "prices": {
+      "basketId": "0x07db64a26567945a2b8f555feb674b47568e5789a71709afdab112bf6364dda8",
+      "complete": true,
+      "indexBps": "10000",
+      "baselineAt": 1789115742,
+      "components": [
+        {
+          "seller": "0xd2137e6d65165400641aff0e34781d09a0215858",
+          "category": "data",
+          "quantity": "1",
+          "unitHash": "0x63690c4a38120b6c3d9400f648f78d4d53a32d92d42fc42d807202ee4895b543",
+          "weightBps": "2000",
+          "endpointHash": "0xcb3fd41f81e018f7b419d623a5682cee3ee2062734fc94100cb3f37bf0628cfa",
+          "currentAtomic": "1000",
+          "baselineAtomic": "1000",
+          "familyServiceHash": "0xf39a4f8122822ac2b280b14867786bf0473a3dbfda5e208bb44510090d3a092b",
+          "currentServiceHash": "0xf39a4f8122822ac2b280b14867786bf0473a3dbfda5e208bb44510090d3a092b",
+          "baselineServiceHash": "0xf39a4f8122822ac2b280b14867786bf0473a3dbfda5e208bb44510090d3a092b",
+          "currentRegisteredAt": 1789115678,
+          "baselineRegisteredAt": 1789115678,
+          "currentTransactionHash": "0x5b34d7d0044d4790ee122af54e3ee56cd5ec428f84dfbec708cdd784903c0bf2",
+          "baselineTransactionHash": "0x5b34d7d0044d4790ee122af54e3ee56cd5ec428f84dfbec708cdd784903c0bf2"
+        },
+        {
+          "seller": "0xd2137e6d65165400641aff0e34781d09a0215858",
+          "category": "compute",
+          "quantity": "1",
+          "unitHash": "0x2f32e6106485ae386796e72bf0e149bc7a7c1551a0617797cf61510a0bba1bf0",
+          "weightBps": "2000",
+          "endpointHash": "0x0c3cd1f2e8294ddfdfeb05deb1e829ce2772da484e9564826921f6b547dd3e80",
+          "currentAtomic": "3000",
+          "baselineAtomic": "3000",
+          "familyServiceHash": "0xd083bb6a6a2182d7cb82becc2ca6fbd4d3f950d220fb29bd309c1de524cc2934",
+          "currentServiceHash": "0x722f99ff6d2a8ecffa31ff97c5bdb8ab44d9378e30bd80ac3af87f792b32efcb",
+          "baselineServiceHash": "0x722f99ff6d2a8ecffa31ff97c5bdb8ab44d9378e30bd80ac3af87f792b32efcb",
+          "currentRegisteredAt": 1789100985,
+          "baselineRegisteredAt": 1789100985,
+          "currentTransactionHash": "0x5cddcccdbbfdf44524fb2934999786686316d6fdb0134ef80312554ca8cc6cb5",
+          "baselineTransactionHash": "0x5cddcccdbbfdf44524fb2934999786686316d6fdb0134ef80312554ca8cc6cb5"
+        },
+        {
+          "seller": "0xd2137e6d65165400641aff0e34781d09a0215858",
+          "category": "inference",
+          "quantity": "1",
+          "unitHash": "0x3ad2905f2c18fdad733fb6571a39e1b641eb7db121bfa85d479658b79a155835",
+          "weightBps": "2000",
+          "endpointHash": "0x3cf771da8499aaf36d3ec21c2a22ab24d01c7922384b9250fb4eb505b3642a2a",
+          "currentAtomic": "1000",
+          "baselineAtomic": "1000",
+          "familyServiceHash": "0x56206fa33d28037757b99d2840fc4ac38cbd906d11d980b45d00d2a3aec041ed",
+          "currentServiceHash": "0x56206fa33d28037757b99d2840fc4ac38cbd906d11d980b45d00d2a3aec041ed",
+          "baselineServiceHash": "0x56206fa33d28037757b99d2840fc4ac38cbd906d11d980b45d00d2a3aec041ed",
+          "currentRegisteredAt": 1789115712,
+          "baselineRegisteredAt": 1789115712,
+          "currentTransactionHash": "0x3fd366f82dcba0b421250d9f77fd1bac4d97e081e650b145cad647bf7e32be4e",
+          "baselineTransactionHash": "0x3fd366f82dcba0b421250d9f77fd1bac4d97e081e650b145cad647bf7e32be4e"
+        },
+        {
+          "seller": "0xd2137e6d65165400641aff0e34781d09a0215858",
+          "category": "verification",
+          "quantity": "1",
+          "unitHash": "0xf57bf9b2fd0909f3098439375990f246668ad41516a144fd9f83975dd2602220",
+          "weightBps": "2000",
+          "endpointHash": "0xe6ce6ee910fb9c100dacb391a86c93aa96ba10a4a027b2ab7ef160ee9d73cbf2",
+          "currentAtomic": "1000",
+          "baselineAtomic": "1000",
+          "familyServiceHash": "0x25cb4ed20ce77ab315bfb1527340822fc09ce4cff399c980faa187ddf0018ec6",
+          "currentServiceHash": "0x25cb4ed20ce77ab315bfb1527340822fc09ce4cff399c980faa187ddf0018ec6",
+          "baselineServiceHash": "0x25cb4ed20ce77ab315bfb1527340822fc09ce4cff399c980faa187ddf0018ec6",
+          "currentRegisteredAt": 1789115725,
+          "baselineRegisteredAt": 1789115725,
+          "currentTransactionHash": "0x9aeafe5a164f2ef6d80c47e4c9f2d02d5fb86de83c7c565ac2dbe91bf3633010",
+          "baselineTransactionHash": "0x9aeafe5a164f2ef6d80c47e4c9f2d02d5fb86de83c7c565ac2dbe91bf3633010"
+        },
+        {
+          "seller": "0xd2137e6d65165400641aff0e34781d09a0215858",
+          "category": "storage",
+          "quantity": "1",
+          "unitHash": "0x7dbde86226e0370fd3ed2bf92d3b982fd57161a3cebaae437644b489a3e92dcb",
+          "weightBps": "2000",
+          "endpointHash": "0x226b096a9ec6f4c7adc22ce07e6635ffc6837c41ca4e701afee06cb617e9c109",
+          "currentAtomic": "1000",
+          "baselineAtomic": "1000",
+          "familyServiceHash": "0xfaf62789a84dabde979c764b3655c37e302812d5bdaa53a68bf7031e04f6a6de",
+          "currentServiceHash": "0xfaf62789a84dabde979c764b3655c37e302812d5bdaa53a68bf7031e04f6a6de",
+          "baselineServiceHash": "0xfaf62789a84dabde979c764b3655c37e302812d5bdaa53a68bf7031e04f6a6de",
+          "currentRegisteredAt": 1789115742,
+          "baselineRegisteredAt": 1789115742,
+          "currentTransactionHash": "0xb618104638375a9eba4b020edb5fed80ccc57f56a27fb0b9dd4d4800dfb64e7a",
+          "baselineTransactionHash": "0xb618104638375a9eba4b020edb5fed80ccc57f56a27fb0b9dd4d4800dfb64e7a"
+        }
+      ],
+      "methodology": "equal-weight-five-category-registered-quotes-v1",
+      "priorClosedDay": null,
+      "purchasingPower": [
+        {
+          "category": "data",
+          "quantity": "1",
+          "unitHash": "0x63690c4a38120b6c3d9400f648f78d4d53a32d92d42fc42d807202ee4895b543",
+          "serviceHash": "0xf39a4f8122822ac2b280b14867786bf0473a3dbfda5e208bb44510090d3a092b",
+          "transactionHash": "0x5b34d7d0044d4790ee122af54e3ee56cd5ec428f84dfbec708cdd784903c0bf2",
+          "unitPriceAtomic": "1000",
+          "unitsPerUsdcMillionths": "1000000000",
+          "ordersPerUsdcMillionths": "1000000000"
+        },
+        {
+          "category": "compute",
+          "quantity": "1",
+          "unitHash": "0x2f32e6106485ae386796e72bf0e149bc7a7c1551a0617797cf61510a0bba1bf0",
+          "serviceHash": "0x722f99ff6d2a8ecffa31ff97c5bdb8ab44d9378e30bd80ac3af87f792b32efcb",
+          "transactionHash": "0x5cddcccdbbfdf44524fb2934999786686316d6fdb0134ef80312554ca8cc6cb5",
+          "unitPriceAtomic": "3000",
+          "unitsPerUsdcMillionths": "333333333",
+          "ordersPerUsdcMillionths": "333333333"
+        },
+        {
+          "category": "inference",
+          "quantity": "1",
+          "unitHash": "0x3ad2905f2c18fdad733fb6571a39e1b641eb7db121bfa85d479658b79a155835",
+          "serviceHash": "0x56206fa33d28037757b99d2840fc4ac38cbd906d11d980b45d00d2a3aec041ed",
+          "transactionHash": "0x3fd366f82dcba0b421250d9f77fd1bac4d97e081e650b145cad647bf7e32be4e",
+          "unitPriceAtomic": "1000",
+          "unitsPerUsdcMillionths": "1000000000",
+          "ordersPerUsdcMillionths": "1000000000"
+        },
+        {
+          "category": "verification",
+          "quantity": "1",
+          "unitHash": "0xf57bf9b2fd0909f3098439375990f246668ad41516a144fd9f83975dd2602220",
+          "serviceHash": "0x25cb4ed20ce77ab315bfb1527340822fc09ce4cff399c980faa187ddf0018ec6",
+          "transactionHash": "0x9aeafe5a164f2ef6d80c47e4c9f2d02d5fb86de83c7c565ac2dbe91bf3633010",
+          "unitPriceAtomic": "1000",
+          "unitsPerUsdcMillionths": "1000000000",
+          "ordersPerUsdcMillionths": "1000000000"
+        },
+        {
+          "category": "storage",
+          "quantity": "1",
+          "unitHash": "0x7dbde86226e0370fd3ed2bf92d3b982fd57161a3cebaae437644b489a3e92dcb",
+          "serviceHash": "0xfaf62789a84dabde979c764b3655c37e302812d5bdaa53a68bf7031e04f6a6de",
+          "transactionHash": "0xb618104638375a9eba4b020edb5fed80ccc57f56a27fb0b9dd4d4800dfb64e7a",
+          "unitPriceAtomic": "1000",
+          "unitsPerUsdcMillionths": "1000000000",
+          "ordersPerUsdcMillionths": "1000000000"
+        }
+      ],
+      "baselineChangeBps": "0",
+      "missingCategories": [],
+      "periodInflationBps": null,
+      "precedingClosedDay": null,
+      "changeSincePriorCloseBps": null
+    },
+    "capital": {
+      "balances": [
+        {
+          "address": "0x90602880dbee4158d96fddbdffe300c03d68e46c",
+          "balanceAtomic": "19590000"
+        }
+      ],
+      "complete": true,
+      "methodology": "current-active-executor-usdc-balances-v1",
+      "totalAtomic": "19590000",
+      "executorCount": 1,
+      "todayTurnoverBps": "5",
+      "knownBalanceAtomic": "19590000",
+      "lifetimeTurnoverBps": "5",
+      "missingExecutorAddresses": []
+    },
+    "activity": {
+      "start": 1789084800,
+      "methodology": "current-active-agent-operational-completion-v1",
+      "endInclusive": 1789155079,
+      "activeAgentIds": [
+        "0x185316bd442fd61d654b6f3b2f1b2c445093f1885561b219ed92e97c9db3bbb6",
+        "0x802fefd9a675c1f3aea6a485135ff55733c9c60130b0a2d4abb8d302ef10b7df",
+        "0xce62b9b9d83f1671df59de48088f56f05997fea9485c28d7b63ab0e65bb04953",
+        "0xe75034eb2939777424a3c36efebd33eec606d33f583cca93029038b6ec21d263",
+        "0xfd62046ce6a02b67279b4eaf4e82c71e965433afe213815d0fc917ab31ab0e93",
+        "0xff042e3df6bf7edaee838a1f3ae3e3c96e5d231c0e17dfd9bf7a0e2b13a8ba8d"
+      ],
+      "utilizationBps": "10000",
+      "activeAgentCount": 6,
+      "fulfilledAgentIds": [
+        "0x185316bd442fd61d654b6f3b2f1b2c445093f1885561b219ed92e97c9db3bbb6",
+        "0x802fefd9a675c1f3aea6a485135ff55733c9c60130b0a2d4abb8d302ef10b7df",
+        "0xce62b9b9d83f1671df59de48088f56f05997fea9485c28d7b63ab0e65bb04953",
+        "0xe75034eb2939777424a3c36efebd33eec606d33f583cca93029038b6ec21d263",
+        "0xfd62046ce6a02b67279b4eaf4e82c71e965433afe213815d0fc917ab31ab0e93",
+        "0xff042e3df6bf7edaee838a1f3ae3e3c96e5d231c0e17dfd9bf7a0e2b13a8ba8d"
+      ],
+      "fulfilledAgentCount": 6,
+      "lifetimeFulfilledAgentCount": 6
+    },
+    "lifetime": {
+      "start": 1789099581,
+      "orderIds": [
+        "0x6aad115e565064b9bdd53bdee020c8be83b81747b89d9666c817302b9ddbc55d",
+        "0x34bf7e0722ab118b85fe04d5d9f766acba0559d77ce4e515ecdf3b5b3a7aa549",
+        "0x5b967a49d8def6058215cc2cf9932424a226c3fb0866d516129be79de3b3bfff",
+        "0x3e7439fd4f023ca3f0dd3beabe734321d595ed39de66287edbc475b26116cbe0",
+        "0xc2f6db3581a38ac18f9eaaf59866c2f3b125103bde07dcdf8cf00e6bbb2f7218",
+        "0x2d6ac527c7b4a54cb761ed52290194cd9beadd001979bcd883971e793d71dc58",
+        "0x3e23d8d74e14e8ce78000f089d4c981cf51196119be4dbc9d90912af7b282286",
+        "0x294e5b9ce0278d818a92cfadc63d8d875ba56391515bdb1b85254b5604dcff03",
+        "0x5deed47338cb1ad93ee118c919d23d984f519a2c6588ded5e803dfec431ade65",
+        "0x3f53b93df0306a56bb2ec7249787045f58dba0b8a86a2986aed1e05aed82bf62",
+        "0x9724e14c2607dd63341acdaf6948f325aecec12ea51af76d07ad756a2dac6165"
+      ],
+      "refundCount": 1,
+      "endInclusive": 1789155079,
+      "refundAtomic": "1000",
+      "deliveredCount": 11,
+      "settlementCount": 11,
+      "acknowledgedCount": 11,
+      "deliveredOrderIds": [
+        "0x6aad115e565064b9bdd53bdee020c8be83b81747b89d9666c817302b9ddbc55d",
+        "0x34bf7e0722ab118b85fe04d5d9f766acba0559d77ce4e515ecdf3b5b3a7aa549",
+        "0x5b967a49d8def6058215cc2cf9932424a226c3fb0866d516129be79de3b3bfff",
+        "0x3e7439fd4f023ca3f0dd3beabe734321d595ed39de66287edbc475b26116cbe0",
+        "0xc2f6db3581a38ac18f9eaaf59866c2f3b125103bde07dcdf8cf00e6bbb2f7218",
+        "0x2d6ac527c7b4a54cb761ed52290194cd9beadd001979bcd883971e793d71dc58",
+        "0x3e23d8d74e14e8ce78000f089d4c981cf51196119be4dbc9d90912af7b282286",
+        "0x294e5b9ce0278d818a92cfadc63d8d875ba56391515bdb1b85254b5604dcff03",
+        "0x5deed47338cb1ad93ee118c919d23d984f519a2c6588ded5e803dfec431ade65",
+        "0x3f53b93df0306a56bb2ec7249787045f58dba0b8a86a2986aed1e05aed82bf62",
+        "0x9724e14c2607dd63341acdaf6948f325aecec12ea51af76d07ad756a2dac6165"
+      ],
+      "grossPaymentsAtomic": "11000",
+      "sellerRevenueAtomic": "10450",
+      "acknowledgedOrderIds": [
+        "0x6aad115e565064b9bdd53bdee020c8be83b81747b89d9666c817302b9ddbc55d",
+        "0x34bf7e0722ab118b85fe04d5d9f766acba0559d77ce4e515ecdf3b5b3a7aa549",
+        "0x5b967a49d8def6058215cc2cf9932424a226c3fb0866d516129be79de3b3bfff",
+        "0x3e7439fd4f023ca3f0dd3beabe734321d595ed39de66287edbc475b26116cbe0",
+        "0xc2f6db3581a38ac18f9eaaf59866c2f3b125103bde07dcdf8cf00e6bbb2f7218",
+        "0x2d6ac527c7b4a54cb761ed52290194cd9beadd001979bcd883971e793d71dc58",
+        "0x3e23d8d74e14e8ce78000f089d4c981cf51196119be4dbc9d90912af7b282286",
+        "0x294e5b9ce0278d818a92cfadc63d8d875ba56391515bdb1b85254b5604dcff03",
+        "0x5deed47338cb1ad93ee118c919d23d984f519a2c6588ded5e803dfec431ade65",
+        "0x3f53b93df0306a56bb2ec7249787045f58dba0b8a86a2986aed1e05aed82bf62",
+        "0x9724e14c2607dd63341acdaf6948f325aecec12ea51af76d07ad756a2dac6165"
+      ]
+    },
+    "blockHash": "0x07d4693c952e30ec5189548b175e4aad115b4ad4708dc174f8c99c229eddc061",
+    "provenance": {
+      "asOf": 1789155079,
+      "orderIds": [
+        "0x6aad115e565064b9bdd53bdee020c8be83b81747b89d9666c817302b9ddbc55d",
+        "0x34bf7e0722ab118b85fe04d5d9f766acba0559d77ce4e515ecdf3b5b3a7aa549",
+        "0x5b967a49d8def6058215cc2cf9932424a226c3fb0866d516129be79de3b3bfff",
+        "0x3e7439fd4f023ca3f0dd3beabe734321d595ed39de66287edbc475b26116cbe0",
+        "0xc2f6db3581a38ac18f9eaaf59866c2f3b125103bde07dcdf8cf00e6bbb2f7218",
+        "0x2d6ac527c7b4a54cb761ed52290194cd9beadd001979bcd883971e793d71dc58",
+        "0x3e23d8d74e14e8ce78000f089d4c981cf51196119be4dbc9d90912af7b282286",
+        "0x294e5b9ce0278d818a92cfadc63d8d875ba56391515bdb1b85254b5604dcff03",
+        "0x5deed47338cb1ad93ee118c919d23d984f519a2c6588ded5e803dfec431ade65",
+        "0x3f53b93df0306a56bb2ec7249787045f58dba0b8a86a2986aed1e05aed82bf62",
+        "0x9724e14c2607dd63341acdaf6948f325aecec12ea51af76d07ad756a2dac6165"
+      ],
+      "blockHash": "0x07d4693c952e30ec5189548b175e4aad115b4ad4708dc174f8c99c229eddc061",
+      "inputHash": "0x002b471324e528f609065587cb74a6525404c42d45fa1700598f086e26278f72",
+      "blockNumber": "61614428",
+      "fromTimestamp": 1789099581,
+      "refundSources": [
+        {
+          "orderId": "0x5b967a49d8def6058215cc2cf9932424a226c3fb0866d516129be79de3b3bfff",
+          "logIndex": 51,
+          "timestamp": 1789118806,
+          "amountAtomic": "1000",
+          "transactionHash": "0xaa1a8ab2f29b0a9b84871ed1e6df5335cd3f72a02efb7ff49506defa29449481"
+        }
+      ],
+      "serviceHashes": [
+        "0xd083bb6a6a2182d7cb82becc2ca6fbd4d3f950d220fb29bd309c1de524cc2934",
+        "0x722f99ff6d2a8ecffa31ff97c5bdb8ab44d9378e30bd80ac3af87f792b32efcb",
+        "0xf39a4f8122822ac2b280b14867786bf0473a3dbfda5e208bb44510090d3a092b",
+        "0xb123b15825e25853130c94e4217b50b24a45efcb420f0fd6a692e5dee64f55d5",
+        "0x56206fa33d28037757b99d2840fc4ac38cbd906d11d980b45d00d2a3aec041ed",
+        "0x25cb4ed20ce77ab315bfb1527340822fc09ce4cff399c980faa187ddf0018ec6",
+        "0xfaf62789a84dabde979c764b3655c37e302812d5bdaa53a68bf7031e04f6a6de"
+      ],
+      "refundTimestampBasis": "supplied-record-time",
+      "serviceTransactionHashes": [
+        "0x058faeb657485e208a4fb07985f7d82bde63176718ff2de6c22a79662b71cd56",
+        "0x5cddcccdbbfdf44524fb2934999786686316d6fdb0134ef80312554ca8cc6cb5",
+        "0x5b34d7d0044d4790ee122af54e3ee56cd5ec428f84dfbec708cdd784903c0bf2",
+        "0x01f7b56ba7e2a9d8bbab8a6da42cf910ff1d9a87443ee695b108e3e2b6cacdee",
+        "0x3fd366f82dcba0b421250d9f77fd1bac4d97e081e650b145cad647bf7e32be4e",
+        "0x9aeafe5a164f2ef6d80c47e4c9f2d02d5fb86de83c7c565ac2dbe91bf3633010",
+        "0xb618104638375a9eba4b020edb5fed80ccc57f56a27fb0b9dd4d4800dfb64e7a"
+      ],
+      "settlementTransactionHashes": [
+        "0x56c0408fe42edad8e2a1d5fcef8644bd60500facace45348bde69a6a33c591fd",
+        "0x88a87c5151faa81bee1514dcd3f094898a853d998828398b0f7a43189375c2a3",
+        "0x5e630923b487278ca6a4fa2ef69b9c5b7d4930493db2bc5fb53fcf276bb1a01b",
+        "0x52846400c1f75e9f244ec735364901fce0a4aa39a0da2f47625fb97f563f919a",
+        "0xa59a1ff60070542866cf775044f6db896ae17692710d19cb0c9605996aae08c7",
+        "0x7c4d5d96d1797ade809d35cb4bd9ec39cb024e100c1160cfae83e886a44607da",
+        "0x534010844f41613916597f7c836b2e1db1f6770cfadee3b59784a7c6b4ad1b3d",
+        "0x9880593dceabc48719771d470edabd16f6fad59addecc8a06418fab2ec67507d",
+        "0xbbc056a54f5243488dec9d95f7e879cc33f1d02551b65f459cee98c8a879013a",
+        "0x4cdb3956f8641623011961253a6b1ff0112e76b562d16c38cd3f7a18fe09ba20",
+        "0xf61cf2ecf6ea8914087ceb2693b53e25f7708ea219c674c1c62469506263e2d2"
+      ],
+      "missingDeliveryTimestampOrderIds": [],
+      "missingAcknowledgmentTimestampOrderIds": []
+    },
+    "blockNumber": "61614428",
+    "limitations": [
+      "Activity includes known same-owner transactions and measures operational completion, not independent demand or productivity.",
+      "Gross payments and seller allocations are observed transfers, not output valuations or value added.",
+      "Capital is the current canonical-USDC balance of distinct active executor wallets; it is not total economic capital.",
+      "Turnover divides observed gross spend by the current balance snapshot, not historical average capital.",
+      "Refund windows use the supplied record timestamp, which may differ from the transfer block timestamp.",
+      "Registered quotes do not prove current seller availability. Basket baselines begin only when all five categories exist.",
+      "Period inflation compares two complete closed UTC days; change since prior close separately compares the current partial day.",
+      "Missing delivery timestamps are counted only in lifetime totals and never assigned to a day."
+    ],
+    "methodology": "obolos-observed-activity-v1"
+  },
+  "replay": {
+    "category": "data",
+    "completedIntentReused": true,
+    "paymentHash": "0x534010844f41613916597f7c836b2e1db1f6770cfadee3b59784a7c6b4ad1b3d",
+    "acknowledgmentHash": "0xfd1bca6836919e2300eefe2f4af42e546f022dda1adfa6e98902c91cdd258ccb",
+    "newPaymentSubmitted": false,
+    "postReplayTotalOrderCount": 11
+  },
+  "httpSmoke": "passed: session, CSRF, operator gate, rehearsal rejection, live workspace redirect; no payment submitted"
+}

@@ -1,0 +1,8 @@
+# Live marketplace population and bug audit
+
+User authorizes populating the app with real agents, doing real testnet runs, finding bugs and fixing/deploying them. Only Ledger hardware may be emulated. Base commit: fe51cff.
+
+1. Inspect existing identities, balances, provider health, services, agents, scoped access and production UI. Preserve all previous orders and money journals.
+2. Register five clearly named specialist agents under the existing buyer account with the existing Circle executor. Bind each to its required seller/category. Use explicit small per-order and total caps. Persist new identities, credentials, signed transaction bytes and immutable order inputs privately before money operations. Start with one 0.001 test USDC order per category; allow at most one further useful bounded order per agent (0.010 total principal for this exercise). Use existing real provider services and verify actual outputs, ledger delivery, buyer acknowledgment and storage retrieval. Do not manufacture economic valuations or unrelated market participants.
+3. Independently inspect marketplace/agent UI and data wiring. Reproduce concrete bugs, add focused regressions, fix their root causes and review fixes. Keep operational role, ownership and process state accurate; a registered agent is not automatically a continuously running process.
+4. Run applicable database, application, browser and production checks. Deploy fixes, refresh finalized indexing, verify actual agents/orders and source receipts. Capture public evidence, scan intended commits for secrets, commit and push. Leave unrelated untracked files and original journals untouched.
