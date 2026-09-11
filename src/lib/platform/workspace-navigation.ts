@@ -1,6 +1,7 @@
 export const workspaceLinks = [
   { label: 'Agents', href: '/app' },
   { label: 'Marketplace', href: '/app/marketplace' },
+  { label: 'Economy', href: '/app/economy' },
   { label: 'Evidence', href: '/app/evidence' },
   { label: 'Developers', href: '/app/developers' },
 ] as const;

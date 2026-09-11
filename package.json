@@ -21,7 +21,14 @@
     "speculos:ring": "bun --env-file=.env.broker ./tools/ledger-speculos/src/cli.ts",
     "speculos:auth": "cd tools/ledger-speculos && bun src/probe-auth.ts",
     "db:migrate": "tsx --env-file-if-exists=.env.local scripts/db-migrate.ts",
-    "agent:runner": "tsx --env-file=.env.broker --env-file=.env.runner services/agent-runner.ts"
+    "agent:runner": "tsx --env-file=.env.broker --env-file=.env.runner services/agent-runner.ts",
+    "contracts:compile": "node scripts/contracts/compile.mjs",
+    "test:contracts": "node --test tests/economy-contract.test.mjs",
+    "economy:index": "tsx --env-file=.env.local scripts/economy-index.ts",
+    "economy:contracts": "tsx --env-file=.env.broker scripts/economy-circle.ts",
+    "economy:policy": "tsx --env-file=.env.broker scripts/economy-policy.ts",
+    "economy:observe": "tsx --env-file=.env.broker scripts/economy-observe.ts",
+    "economy:smoke": "tsx --env-file=.env.broker scripts/economy-testnet-smoke.ts"
   },
   "dependencies": {
     "@circle-fin/cli": "^1.0.0",
@@ -44,6 +51,8 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
+    "@foundry-rs/anvil": "1.7.1",
+    "@openzeppelin/contracts": "5.4.0",
     "@playwright/test": "^1.58.0",
     "@types/express": "^5.0.0",
     "@types/node": "^22.0.0",
@@ -51,6 +60,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "pg": "^8.23.0",
+    "solc": "0.8.28",
     "tsx": "^4.20.0",
     "typescript": "^5.9.0",
     "vitest": "^3.2.0"

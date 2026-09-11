@@ -1,0 +1,19 @@
+import {economyDeployment} from '@/lib/economy/chain';
+import {sql} from '@/lib/platform/db';
+import {platformError,platformJson} from '@/lib/platform/http';
+import {NextRequest} from 'next/server';
+import pg from 'pg';
+import {requireOrigin,PlatformError} from '@/lib/platform/http';
+import {requireUser,rateLimit} from '@/lib/platform/auth';
+import {indexEconomy} from '@/lib/economy/indexer';
+export const runtime='nodejs';
+export const maxDuration=60;
+export async function GET(){try{const deployment=economyDeployment();if(!deployment)return platformJson({status:'not_deployed',snapshot:null});const rows=await sql()`SELECT snapshot,updated_at FROM economy_index_state WHERE settlement_address=${deployment.settlement.toLowerCase()}`;return platformJson({status:rows[0]?'indexed':'awaiting_index',snapshot:rows[0]?.snapshot??null,updatedAt:rows[0]?.updated_at??null,deployment});}catch(error){return platformError(error);}}
+/** Authenticated refresh reads chain evidence only; it never invokes a wallet. */
+export async function POST(req:NextRequest){try{
+ requireOrigin(req);const user=await requireUser(req);await rateLimit(`economy-refresh:${user.id}`,2,60);await rateLimit('economy-refresh-global',6,60);
+ const deployment=economyDeployment();if(!deployment)return GET();if(!process.env.DATABASE_URL)throw new PlatformError(503,'DATABASE_REQUIRED','Database is unavailable.');
+ const db=new pg.Client({connectionString:process.env.DATABASE_URL,connectionTimeoutMillis:10000,query_timeout:40000});await db.connect();
+ try{for(let i=0;i<4;i++){const result=await indexEconomy(db,deployment);if(!result.changed||result.caughtUp)break;}}finally{await db.end();}
+ return GET();
+ }catch(error){return platformError(error);}}

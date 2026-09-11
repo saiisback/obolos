@@ -3,7 +3,7 @@ import {workspaceLinks, workspaceReturnPath} from '@/lib/platform/workspace-navi
 
 describe('private workspace navigation', () => {
   it('keeps all workspace sections under /app', () => {
-    expect(workspaceLinks.map(link => link.href)).toEqual(['/app', '/app/marketplace', '/app/evidence', '/app/developers']);
+    expect(workspaceLinks.map(link => link.href)).toEqual(['/app', '/app/marketplace', '/app/economy', '/app/evidence', '/app/developers']);
   });
   it('returns users to their requested workspace section after login', () => {
     for (const link of workspaceLinks) expect(workspaceReturnPath(link.href)).toBe(link.href);

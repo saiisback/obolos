@@ -4,7 +4,7 @@ import Link from 'next/link';
 import {usePathname, useRouter} from 'next/navigation';
 import {useEffect, useState, type ReactNode} from 'react';
 import {api, errorMessage, type User} from './api';
-import {Bot, Store, ReceiptText, Code2, LogOut} from 'lucide-react';
+import {Bot, Store, ChartNoAxesCombined, ReceiptText, Code2, LogOut} from 'lucide-react';
 import {workspaceLinks, workspaceReturnPath} from '@/lib/platform/workspace-navigation';
 import s from './platform.module.css';
 import w from './workspace-shell.module.css';
@@ -42,7 +42,7 @@ export function WorkspaceShell({children}: {children: ReactNode}) {
     <aside className={w.sidebar}>
       <Link className={s.brand} href="/app" aria-label="Obolos workspace"><img src="/brand/obolos-symbol-white.png" width={32} height={32} alt="" />obolos</Link>
       <nav className={w.navigation} aria-label="Workspace navigation">{workspaceLinks.map((link, index) => {
-        const Icon = [Bot, Store, ReceiptText, Code2][index];
+        const Icon = [Bot, Store, ChartNoAxesCombined, ReceiptText, Code2][index];
         return <Link key={link.href} href={link.href} aria-label={link.label} aria-current={pathname === link.href ? 'page' : undefined}><Icon size={18} aria-hidden="true"/><span>{link.label}</span></Link>;
       })}</nav>
       <div className={w.sidebarNote}><span className={w.networkDot} aria-hidden="true"/><strong>Testnet</strong><p>Hedera · Arc</p></div>

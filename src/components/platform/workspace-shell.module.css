@@ -24,3 +24,9 @@
 @media(max-width:370px) { .navigation a { padding-inline:6px; }.navigation svg { display:none; }.header>span { display:none; }.account { margin-left:auto; } }
 .shell main p { overflow-wrap:anywhere; }.shell main pre { max-width:100%; }.shell main code { overflow-wrap:anywhere; }
 .shell main article>div:first-child { min-width:0; }
+/* Five workspace destinations stay visible together on a narrow screen. */
+@media(max-width:600px) {
+  .navigation { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:2px; }
+  .navigation a { flex-direction:column; padding:10px 0; gap:5px; font-size:10px; }
+  .navigation svg { display:block; }
+}

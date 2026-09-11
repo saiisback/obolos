@@ -1,0 +1,11 @@
+{
+  "chainId": 5042002,
+  "policy": "0x714c5d940a3a12dc0cc5ec05a5e29bf31e11d522",
+  "ledger": "0xfb5cc06a6bf8a3ff0d37043cd64fcd7ae7bbdb5e",
+  "settlement": "0xb1c8370f42c1349c82b421576458b5251aaf5e36",
+  "fromBlock": "61506219",
+  "controller": "0x90602880dbee4158d96fddbdffe300c03d68e46c",
+  "approver": "0xA7a1C8b8d1aa6c5B32aECB56F4396A353c5f81fa",
+  "reserve": "0x1F21897512e5AD2d9Aa087a0C8E818A3E2dD22FD",
+  "reviewPool": "0xc76e4cf85fceda68af2e5cae6d2fc5d054362c4c"
+}

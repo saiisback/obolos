@@ -45,6 +45,12 @@ A user asks: *Compare these three developer tools using current repository activ
 
 The frontend and backend use **Next.js, React and TypeScript**. Separate Node services implement the metered API and private capability broker. The application interface uses the user-selected Foundation reference on Mobbin, black-and-white surfaces, orange actions and an original flat illustration. The landing page, Product catalog, Evidence page and Developer guide use the later supplied video and dot-matrix design brief. Product and documentation pages scroll to keep forms, receipts and code examples accessible.
 
+## Phase 2 · AgentGDP economy
+
+The Arc testnet Phase 2 contracts are deployed and recorded in [deployment metadata](src/lib/economy/deployment.json). They separate human-owned agent limits, Circle wallet execution, canonical-USDC settlement, delivery evidence, and conservative economic measurements. The generic `obolos.service.v1` market supports data, compute, inference, verification, and storage providers with finalized receipt checks and delivery-only retries.
+
+Deployment is not a paid-order claim. A new Phase 2 service purchase, delivery attestation, metric observation, and policy response remain pending until their own evidence is retained. See the [implemented design](docs/superpowers/specs/2026-09-11-agentgdp-open-market-design.md), [architecture and operator commands](docs/economy-architecture.md), and [provider protocol](docs/economy-provider-protocol.md).
+
 ## Run the application
 
 Use Node.js 22.12+ and npm. The project pins Wallet CLI 2.1.0 locally, so a global installation is not required. Native Ledger HID dependencies may need platform USB build tools; private broker deployments install their own dependencies.
