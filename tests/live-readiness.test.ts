@@ -16,7 +16,7 @@ describe('live readiness disclosure',()=>{
     expect(value.checks.find(c=>c.id==='funding-hedera-payer')?.status).toBe('action');
   });
   it('does not treat rehearsal or pending receipts as qualification evidence',()=>{
-    const rehearsal=createRun({mode:'rehearsal',repos:['vercel/next.js']});
+    const rehearsal={...createRun({mode:'live',repos:['vercel/next.js']}),mode:'rehearsal' as const};
     rehearsal.receipts=[{id:'x',requestId:'r',mode:'rehearsal',network:'arc:testnet',asset:'USDC',amountAtomic:1,units:1,provider:'v',status:'simulated',timestamp:new Date().toISOString()}];
     const value=buildLiveOverview({authenticated:true,env,runs:[rehearsal],health:{ready:true,integrations:[]},serviceReachable:true});
     expect(value.evidence).toEqual({liveRuns:0,hederaPayments:0,arcPayments:0,ledgerApprovals:0});

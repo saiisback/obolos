@@ -1,6 +1,6 @@
 # Self-service testnet setup
 
-Obolos provides wallet sign-in (`/login`), user-owned agents (`/app`), scoped API access, private runner pairing, signed spending mandates, and persisted jobs with reports and runner-confirmed receipts. The landing page is `/` and the developer guide is `/developers`. The separate operator console remains at `/demo`.
+Obolos provides wallet sign-in (`/login`), user-owned agents (`/app`), scoped API access, private runner pairing, signed spending mandates, and persisted jobs with reports and runner-confirmed receipts. The landing page is `/` and the developer guide is `/developers`. `/demo` redirects to the live workspace. New rehearsal jobs are disabled; only historical read/export remains.
 
 The deployed account, API and runner path completed a [bounded funded testnet run](evidence/2026-09-09-self-service-testnet.md): one repository purchase for 0.001 HBAR and verification for 0.05 USDC, with both payments independently checked on chain. That test used a generated EOA owner and an explicitly authorized funded broker fixture with Speculos credential retrieval; it does not establish physical Ledger signing or browser-wallet interaction.
 

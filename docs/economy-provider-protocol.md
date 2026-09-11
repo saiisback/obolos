@@ -125,3 +125,7 @@ Content-Type: application/json
 The path supplies `platformAgentId`; clients cannot override it in the body. The key must be scoped to that exact agent, including when multiple agents have the same human owner. The marketplace still requires `request.agentId` to equal `keccak256(utf8(platformAgentId))` and independently verifies the finalized payment receipt. This action records the paid job and attempts provider delivery; it never moves funds.
 
 `GET /api/economy/orders/{orderId}` requires the owning user and omits the private input and full request. `POST /api/economy/orders/{orderId}/delivery` retries provider delivery for the same durable paid order. A retry never performs or requests another payment.
+
+## Recovery and reference operation
+
+Active discovery excludes retired services; `GET /api/economy/services/{serviceHash}` preserves exact historical definitions for paid delivery. Owner-authenticated recovery and seller retirement are described in [live provider operation](economy/live-provider.md). The reusable [executor](economy/executor.md) handles bounded real purchases and durable retries. [Signed economic evidence](economy/signed-evidence.md) supplies independent assessments separately from payment and delivery.

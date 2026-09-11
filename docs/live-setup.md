@@ -1,8 +1,8 @@
 # Live setup: credentials, wallets and evidence
 
-The live integrations are implemented. Completing this guide requires your own testnet accounts, an inference credential, a physical Ledger and a private broker host. This document is a procedure, not a record that provisioning, funding, signing or payment has happened.
+The live integrations are implemented. Completing this guide requires your own testnet accounts, an inference credential, a Ledger signer (physical hardware or explicitly configured Speculos) and a private broker host. This document is a procedure, not a record that provisioning, funding, signing or payment has happened.
 
-Use **Connections → Live workspace** to inspect setup checks, actual public wallet addresses, balance sources and timestamps, recipients, official resource links and recorded live evidence. Wallet details require operator authentication. An unavailable balance stays unavailable; it is never converted to zero. A configured integration or positive balance does not prove a paid request, hardware use or prize eligibility.
+For the current wallet-owned workspace, start with [account setup](self-service-setup.md), [the economy executor](economy/executor.md) and [live provider operation](economy/live-provider.md). The former Connections/operator dashboard has been retired. Historical rehearsal records are read-only; only actual configured providers can run new work. An unavailable balance or external assessment remains unavailable.
 
 ## 1. Gather the right values
 
@@ -28,7 +28,7 @@ The HBAR payer, Circle agent wallet, Ledger controller and two service recipient
 | Secret | Purpose | Storage and access |
 |---|---|---|
 | `SESSION_SECRET` | Signs application session cookies | App `.env.local` or app secret manager |
-| `OPERATOR_TOKEN` | Authenticates your browser for live actions | App secret configuration; enter only in the local Connections operator form |
+| `OPERATOR_TOKEN` | Authenticates the legacy private operator API | App secret configuration; normal workspace accounts use wallet sign-in |
 | `BROKER_TOKEN` | Authenticates narrow app-to-broker capabilities | Same strong value in app and private broker configuration; never give it to the model/browser |
 | `DATA_SERVICE_OPERATOR_TOKEN` | Allows changing your own service quotes for the live intervention demo | Same value in service and app; at least 24 random characters; optional for normal research |
 | `inferenceApiKey` | Authorizes the fixed worker model call | Encrypted Ledger Ring bundle, decrypted only inside the broker |
@@ -166,27 +166,19 @@ Configure the app's `.env.local` with the public controller/service values, priv
 npm run dev
 ```
 
-Open Connections and authenticate with `OPERATOR_TOKEN`. Refresh the live workspace. Read each readiness detail rather than relying only on the headline: broker availability, pinned controller, service health, wallet funding and external submission evidence are different checks. The dashboard links to public explorers and setup resources. It never creates/imports wallets or requests a seed/private key.
+Open `/app` and sign in with the owning wallet. Inspect the agent’s runner connection and mandate, the economy’s finalized receipts and freshness, and the provider health endpoint. Broker availability, wallet funding and external submission evidence are separate checks. The application never asks for a seed phrase or private key.
 
 Run `npm run preflight` from a **trusted operator setup context**. It inspects `.env.local`, `.env.broker` and `.env.services` in its working directory, validates field relationships and configured executable/file presence, and reports names/statuses without secret values. It does not execute a CLI, open the encrypted bundle, call the network or sign/pay. It checks only whether `WALLET_PASS` is present in that process environment, never its value or ability to decrypt.
 
-This diagnostic expects access to all three configuration files. In a properly isolated deployment, the app account should not have that access. Do not copy broker files or inject its password into the app/model account to make the checker green; run it from the already-authorized private management context. Its static result cannot confirm Circle login, sufficient funding, service reachability or hardware use. Use Connections for authenticated network snapshots and resolve each missing prerequisite separately.
+This diagnostic expects access to all three configuration files. In a properly isolated deployment, the app account should not have that access. Do not copy broker files or inject its password into the app/model account to make the checker green; run it from the already-authorized private management context. Its static result cannot confirm Circle login, sufficient funding, service reachability or hardware use. Use the authenticated runner status and provider health checks, and resolve each missing prerequisite separately.
 
 ## 8. Produce real execution and authorization evidence
 
-Create a **live** run with separate allowances and inspect discovered prices. If demonstrating intervention, use the live price-change control only against your own service with the matching operator token, before purchase. The planner must pause when available quotes exceed the mandate.
+Use [account setup](self-service-setup.md) to create an agent, pair its private runner, sign a bounded mandate and request real research. For contract service purchases, use [the reusable economy executor](economy/executor.md) with an existing owner-authorized agent and exact published service definition. An expensive quote must stop before payment; it must never trigger automatic spending approval.
 
-Download the pending approval JSON from the run and preserve its exact `message`. On the Ledger-connected machine, with Ethereum open and the same controller/path configured:
+Global economy policy changes use `npm run economy:policy -- <private-action.json> --execute-testnet`. Review the exact limits, then verify the pinned address and digest on the Ledger or Speculos display. The same signed action and Circle operation journal must survive retries. A signature alone does not establish physical device provenance; disclose Speculos when used.
 
-```sh
-npm run ledger:approve -- /absolute/path/approval.json
-```
-
-Review the address and exact message on the device, then paste only the resulting `signature` into the live approval form. The server validates and saves the authorization message, nonce, signer/signature, verification time, previous mandate and approved mandate in `run.authorizations`. A signature by itself does not establish physical device provenance; capture the device interaction in the demo. Rehearsal proof records are explicitly simulated and contain no claimed Ledger signature.
-
-Resume and inspect both settled receipts. Export the run JSON, including its sources, timestamps, receipts, audit chain and saved authorizations. Match the amounts, recipients and networks in [HashScan testnet](https://hashscan.io/testnet) and [ArcScan testnet](https://testnet.arcscan.app/). The live evidence counters in Connections count this browser's live run history; simulated receipts and approvals do not qualify.
-
-A verified report means its structural/source checks passed. It does not certify every model statement, repository quality, or an independent auditor's conclusion. The verification capability runs in the broker and binds the report/payment locally; the report digest is not published on-chain.
+Inspect actual receipts and source timestamps in `/app/evidence` and `/app/economy`. Match amounts, recipients and networks in [HashScan testnet](https://hashscan.io/testnet) and [ArcScan testnet](https://testnet.arcscan.app/). The economy records separate seller delivery and buyer acknowledgment; independent quality and economic value require their own authentic evidence. No simulated receipt qualifies as live evidence.
 
 ## 9. Finish the external submission package
 

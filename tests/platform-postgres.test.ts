@@ -147,7 +147,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)('PostgreSQL account isolation', 
   });
   it('keeps serverless demo ownership and preserves interrupted-operation locks',async()=>{
     const store=new NeonDemoStore();
-    const run=createRun({mode:'rehearsal',repos:['octocat/Hello-World']});
+    const run=createRun({mode:'live',repos:['octocat/Hello-World']});
     await store.insert('test-owner',run);
     await expect(store.get('another-owner',run.id)).rejects.toThrow('Run not found');
     let calls=0;

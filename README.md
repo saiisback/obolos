@@ -2,11 +2,11 @@
 
 **Work, within limits.** Agents buy evidence and pay for verification. Humans control their spending authority.
 
-[Public app](https://obolos.app) · [Product](https://obolos.app/marketplace) · [Payment evidence](https://obolos.app/evidence) · [Developers](https://obolos.app/developers) · [Operator demo](https://obolos.app/demo) · [Source code](https://github.com/saiisback/obolos) · [Live setup](docs/live-setup.md) · [Speculos setup](docs/speculos-setup.md) · [Architecture](docs/architecture.md) · [Submission checklist](docs/submission.md) · [Video footage — human narration required](docs/presentation/obolos-human-narration-visual-bed.mp4) · [Presentation PDF](docs/presentation/obolos-presentation.pdf) · [Demo script](docs/demo-script.md)
+[Public app](https://obolos.app) · [Product](https://obolos.app/marketplace) · [Payment evidence](https://obolos.app/evidence) · [Developers](https://obolos.app/developers) · [Live workspace](https://obolos.app/app) · [Source code](https://github.com/saiisback/obolos) · [Live setup](docs/live-setup.md) · [Speculos setup](docs/speculos-setup.md) · [Architecture](docs/architecture.md) · [Submission checklist](docs/submission.md) · [Video footage — human narration required](docs/presentation/obolos-human-narration-visual-bed.mp4) · [Presentation PDF](docs/presentation/obolos-presentation.pdf) · [Demo script](docs/demo-script.md)
 
 ![Three robot coworkers exchanging a payment token and a research report](public/illustrations/agent-workforce.png)
 
-A self-service workspace for research agents with wallet accounts, scoped API access, and signed spending limits. User-owned runners execute through private local brokers; the original operator console remains available at `/demo`. Built for the **Ledger AI Agents x Ledger**, **Hedera AI & Agentic Payments**, and **Arc Best Agentic Economy Application with Circle Agent Stack** tracks at ETHOnline 2026.
+A self-service workspace for research agents with wallet accounts, scoped API access, and signed spending limits. User-owned runners execute through private local brokers; the former `/demo` URL redirects to the live workspace. Built for the **Ledger AI Agents x Ledger**, **Hedera AI & Agentic Payments**, and **Arc Best Agentic Economy Application with Circle Agent Stack** tracks at ETHOnline 2026.
 
 Signed-in navigation stays inside the workspace:
 
@@ -62,16 +62,11 @@ npm ci
 npm run dev
 ```
 
-Open http://127.0.0.1:3000 for the landing page, or http://127.0.0.1:3000/demo for the operator console. Rehearsal works in the operator console without environment variables, wallet funding or a Ledger device. Repository data is an explicitly labeled fixture, report text is a template, and receipts say simulated with no chain hash. Changing to live mode never falls back to rehearsal. If you set `APP_ORIGIN`, use that exact origin in your browser. Wallet accounts require [Neon setup](docs/self-service-setup.md).
+Open http://127.0.0.1:3000 for the landing page and `/app` for the live workspace. All new jobs require actual configured providers and funded testnet wallets. Only the Ledger device may be emulated with Speculos. Historical rehearsal records remain readable/exportable; new rehearsal creation, advancement and simulated approval are rejected server-side. `/demo` redirects to `/app`. If you set `APP_ORIGIN`, use that exact origin in your browser.
 
-For self-service work, follow [account setup](docs/self-service-setup.md), then pair a runner and sign a bounded mandate. The following steps describe the separate operator demonstration:
+The [live-only audit](docs/evidence/2026-09-11-live-only-audit.md) explains actual providers, the Ledger emulation boundary and remaining external evidence requirements. The [five-service release evidence](docs/evidence/2026-09-11-live-only-release.md) records real paid delivery, buyer acknowledgment, authenticated storage retrieval and a proof-verified refund.
 
-1. Create a research job with one to three GitHub `owner/repository` names.
-2. Set separate HBAR and USDC purchase allowances, a data unit-price cap, permitted providers, and expiry.
-3. Run the job: mandate → discovery → data purchase → report → verification.
-4. For the intervention demo, step through discovery, raise provider prices before purchase, then advance to the blocked request.
-5. Approve the larger allowance (explicitly simulated in rehearsal), then resume.
-6. Inspect the structural/source checks, payment receipts and activity history. Export the JSON evidence pack; saved authorizations remain available after an approval is consumed.
+Follow [account setup](docs/self-service-setup.md), pair your private runner, sign bounded spending authority and queue real work. A quote above that authority stops payment until a fresh valid authorization is supplied. Inspect actual source timestamps and chain receipts in Evidence. The read-only smoke checks authorization and rehearsal rejection; it does not buy work.
 
 ## Architecture and payment flow
 
@@ -139,7 +134,7 @@ Tests cover budget and expiry enforcement, quote changes, approved signer/run bi
 
 `npm run preflight` inspects local configuration, matching values and executable/file presence without executing CLIs, decrypting the bundle or contacting the network. Run it only from a trusted setup context already authorized to read all three environment files; do not copy private broker configuration into the app account. It does not establish login, funding, hardware use or settlement.
 
-With the app running, `npm run test:smoke` exercises the HTTP workflow in a separate rehearsal session, including blocked live access, price shock, approval, report, receipts and export. It creates one simulated run and never transfers funds.
+With the app running at the configured origin, `npm run test:smoke` checks session creation, cross-origin rejection, operator gating, rehearsal rejection and the `/demo` redirect. It creates no jobs and transfers no funds.
 
 The dependency audit on September 7 reported zero high/critical advisories after compatible transitive patches, with 9 low and 7 moderate advisories remaining. Recheck the audit before deployment; passing application tests is not a claim that every dependency is vulnerability-free.
 
@@ -158,7 +153,7 @@ Existing installations retain their data directory, cookies, signed messages and
 - `src/components/platform/`: self-service account, agent, runner, mandate and job interfaces.
 - `src/lib/platform/`, `db/migrations/`: Neon-backed control plane and native x402 service.
 - `services/agent-runner.ts`, `src/lib/runner/`: isolated execution, signed-scope enforcement and durable recovery.
-- `src/components/dashboard.tsx`: separate operator demonstration.
+- `src/components/platform/economy-workspace.tsx`: live economy evidence, publication and paid-order recovery.
 - `src/lib/engine.ts`, `policy.ts`, `store.ts`: mandate, stage machine, audit and persistence.
 - `src/app/api/`: session-scoped run actions and operator authentication.
 - `services/data-service.ts`: public discovery, metered quotes, native Hedera x402 endpoint.

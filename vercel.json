@@ -3,5 +3,13 @@
   "framework": "nextjs",
   "buildCommand": "npm run build",
   "installCommand": "npm ci",
-  "regions": ["iad1"]
+  "regions": [
+    "iad1"
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/economy-index",
+      "schedule": "0 0 * * *"
+    }
+  ]
 }

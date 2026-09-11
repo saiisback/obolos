@@ -47,6 +47,7 @@ async function fixture(page: Page, mode: 'publish' | 'delivery') {
     if (path === '/api/agents') return json({agents: [agent]});
     if (path === '/api/economy') return json({status: 'indexed', snapshot});
     if (path === '/api/economy/services' && req.method() === 'GET') return json({services: definitions});
+    if (path === `/api/economy/services/${service.serviceHash}`) return json({service});
     if (path === '/api/economy/services') {
       publicationAttempts++;
       if (publicationAttempts === 1) return json({error: 'Registration is not finalized.', code: 'SERVICE_NOT_REGISTERED'}, 409);
@@ -97,7 +98,7 @@ for (const viewport of [{width: 1440, height: 1000}, {width: 390, height: 844}])
     await page.getByRole('button', {name: 'Publish registered service', exact: true}).click();
     await expect(page.locator('main').getByRole('alert')).toContainText('Registration is not finalized');
     await page.getByRole('button', {name: 'Publish registered service', exact: true}).click();
-    await expect(page.getByRole('status')).toContainText('Service published');
+    await expect(page.getByRole('status').first()).toContainText('Service published');
     expect(posts.map(post => post.path)).toEqual(['/api/economy/services', '/api/economy/services']);
     expect(posts[1].body).toEqual(service);
     expect(await page.evaluate(() => (window as Window & {fixtureWalletCalls?: string[]}).fixtureWalletCalls!.filter(method => method === 'eth_sendTransaction').length)).toBe(1);
@@ -132,4 +133,23 @@ for (const viewport of [{width: 1440, height: 1000}, {width: 390, height: 844}])
     await expect(page.locator('body')).toHaveJSProperty('scrollWidth', viewport.width);
     await screenshot(page, `economy-delivery-${viewport.width}-fixture`);
   });
+}
+
+for (const viewport of [{width:1440,height:1000},{width:390,height:844}]) {
+ test(`dispute recovery preserves the order and sends no wallet transaction (${viewport.width}px)`,async({page})=>{
+  await page.setViewportSize(viewport);await fixture(page,'delivery');let disputes:{reason:string}[]=[];const submissions:unknown[]=[];
+  await page.route(`**/api/economy/orders/${request.orderId}/recovery`,async route=>{
+   if(route.request().method()==='POST'){const body=route.request().postDataJSON();submissions.push(body);disputes=[{reason:body.reason}];return route.fulfill({json:{recorded:true}});}
+   return route.fulfill({json:{orderId:request.orderId,canDispute:true,canRefund:false,disputes,refunds:[],reviews:[],refundPolicy:'Voluntary'}});
+  });
+  await page.goto(origin+'/app/economy#settlements');await page.getByText('Disputes and completed refunds',{exact:true}).click();
+  await page.getByLabel('Order ID',{exact:true}).last().fill(request.orderId);await page.getByRole('button',{name:'Read recovery records',exact:true}).click();
+  await page.getByLabel('What went wrong?').fill('The paid provider has not delivered.');await page.getByRole('button',{name:'Record dispute',exact:true}).click();
+  await expect(page.getByText('Dispute recorded. This does not reverse the settlement.')).toBeVisible();
+  expect(submissions).toEqual([{action:'dispute',reason:'The paid provider has not delivered.'}]);
+  await expect(page.getByRole('button',{name:'Record completed refund',exact:true})).toHaveCount(0);
+  expect(await page.evaluate(()=>(window as Window & {fixtureWalletCalls?:string[]}).fixtureWalletCalls)).toEqual([]);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(viewport.width);
+  await screenshot(page,`economy-recovery-${viewport.width}-fixture`);
+ });
 }

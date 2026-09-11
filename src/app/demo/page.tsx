@@ -1,2 +1,3 @@
-import Dashboard from '@/components/dashboard';
-export default function DemoPage() { return <Dashboard />; }
+import {redirect} from 'next/navigation';
+/** Historical demo URLs now enter the real workspace. */
+export default function DemoPage(){redirect('/app');}

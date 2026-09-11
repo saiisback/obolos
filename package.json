@@ -28,7 +28,9 @@
     "economy:contracts": "tsx --env-file=.env.broker scripts/economy-circle.ts",
     "economy:policy": "tsx --env-file=.env.broker scripts/economy-policy.ts",
     "economy:observe": "tsx --env-file=.env.broker scripts/economy-observe.ts",
-    "economy:smoke": "tsx --env-file=.env.broker scripts/economy-testnet-smoke.ts"
+    "economy:smoke": "tsx --env-file=.env.broker scripts/economy-testnet-smoke.ts",
+    "economy:execute": "tsx --env-file-if-exists=.env.broker scripts/economy-execute.ts",
+    "economy:provider": "tsx --env-file-if-exists=.env.broker --env-file-if-exists=.env.economy services/economy-provider.ts"
   },
   "dependencies": {
     "@circle-fin/cli": "^1.0.0",

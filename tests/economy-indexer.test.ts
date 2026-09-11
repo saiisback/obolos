@@ -11,9 +11,10 @@ function harness(logOverride?:Record<string,unknown>){
  let state:Record<string,unknown>|undefined;
  const db={query:async(sql:string,params:unknown[]=[])=>{
   queries.push({sql,params});
+  if(sql.startsWith('SELECT pg_try_advisory_xact_lock'))return {rows:[{acquired:true}]};
   if(sql.startsWith('SELECT block_number'))return {rows:state?[state]:[]};
   if(sql.startsWith('INSERT INTO economy_chain_events')){events.push({chain_id:params[0],contract_address:params[1],transaction_hash:params[2],log_index:params[3],block_number:params[4],block_hash:params[5],block_timestamp:String(params[6]),event_name:params[7],payload:JSON.parse(String(params[8]))});}
-  if(sql.startsWith('SELECT * FROM economy_chain_events'))return {rows:events};
+  if(sql.startsWith('SELECT * FROM economy_chain_events'))return {rows:sql.includes('OFFSET')?events.slice(Number(params[3]),Number(params[3])+2000):events};
   if(sql.startsWith('INSERT INTO economy_index_state'))state={block_number:params[1],block_hash:params[2],snapshot:JSON.parse(String(params[3]))};
   return {rows:[]};
  }};
@@ -24,6 +25,22 @@ function harness(logOverride?:Record<string,unknown>){
  return {db:db as unknown as pg.Client,client:client as unknown as Parameters<typeof indexEconomy>[2],queries,events,state:()=>state};
 }
 describe('economy finalized event indexer',()=>{
+ it('continues indexing past 256 public sellers without dropping their events',async()=>{
+  const f=harness();
+  for(let i=1;i<=257;i++)f.events.push({event_name:'ServiceRegistered',payload:{serviceHash:`0x${i.toString(16).padStart(64,'0')}`,seller:`0x${i.toString(16).padStart(40,'0')}`,category:'1',unitHash:zeroHash,unitPrice:'1000',quantity:'1',endpointHash:zeroHash},transaction_hash:zeroHash,block_timestamp:'100',block_number:'10',log_index:i});
+  expect(await indexEconomy(f.db,deployment,f.client)).toMatchObject({changed:true,caughtUp:true});
+ });
+ it('advances beyond ten thousand historical events with paged reads',async()=>{
+  const f=harness();for(let i=0;i<10001;i++)f.events.push({event_name:'PolicyChanged',payload:{},transaction_hash:zeroHash,block_timestamp:'100',block_number:'10',log_index:i});
+  expect(await indexEconomy(f.db,deployment,f.client)).toMatchObject({changed:true});
+  expect(f.queries.filter(q=>q.sql.includes('OFFSET'))).toHaveLength(6);
+ });
+ it('shrinks an oversized finalized log range instead of freezing at a public volume threshold',async()=>{
+  const f=harness();const ranges:bigint[]=[];
+  const client={...f.client,getBlock:async({blockNumber}:{blockNumber?:bigint})=>({number:blockNumber??2010n,hash:canonicalHash,timestamp:172800n}),getLogs:async({fromBlock,toBlock,address}:{fromBlock:bigint;toBlock:bigint;address:string})=>{ranges.push(toBlock-fromBlock);return address===deployment.policy&&toBlock-fromBlock>1000n?Array.from({length:10001},()=>({})):[];}} as unknown as Parameters<typeof indexEconomy>[2];
+  expect(await indexEconomy(f.db,deployment,client)).toMatchObject({changed:true,blockNumber:'1009',caughtUp:false});
+  expect(ranges).toContain(1999n);expect(ranges).toContain(999n);
+ });
  it('writes a verified snapshot once and makes repeat indexing a no-op',async()=>{
   const f=harness();expect(await indexEconomy(f.db,deployment,f.client)).toEqual({changed:true,blockNumber:'10',caughtUp:true,orders:0});
   const snapshot=f.state()?.snapshot as {metrics:{gapAtomic:null;moneyVelocityBps:null;utilizationBps:null};policyHistory:unknown[]};

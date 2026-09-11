@@ -1,4 +1,3 @@
-import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import type { BrokerHealth, DataPurchase, Provider, Receipt, RepoEvidence, Report, VerificationPurchase } from './contracts';
 
@@ -8,22 +7,6 @@ export interface Gateway {
  generateReport(evidence:RepoEvidence[],runId:string):Promise<string>;
  verify(input:VerificationPurchase):Promise<{receipt:Receipt;checks?:Report['checks']}>;
 }
-export const DEFAULT_PROVIDERS:Provider[]=[
- {id:'repo-standard',name:'Repository Signals',description:'Current repository metadata with source evidence.',network:'hedera:testnet',asset:'HBAR',unit:'repository',unitPriceAtomic:100000},
- {id:'repo-economy',name:'Repository Signals Economy',description:'An alternative quote for the same verified repository fields.',network:'hedera:testnet',asset:'HBAR',unit:'repository',unitPriceAtomic:120000}
-];
-function simulatedReceipt(requestId:string,network:Receipt['network'],amount:number,units:number,provider:string):Receipt{
- return {id:randomUUID(),requestId,mode:'rehearsal',network,asset:network==='hedera:testnet'?'HBAR':'USDC',amountAtomic:amount,units,provider,status:'simulated',timestamp:new Date().toISOString()};
-}
-export const rehearsalGateway:Gateway={
- async discover(){return structuredClone(DEFAULT_PROVIDERS);},
- async purchaseData(input){
-  const samples:Record<string,[number,number,string]>={'vercel/next.js':[135000,29000,'TypeScript'],'remix-run/react-router':[55000,10800,'TypeScript'],'sveltejs/kit':[19000,1900,'JavaScript']};
-  return {evidence:input.repos.map(repo=>({repo,description:'Illustrative rehearsal fixture; not current GitHub data.',stars:samples[repo]?.[0]??1000,forks:samples[repo]?.[1]??100,openIssues:200,pushedAt:'2026-09-01T10:00:00.000Z',language:samples[repo]?.[2]??'TypeScript',license:'MIT',sourceUrl:`https://api.github.com/repos/${repo}`,fetchedAt:'2026-09-01T12:00:00.000Z'})),receipt:simulatedReceipt(input.requestId,'hedera:testnet',input.unitPriceAtomic*input.repos.length,input.repos.length,input.providerId)};
- },
- async generateReport(evidence){return `This rehearsal compares ${evidence.length} repositories using illustrative metadata. Review popularity, maintenance recency and licensing together; repository counts alone do not determine technical suitability.`;},
- async verify(input){return {receipt:simulatedReceipt(input.requestId,'arc:testnet',50000,1,'Report Verifier')};}
-};
 const providerSchema=z.object({id:z.string().regex(/^repo-(standard|economy)$/),name:z.string().max(100),description:z.string().max(500),network:z.literal('hedera:testnet'),asset:z.literal('HBAR'),unit:z.string().max(40),unitPriceAtomic:z.number().int().positive().max(100000000),endpoint:z.string().optional()});
 export async function brokerRequest<T>(path:string,body?:unknown):Promise<T>{
  const url=process.env.BROKER_URL,token=process.env.BROKER_TOKEN;

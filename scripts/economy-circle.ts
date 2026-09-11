@@ -6,6 +6,8 @@ import { resolve, join, dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 import { createPublicClient, http, isAddress, keccak256, toHex, verifyMessage, type Abi, type Address, type Hex } from 'viem';
+import {findFinalizedUserOperation} from './circle-userop-recovery';
+import {serializeIndexReads} from '../src/lib/economy/index-rpc';
 import { signerConfiguration, SpeculosTransport } from './speculos-transport';
 import { circleCalldataAdapter, encodeCircleCall } from './circle-calldata-adapter';
 const exec = promisify(execFile);
@@ -17,7 +19,7 @@ type Intent = {kind:string;args:string[]};
 export type Operation = {version:1;name:string;intent:Intent;intentHash:Hex;idempotencyKey:string;createdAt:string;status:'submitting'|'uncertain'|'submitted'|'failed';result?:Record<string,Json>};
 export type CircleConfig = {wallet:Address;approver:Address;cli:string;cliHome:string;rpc:string;journal:string};
 type Artifact = {abi:Abi;evm:{bytecode:{object:string};deployedBytecode:{object:string;immutableReferences?:Record<string,{start:number;length:number}[]>}}};
-const publicClient=(config:CircleConfig)=>createPublicClient({transport:http(config.rpc,{timeout:20000,retryCount:0})});
+const publicClient=(config:CircleConfig)=>serializeIndexReads(createPublicClient({transport:http(config.rpc,{timeout:20000,retryCount:0})}));
 function validName(name:string){if(!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,100}$/.test(name))throw Error('Invalid operation name.');}
 async function save(filename:string,value:unknown){
  const temp=`${filename}.${randomUUID()}.tmp`;const file=await open(temp,'wx',0o600);
@@ -66,7 +68,7 @@ export function configuration(env=process.env):CircleConfig{
 async function assertTestnet(config:CircleConfig){if(await publicClient(config).getChainId()!==CHAIN_ID)throw Error('Wrong chain.');}
 function sanitizeResult(value:unknown):Record<string,Json>{
  if(!value||typeof value!=='object')throw Error('Missing Circle result.');const record=value as Record<string,unknown>;
- const result:Record<string,Json>={};for(const key of ['id','idempotencyKey','state','blockchain','txHash','sourceAddress','destinationAddress','contractAddress','blockHeight','operation','abiFunctionSignature','abiParameters','createDate','errorReason','errorDetails']){
+ const result:Record<string,Json>={};for(const key of ['id','idempotencyKey','state','blockchain','txHash','userOpHash','sourceAddress','destinationAddress','contractAddress','blockHeight','operation','abiFunctionSignature','abiParameters','createDate','errorReason','errorDetails']){
   if(record[key]!==undefined)result[key]=JSON.parse(JSON.stringify(record[key])) as Json;
  }return result;
 }
@@ -127,18 +129,36 @@ async function deployedAddress(config:CircleConfig,op:Operation,name:string):Pro
  const built=await artifact(name);const code=await publicClient(config).getCode({address});
  if(!code||!built.evm.deployedBytecode.immutableReferences||!runtimeMatches(code,built.evm.deployedBytecode.object,built.evm.deployedBytecode.immutableReferences))throw Error('Deployed runtime differs from compiled artifact.');return address;
 }
+/** A correlated pending result is not missing correlation and never proves payment. */
+export function requireCircleTransactionHash(op:Operation):Hex{
+ const hash=op.result?.txHash;if(typeof hash==='string'&&/^0x[\da-f]{64}$/i.test(hash))return hash as Hex;
+ if(typeof op.result?.id==='string'&&op.result.id)throw Error('Circle transaction is correlated, but its transaction hash is not available yet. Preserve this operation and retry read-only reconciliation; do not submit again.');
+ throw Error('No uniquely correlated transaction found. Preserve the journal and reconcile Circle challenge manually; do not create a replacement operation.');
+}
 /** Read-only recovery. Unknown timeout results require manual Circle correlation, never resubmission. */
 export async function reconcile(config:CircleConfig,name:string):Promise<Operation>{
  validName(name);await assertTestnet(config);const filename=join(config.journal,`${name}.json`);const op=await load(filename);if(!op)throw Error('Unknown operation.');if(op.status==='failed')return op;
  let cursor:string|undefined;let matched:Record<string,Json>|undefined;
- for(let page=0;page<20;page++){
-  const data=await circle(config,['transaction','list','--address',config.wallet,'--chain',CHAIN,'--limit','50','--output','json',...(cursor?['--cursor',cursor]:[])]) as {transactions?:unknown[];cursor?:string};
+ if(typeof op.result?.id==='string'){
+  const data=await circle(config,['transaction','list','--address',config.wallet,'--chain',CHAIN,'--transaction-id',op.result.id,'--output','json'],true) as {transactions?:unknown[]};
+  if(!Array.isArray(data.transactions)||data.transactions.length!==1)throw Error('Missing exact Circle transaction detail.');
+  const detail=sanitizeResult(data.transactions[0]);
+  if(detail.id!==op.result.id||detail.blockchain!==CHAIN||String(detail.sourceAddress).toLowerCase()!==config.wallet.toLowerCase())throw Error('Circle detail differs from original wallet, chain or transaction ID.');
+  matched=detail;
+ }
+ for(let page=0;!matched&&page<20;page++){
+  const data=await circle(config,['transaction','list','--address',config.wallet,'--chain',CHAIN,'--limit','50','--output','json',...(cursor?['--cursor',cursor]:[])],true) as {transactions?:unknown[];cursor?:string};
   if(!data||!Array.isArray(data.transactions))throw Error('Unexpected Circle history envelope.');
   for(const value of data.transactions){const tx=sanitizeResult(value);if(tx.idempotencyKey===op.idempotencyKey||(op.result?.id&&tx.id===op.result.id)||(op.result?.txHash&&tx.txHash===op.result.txHash)){matched=tx;break;}}
   if(matched||data.transactions.length<50)break;const last=sanitizeResult(data.transactions.at(-1));if(typeof last.id!=='string')break;cursor=last.id;
  }
- if(matched){op.result={...matched,idempotencyKey:op.idempotencyKey};op.status=matched.state==='FAILED'||matched.state==='CANCELLED'||matched.state==='DENIED'?'failed':'submitted';await save(filename,op);if(op.status==='failed')return op;}
- if(!op.result?.txHash)throw Error('No uniquely correlated transaction found. Preserve the journal and reconcile Circle challenge manually; do not create a replacement operation.');
+ if(matched){if(op.result?.txHash&&matched.txHash&&op.result.txHash!==matched.txHash)throw Error('Conflicting Circle transaction hash; preserve original evidence.');op.result={...op.result,...matched,idempotencyKey:op.idempotencyKey};op.status=matched.state==='FAILED'||matched.state==='CANCELLED'||matched.state==='DENIED'?'failed':'submitted';await save(filename,op);if(op.status==='failed')return op;}
+ if(!op.result?.txHash&&typeof op.result?.userOpHash==='string'){
+  if(op.result.blockchain!==CHAIN||String(op.result.sourceAddress).toLowerCase()!==config.wallet.toLowerCase())throw Error('Circle user operation belongs to a different wallet or chain.');
+  const hash=await findFinalizedUserOperation(publicClient(config),config.wallet,op.result.userOpHash as Hex);
+  if(hash){op.result.txHash=hash;op.result.chainCorrelation='finalized-user-operation-event';await save(filename,op);}
+ }
+ requireCircleTransactionHash(op);
  await receipt(config,op);return op;
 }
 export async function signPolicyDigest(digest:Hex,env=process.env):Promise<{signature:Hex;approver:Address;signerMode:'usb'|'speculos'}>{

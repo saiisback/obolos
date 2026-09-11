@@ -1,11 +1,11 @@
 import {describe,it,expect} from 'vitest';
 import {privateKeyToAccount} from 'viem/accounts';
 import {createRun,advanceRun,applyShock,approveRun} from '../src/lib/engine';
-import {rehearsalGateway} from '../src/lib/gateway';
+import {rehearsalGateway,DEFAULT_PROVIDERS} from './fixtures/gateway';
 import {verifyMessage} from 'viem';
 // Deliberately public deterministic test key. Never fund it or use it in a deployment.
 const account=privateKeyToAccount(`0x${'11'.repeat(32)}`);
-async function awaiting(){const run=createRun({repos:['vercel/next.js'],mode:'rehearsal'});await advanceRun(run,rehearsalGateway);await advanceRun(run,rehearsalGateway);applyShock(run);await advanceRun(run,rehearsalGateway);run.mode='live';run.approval!.message=run.approval!.message.replace('Mode: rehearsal','Mode: live');return run;}
+async function awaiting(){const run=createRun({repos:['vercel/next.js'],mode:'live'});const gateway={...rehearsalGateway,discover:async()=>DEFAULT_PROVIDERS.map(p=>({...p,unitPriceAtomic:400000}))};await advanceRun(run,gateway);await advanceRun(run,gateway);await advanceRun(run,gateway);return run;}
 describe('controller signatures',()=>{
  it('accepts only a signature for the current run and consumes its nonce',async()=>{
   process.env.LEDGER_CONTROLLER_ADDRESS=account.address;

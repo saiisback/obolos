@@ -6,6 +6,7 @@ import {decodeFunctionResult, encodeFunctionData, formatUnits, keccak256, parseA
 import {createServiceDefinition, serviceRequestSchema, validateServiceDefinition, validateServiceRequest, type ServiceDefinition, type ServiceRequest} from '@/lib/economy/service-contract';
 import {resourceCategories} from '@/lib/economy/model';
 import {api, errorMessage, type Agent, type User} from './api';
+import {EconomyRecovery} from './economy-recovery';
 import {useBrowserWallets} from './wallets';
 import s from './platform.module.css';
 import e from './economy-workspace.module.css';
@@ -31,6 +32,9 @@ export function EconomyServicePublishing({deployment, reserveBps, reviewBps}: {d
   const [source, setSource] = useState(serviceTemplate);
   const [definition, setDefinition] = useState<ServiceDefinition | null>(null);
   const [services, setServices] = useState<ServiceDefinition[]>([]);
+  const [sellerAddress, setSellerAddress] = useState('');
+  const [retireHash, setRetireHash] = useState('');
+  const [retireReason, setRetireReason] = useState('');
   const [catalogError, setCatalogError] = useState('');
   const [busy, setBusy] = useState('');
   const [message, setMessage] = useState('');
@@ -43,7 +47,13 @@ export function EconomyServicePublishing({deployment, reserveBps, reviewBps}: {d
     try {setServices((await api<{services: ServiceDefinition[]}>('/api/economy/services')).services); setCatalogError('');}
     catch (caught) {setCatalogError(errorMessage(caught));}
   }
-  useEffect(() => {void loadCatalog();}, []);
+  useEffect(() => {void loadCatalog(); void api<{user: User | null}>('/api/account').then(value => setSellerAddress(value.user?.address.toLowerCase() ?? '')).catch(() => {});}, []);
+
+  async function retire(event: FormEvent) {
+    event.preventDefault(); setBusy('retire'); setError(''); setMessage('');
+    try {await api(`/api/economy/services/${retireHash}/retire`, {method: 'POST', body: JSON.stringify({reason: retireReason})}); setMessage('Service retired from discovery. Existing paid orders retain delivery access.'); setRetireHash(''); setRetireReason(''); await loadCatalog();}
+    catch (caught) {setError(errorMessage(caught));} finally {setBusy('');}
+  }
 
   async function prepare(event: FormEvent) {
     event.preventDefault(); setBusy('review'); setError(''); setMessage('');
@@ -116,6 +126,7 @@ export function EconomyServicePublishing({deployment, reserveBps, reviewBps}: {d
       </div>}
       {error && <p className={e.formError} role="alert">{error}</p>}{message && <p className={e.note} role="status">{message}</p>}
     </div></details>
+    {services.some(service => service.seller === sellerAddress) && <details className={e.details}><summary>Retire one of your services</summary><div className={e.actionPanel}><p>Retirement permanently removes this offer from discovery. Keep its endpoint available for paid orders.</p><form onSubmit={retire}><label htmlFor="retire-service">Your service<select id="retire-service" value={retireHash} onChange={event => setRetireHash(event.target.value)} required disabled={!!busy}><option value="">Choose a service</option>{services.filter(service => service.seller === sellerAddress).map(service => <option key={service.serviceHash} value={service.serviceHash}>{service.category} · {short(service.serviceHash)}</option>)}</select></label><label htmlFor="retire-reason">Reason<textarea id="retire-reason" value={retireReason} onChange={event => setRetireReason(event.target.value)} maxLength={1000} required disabled={!!busy}/></label><button className={s.secondary} disabled={!!busy || !retireHash}>{busy === 'retire' ? 'Retiring…' : 'Permanently retire service'}</button></form>{error && <p role="alert">{error}</p>}{message && <p role="status">{message}</p>}</div></details>}
     <details className={e.details}><summary>Browse published service definitions ({services.length})</summary>{catalogError ? <p role="alert">{catalogError} <button className={s.secondary} onClick={() => void loadCatalog()}>Reload definitions</button></p> : services.length === 0 ? <p>No immutable service definitions have been published.</p> : <ul className={e.definitionList}>{services.map(service => <li key={service.serviceHash}><strong>{service.category} · {amount(service.unitPriceAtomic)} / {service.unit}</strong><p>{service.endpoint}</p><code>{service.serviceHash}</code><pre>{JSON.stringify(service, null, 2)}</pre></li>)}</ul>}<p><a href="/api/economy/services" target="_blank" rel="noopener noreferrer">Public services JSON</a></p></details>
   </section>;
 }
@@ -143,9 +154,7 @@ export function EconomyOrderDelivery({deployment}: {deployment: Deployment}) {
       const parsed = serviceRequestSchema.parse(JSON.parse(source));
       if (!agentId || keccak256(toHex(agentId)) !== parsed.agentId) throw Error('Choose the platform agent used by this settled request. Its on-chain ID must match.');
       if (parsed.settlement.address !== deployment.settlement.toLowerCase() || parsed.settlement.ledgerAddress !== deployment.ledger.toLowerCase()) throw Error('The request must use the active Arc deployment.');
-      const services = await api<{services: ServiceDefinition[]}>('/api/economy/services');
-      const service = services.services.find(item => item.serviceHash === parsed.serviceHash);
-      if (!service) throw Error('Publish this service definition before requesting delivery.');
+      const {service} = await api<{service: ServiceDefinition}>(`/api/economy/services/${parsed.serviceHash}`);
       setPrepared(validateServiceRequest(service, parsed));
     } catch (caught) {setError(errorMessage(caught));}
     finally {setBusy('');}
@@ -179,5 +188,6 @@ export function EconomyOrderDelivery({deployment}: {deployment: Deployment}) {
       {error && <p className={e.formError} role="alert">{error}</p>}
       {order && <div className={e.serviceReview} role="status"><h3>{order.state === 'fulfilled' ? 'Provider response received' : order.state === 'delivering' ? 'Delivery in progress' : 'Paid · awaiting delivery'}</h3><p>Order <code>{order.orderId}</code></p><p>Delivery attempts: {order.deliveryAttempts}. The provider response does not attest on-chain delivery or independently verify output quality.</p>{order.deliveryError && <p>{order.deliveryError}</p>}{order.output !== undefined && <><h3>Provider output</h3><pre>{JSON.stringify(order.output, null, 2)}</pre></>}{order.outputHash && <p>Output hash <code>{order.outputHash}</code></p>}<p><ReceiptLink hash={order.transactionHash}/></p></div>}
     </div></details>
+    <EconomyRecovery/>
   </section>;
 }

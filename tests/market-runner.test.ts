@@ -3,7 +3,8 @@ import {randomUUID} from 'node:crypto';
 import {privateKeyToAccount} from 'viem/accounts';
 import {mandateMessage,validateSignedMandate,type MandateFields} from '../src/lib/platform/execution-contracts';
 import {createRun,advanceRun} from '../src/lib/engine';
-import {rehearsalGateway,type Gateway} from '../src/lib/gateway';
+import type {Gateway} from '../src/lib/gateway';
+import {rehearsalGateway} from './fixtures/gateway';
 const account=privateKeyToAccount(`0x${'29'.repeat(32)}`);
 function fields():MandateFields{return {id:randomUUID(),agentId:randomUUID(),owner:account.address,origin:'https://obolos.app',repos:['owner/repo'],allowedProviders:['repo-standard'],dataBudgetAtomic:100000,verificationBudgetAtomic:100000,maxDataUnitPriceAtomic:100000,maxRuns:1,expiresAt:new Date(Date.now()+3600000).toISOString()};}
 function service(){const id=randomUUID();return {id,revision:1,name:'Metrics verifier',recipient:`0x${'38'.repeat(20)}`,priceAtomic:60000,endpoint:`https://obolos.app/api/market/services/${id}`};}

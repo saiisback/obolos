@@ -21,7 +21,9 @@ const same=(a:unknown,b:unknown)=>canonicalJsonHash(a)===canonicalJsonHash(b);
 
 export function publicEconomyService(row:Row):ServiceDefinition{return serviceDefinitionSchema.parse(row.definition);}
 export function publicEconomyOrder(row:Row){return {orderId:String(row.order_id),serviceHash:String(row.service_hash),transactionHash:String(row.transaction_hash),state:String(row.state),deliveryAttempts:Number(row.delivery_attempts??0),createdAt:new Date(String(row.created_at)).toISOString(),updatedAt:new Date(String(row.updated_at)).toISOString(),...(row.output?{output:row.output,outputHash:String(row.output_hash)}:{}),...(row.delivery_error?{deliveryError:String(row.delivery_error)}:{})};}
-export async function listEconomyServices(){const rows=await sql()`SELECT definition FROM economy_services ORDER BY created_at DESC LIMIT 100`;return rows.map(publicEconomyService);}
+export async function listEconomyServices(){const rows=await sql()`SELECT s.definition FROM economy_services s WHERE NOT EXISTS(SELECT 1 FROM economy_service_retirements r WHERE r.service_hash=s.service_hash) ORDER BY s.created_at DESC LIMIT 100`;return rows.map(publicEconomyService);}
+
+export async function getPublishedEconomyService(serviceHash:string){const id=z.string().regex(/^0x[0-9a-fA-F]{64}$/).parse(serviceHash).toLowerCase();const rows=await sql()`SELECT definition FROM economy_services WHERE service_hash=${id}`;if(!rows[0])throw fail(404,'SERVICE_NOT_FOUND','Published service not found.');return publicEconomyService(rows[0]);}
 
 export async function createEconomyService(user:User,value:unknown,overrides?:Partial<Dependencies>){
  const d=deps(overrides),deployment=d.deployment;if(!deployment)throw fail(503,'ECONOMY_NOT_DEPLOYED','The Arc economy contracts are not deployed.');

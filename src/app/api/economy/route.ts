@@ -6,9 +6,10 @@ import pg from 'pg';
 import {requireOrigin,PlatformError} from '@/lib/platform/http';
 import {requireUser,rateLimit} from '@/lib/platform/auth';
 import {indexEconomy} from '@/lib/economy/indexer';
+import {indexFreshness} from '@/lib/economy/indexing-scheduler';
 export const runtime='nodejs';
 export const maxDuration=60;
-export async function GET(){try{const deployment=economyDeployment();if(!deployment)return platformJson({status:'not_deployed',snapshot:null});const rows=await sql()`SELECT snapshot,updated_at FROM economy_index_state WHERE settlement_address=${deployment.settlement.toLowerCase()}`;return platformJson({status:rows[0]?'indexed':'awaiting_index',snapshot:rows[0]?.snapshot??null,updatedAt:rows[0]?.updated_at??null,deployment});}catch(error){return platformError(error);}}
+export async function GET(){try{const deployment=economyDeployment();if(!deployment)return platformJson({status:'not_deployed',snapshot:null});const rows=await sql()`SELECT snapshot,updated_at FROM economy_index_state WHERE settlement_address=${deployment.settlement.toLowerCase()}`;return platformJson({status:rows[0]?'indexed':'awaiting_index',snapshot:rows[0]?.snapshot??null,updatedAt:rows[0]?.updated_at??null,freshness:indexFreshness(rows[0]?.snapshot??null),deployment});}catch(error){return platformError(error);}}
 /** Authenticated refresh reads chain evidence only; it never invokes a wallet. */
 export async function POST(req:NextRequest){let phase='authentication';try{
  requireOrigin(req);const user=await requireUser(req);await rateLimit(`economy-refresh:${user.id}`,2,60);await rateLimit('economy-refresh-global',6,60);

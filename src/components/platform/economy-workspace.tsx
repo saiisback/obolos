@@ -19,7 +19,7 @@ type Snapshot = {
   metrics: JsonNumbers<EconomyMetrics>;
   policy: {enabled: boolean; reserveBps: Integer; reviewBps: Integer; policyVersion: Integer; feeVersion: Integer; categories: {name: string; enabled: boolean; perOrderCap: string; windowCap: string; windowSeconds: Integer; delaySeconds: Integer}[]};
   services: {serviceHash: string; seller: string; unitHash: string; unitPrice: string; quantity: string; endpointHash: string; category: string; transactionHash: string}[];
-  reputation: {seller: string; paid: string; delivered: string; acknowledged: string; acceptanceBps: string | null; qualityScore: null}[];
+  reputation: {seller: string; paid: string; delivered: string; acknowledged: string; acceptanceBps: string | null; qualityScore: string | null}[];
   orders: {orderId: string; agentId: string; seller: string; principalAtomic: string; sellerAtomic: string; delivered: boolean; buyerAcknowledged: boolean; transactionHash: string}[];
   policyHistory: {version: string; actionHash: string; observationHash: string; actor: string; approvalDigest: string; transactionHash: string}[];
   observations?: {observationHash: string; metricId: string; windowStart: string; windowEnd: string; value: string; baseline: string; inputRoot: string; methodologyHash: string; transactionHash: string}[];

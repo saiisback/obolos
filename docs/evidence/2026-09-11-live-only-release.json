@@ -1,0 +1,220 @@
+{
+  "schema": "obolos.live-only-release.v1",
+  "verifiedAt": "2026-09-11T09:27:16.431Z",
+  "origin": "https://obolos.app",
+  "deploymentId": "dpl_G7diE9ETVYRP66T9fK7PjpCJFKQX",
+  "chainId": 5042002,
+  "asset": "testnet USDC",
+  "emulation": "Ledger hardware only, through Speculos",
+  "allocation": {
+    "sellerBps": 9500,
+    "reserveBps": 300,
+    "reviewPoolBps": 200
+  },
+  "orders": [
+    {
+      "category": "data",
+      "orderId": "0x34bf7e0722ab118b85fe04d5d9f766acba0559d77ce4e515ecdf3b5b3a7aa549",
+      "serviceHash": "0xf39a4f8122822ac2b280b14867786bf0473a3dbfda5e208bb44510090d3a092b",
+      "input": {
+        "repo": "saiisback/obolos"
+      },
+      "quantity": "1",
+      "unit": "source-record",
+      "amountAtomic": "1000",
+      "payment": {
+        "transactionHash": "0x88a87c5151faa81bee1514dcd3f094898a853d998828398b0f7a43189375c2a3",
+        "blockNumber": 61539797,
+        "blockHash": "0x885f30791297b9f60f1e00feab023c6e5d4d78d8ea13b7683fe16fb8705a8797"
+      },
+      "sellerAttestation": {
+        "transactionHash": "0xb398d788ab1b0f6dc7a2fa4d00bd35af392262b3bab9c50471224b2eb44a2045",
+        "blockNumber": 61540859,
+        "blockHash": "0x5458e7620957d1478e9276c76feb01921b8db37d8005037873004db695fec509"
+      },
+      "buyerAcknowledgment": {
+        "transactionHash": "0x44dcf6e3c08c2012ca93003d08e745204c7731d9d203434387232ebc224e2b25",
+        "blockNumber": 61542674,
+        "blockHash": "0x2992a7d046ff90a2c0a5a9e063fb2d2771e76a5954c41b8998a4dc72dff0e37f"
+      },
+      "outputHash": "0xba0b7aa3135c70cb1c694fb928ef68f2b18e2c1ed9ed6dd9634e891ad95fd173",
+      "output": {
+        "repo": "saiisback/obolos",
+        "forks": 0,
+        "stars": 0,
+        "pushedAt": "2026-09-11T04:47:11Z",
+        "fetchedAt": "2026-09-11T08:57:37.761Z",
+        "sourceUrl": "https://api.github.com/repos/saiisback/obolos",
+        "openIssues": 0
+      }
+    },
+    {
+      "category": "compute",
+      "orderId": "0x5b967a49d8def6058215cc2cf9932424a226c3fb0866d516129be79de3b3bfff",
+      "serviceHash": "0xb123b15825e25853130c94e4217b50b24a45efcb420f0fd6a692e5dee64f55d5",
+      "input": {
+        "text": "Obolos real provider release: preserve the original paid order."
+      },
+      "quantity": "1",
+      "unit": "compute-unit",
+      "amountAtomic": "1000",
+      "payment": {
+        "transactionHash": "0x5e630923b487278ca6a4fa2ef69b9c5b7d4930493db2bc5fb53fcf276bb1a01b",
+        "blockNumber": 61541644,
+        "blockHash": "0x819b73ff5b956db83b5eb3db38befc6ac174dcf8971d04884efbfe7ef34b0f84"
+      },
+      "sellerAttestation": {
+        "transactionHash": "0x7a82f8be95207261ed4594c74ac88e404d1ae274bbadbb7313acad70380ff750",
+        "blockNumber": 61542595,
+        "blockHash": "0x5aa12e18143a964828aacb1a7926cd4db1a06451727e17503ae28ce3068f160a"
+      },
+      "buyerAcknowledgment": {
+        "transactionHash": "0xb902e8b31e3ffdbf59f48bab53cdda860d3d6ecadaf3cef9c23aadde6445db59",
+        "blockNumber": 61542620,
+        "blockHash": "0xb543a44ea00065793eee9a5ddaa846bd6cf59a6cb6a82312214f2b015226e5de"
+      },
+      "outputHash": "0x4fd49a0f360037f446423afbdf799f7f6ee616b1585916389768c7fceca5e06c",
+      "output": {
+        "bytes": 63,
+        "words": 9,
+        "sha256": "55fa75249882a4b4d555c35b3923e2b24b44b1654939199ccf63ce3943825856",
+        "characters": 63
+      }
+    },
+    {
+      "category": "inference",
+      "orderId": "0x3e7439fd4f023ca3f0dd3beabe734321d595ed39de66287edbc475b26116cbe0",
+      "serviceHash": "0x56206fa33d28037757b99d2840fc4ac38cbd906d11d980b45d00d2a3aec041ed",
+      "input": {
+        "prompt": "In one sentence, explain why a paid API response is different from independent evidence of its economic value."
+      },
+      "quantity": "1",
+      "unit": "inference-request",
+      "amountAtomic": "1000",
+      "payment": {
+        "transactionHash": "0x52846400c1f75e9f244ec735364901fce0a4aa39a0da2f47625fb97f563f919a",
+        "blockNumber": 61542945,
+        "blockHash": "0xd620ede9f4084a3fe1b3ccbcd0959648b6c9ff3f2840f9c73b7cb6ad99e3cf21"
+      },
+      "sellerAttestation": {
+        "transactionHash": "0x57865f221f1b9d5b9bd40978c2481161a92e8d2e999181979df37e2f85975d88",
+        "blockNumber": 61543499,
+        "blockHash": "0x22472c8fe0a790e0786d79d06e387aea7a7b0a20ba18bba0252d02a1f2520b04"
+      },
+      "buyerAcknowledgment": {
+        "transactionHash": "0xa79d50e3e51d7cc60c12459619fdb4cc8e86d867ec456d170a832b61e9f971ac",
+        "blockNumber": 61543535,
+        "blockHash": "0x945516f321497c965abeeb6fa078e44461a36a66630178eb13384cbe07ba00e2"
+      },
+      "outputHash": "0x6d1b4d74ea6f6c38866a4eeb2d4a6130a782e20bbbda973a41da8b013933c6da",
+      "output": {
+        "text": "A paid API response reflects a negotiated service value with guarantees and access controls, whereas independent evidence of economic value is external, uncontracted, and may be noisy or context-dependent.",
+        "model": "gpt-5-nano-2025-08-07",
+        "requestId": "chatcmpl-EMrieCq6NIJaVrBNUop91aX7LWzU2",
+        "promptTokens": 51,
+        "completionTokens": 45
+      }
+    },
+    {
+      "category": "verification",
+      "orderId": "0xc2f6db3581a38ac18f9eaaf59866c2f3b125103bde07dcdf8cf00e6bbb2f7218",
+      "serviceHash": "0x25cb4ed20ce77ab315bfb1527340822fc09ce4cff399c980faa187ddf0018ec6",
+      "input": {
+        "text": "Obolos real provider release: preserve the original paid order.",
+        "sha256": "55fa75249882a4b4d555c35b3923e2b24b44b1654939199ccf63ce3943825856"
+      },
+      "quantity": "1",
+      "unit": "verification-job",
+      "amountAtomic": "1000",
+      "payment": {
+        "transactionHash": "0xa59a1ff60070542866cf775044f6db896ae17692710d19cb0c9605996aae08c7",
+        "blockNumber": 61543679,
+        "blockHash": "0xbdf59fd9eeef1b34c67ed905c4ce14b5eaa961e11a257d0a90ee6ec3f90bcc7d"
+      },
+      "sellerAttestation": {
+        "transactionHash": "0x5f277931e2e09b59db0b1c063337fd45cc65d94220bef5f667045793a022bc32",
+        "blockNumber": 61543726,
+        "blockHash": "0xf74e61cfb34a7bca696f9fa50f802f3d43ff56ce2d077bef5427d6ee2a573f23"
+      },
+      "buyerAcknowledgment": {
+        "transactionHash": "0xbcebc7383ae40a2e7eb7c7855227ca1750306e7553bd521923c2731abe876787",
+        "blockNumber": 61543760,
+        "blockHash": "0x6f30121530f227d3682adf1d9ee27ff7a60dc97e4beb1d65b7358b158aa41d42"
+      },
+      "outputHash": "0xee8374e2a4afa49cf51d60fe623b026949d832db4951a4865e120370d7b31497",
+      "output": {
+        "check": "SHA-256 content integrity; no claim of narrative quality",
+        "passed": true,
+        "sha256": "55fa75249882a4b4d555c35b3923e2b24b44b1654939199ccf63ce3943825856"
+      }
+    },
+    {
+      "category": "storage",
+      "orderId": "0x2d6ac527c7b4a54cb761ed52290194cd9beadd001979bcd883971e793d71dc58",
+      "serviceHash": "0xfaf62789a84dabde979c764b3655c37e302812d5bdaa53a68bf7031e04f6a6de",
+      "input": {
+        "text": "Obolos real provider release: preserve the original paid order."
+      },
+      "quantity": "1",
+      "unit": "stored-object-hour",
+      "amountAtomic": "1000",
+      "payment": {
+        "transactionHash": "0x7c4d5d96d1797ade809d35cb4bd9ec39cb024e100c1160cfae83e886a44607da",
+        "blockNumber": 61543984,
+        "blockHash": "0x30a756ae5972af8aa32efbbe4e3cafe9a6f9bb685f08c9c7b334f5ec07900316"
+      },
+      "sellerAttestation": {
+        "transactionHash": "0x4a1e449ec97506fecbf61699332697fb6ef6e2b40515beca440d0da6c67e4a12",
+        "blockNumber": 61544022,
+        "blockHash": "0xac859ced6874bbc3579d4b0f4533c8dc5721d028661676e59f592a5fcde62ecb"
+      },
+      "buyerAcknowledgment": {
+        "transactionHash": "0xf0a2121a64320df32dc9c3b84b93ce92784d77c9e18c222f729baf1953067892",
+        "blockNumber": 61544095,
+        "blockHash": "0x706482d4e16bbe6050a844c53724a7a39089b6d725c13d555fe7ad6652f0322b"
+      },
+      "outputHash": "0x9cb7987a99d5a540996b7ef1ef54d71ea44376148cbde77b819bf824087c66c0",
+      "output": {
+        "bytes": 63,
+        "sha256": "55fa75249882a4b4d555c35b3923e2b24b44b1654939199ccf63ce3943825856",
+        "objectId": "0x2d6ac527c7b4a54cb761ed52290194cd9beadd001979bcd883971e793d71dc58",
+        "expiresAt": "2026-09-11T10:24:47.000Z"
+      }
+    }
+  ],
+  "refund": {
+    "orderId": "0x5b967a49d8def6058215cc2cf9932424a226c3fb0866d516129be79de3b3bfff",
+    "amountAtomic": "1000",
+    "transactionHash": "0xaa1a8ab2f29b0a9b84871ed1e6df5335cd3f72a02efb7ff49506defa29449481",
+    "blockNumber": 61544239,
+    "blockHash": "0x3cc8ecf8b90c7d3e18a968842ceeebb32a0395d26db971848853eb46abea502d"
+  },
+  "storageRetrievalVerified": true,
+  "freshness": {
+    "status": "fresh",
+    "indexAgeSeconds": 50,
+    "chainAgeSeconds": 58,
+    "caughtUp": true
+  },
+  "provider": {
+    "status": "online",
+    "model": "gpt-5-nano",
+    "storageLeaseSeconds": 3600
+  },
+  "validation": {
+    "applicationTests": 497,
+    "browserTests": 15,
+    "executableContractTests": 1,
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "deployedHttpSmoke": "passed"
+  },
+  "limitations": [
+    "Integration buyer and seller are controlled for this release; these purchases do not establish independent demand or economic usefulness.",
+    "Missing independent valuations, costs, capital, basket prices and trusted reviews remain unavailable.",
+    "The private provider host must remain online.",
+    "Storage is one stored-object-hour; retrieval expires after its original one-hour lease.",
+    "Refunds are voluntary seller transfers verified on-chain; no escrow, compulsory arbitration or automatic reviewer payouts.",
+    "Testnet assets and staging Ledger services do not establish mainnet maturity or physical-device security."
+  ]
+}

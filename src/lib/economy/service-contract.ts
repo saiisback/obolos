@@ -8,7 +8,7 @@ const hex32=z.string().regex(/^0x[0-9a-fA-F]{64}$/).transform(value=>value.toLow
 const address=z.string().refine(isAddress).transform(value=>value.toLowerCase() as Address);
 const positiveInteger=z.string().regex(/^[1-9]\d*$/);
 const category=z.enum(resourceCategories);
-export const normalizedUnits={data:['source-record'],compute:['compute-unit'],inference:['inference-request'],verification:['verification-job'],storage:['gigabyte-hour']} as const satisfies Record<ResourceCategory,readonly string[]>;
+export const normalizedUnits={data:['source-record'],compute:['compute-unit'],inference:['inference-request'],verification:['verification-job'],storage:['gigabyte-hour','stored-object-hour']} as const satisfies Record<ResourceCategory,readonly string[]>;
 
 export type ConstrainedJsonSchema={
  type:'object'|'array'|'string'|'number'|'integer'|'boolean'|'null';

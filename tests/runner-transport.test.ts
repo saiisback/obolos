@@ -38,7 +38,7 @@ it('uses runner token only for the pinned platform after authenticated local hea
 it('retries only cached result delivery after a lost acknowledgment and checks authorization at every capability',async()=>{
  const {privateKeyToAccount}=await import('viem/accounts');
  const {mandateMessage}=await import('../src/lib/platform/execution-contracts');
- const {rehearsalGateway}=await import('../src/lib/gateway');
+ const {rehearsalGateway}=await import('./fixtures/gateway');
  const {randomUUID}=await import('node:crypto');
  const owner=privateKeyToAccount(`0x${'24'.repeat(32)}`),env=await settings();env.RUNNER_OWNER_ADDRESS=owner.address;
  const config=await loadRunnerConfig(env),j=await RunnerJournal.open(config.dataDir,config.pins.agentId);

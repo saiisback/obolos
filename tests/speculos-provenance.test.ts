@@ -2,7 +2,7 @@ import {afterEach,describe,expect,it} from 'vitest';
 import {privateKeyToAccount} from 'viem/accounts';
 import {createRun,advanceRun,applyShock,approveRun} from '../src/lib/engine';
 import {buildLiveOverview} from '../src/lib/live-readiness';
-import {rehearsalGateway,DEFAULT_PROVIDERS} from '../src/lib/gateway';
+import {rehearsalGateway,DEFAULT_PROVIDERS} from './fixtures/gateway';
 
 afterEach(()=>{delete process.env.LEDGER_SIGNER_MODE;delete process.env.LEDGER_CONTROLLER_ADDRESS;});
 async function pending(){

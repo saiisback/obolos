@@ -13,8 +13,10 @@ test('real EVM: policy-authorized USDC settlement, roles, accounting, delivery a
   const port = 18545 + Math.floor(Math.random()*1000);
   const process_ = spawn(process.execPath,['node_modules/@foundry-rs/anvil/bin.mjs','--port',String(port),'--silent'],{stdio:'ignore'});
   t.after(()=>process_.kill());
-  const client = createPublicClient({transport:http(`http://127.0.0.1:${port}`)});
-  for(let i=0;i<100;i++) { try {await client.getChainId();break} catch {await new Promise(r=>setTimeout(r,50))} }
+  const client = createPublicClient({pollingInterval:50,transport:http(`http://127.0.0.1:${port}`,{timeout:500,retryCount:0})});
+  let ready=false;
+  for(let i=0;i<100;i++) { try {await client.getChainId();ready=true;break} catch {if(process_.exitCode!==null)throw Error('Local Anvil exited before startup');await new Promise(r=>setTimeout(r,50))} }
+  assert.equal(ready,true,'Local Anvil did not start within five seconds');
   const accounts = await client.request({method:'eth_accounts'});
   const wallets = accounts.map(account => createWalletClient({account,transport:http(`http://127.0.0.1:${port}`)}));
   const [controller,owner,payer,seller,reserve,review,guardian,attacker] = accounts;
