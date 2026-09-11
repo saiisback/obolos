@@ -1,4 +1,4 @@
-# AgentGDP phase 2 implementation and review ledger
+# Obolos phase 2 implementation and review ledger
 
 Approved specification: ../specs/2026-09-11-agentgdp-open-market-design.md.
 User authorized implementation, subagents, testnet verification, and existing GitHub/Vercel deployment. Work remains in the requested ETHONLINE checkout on codex/obolos.
@@ -25,7 +25,7 @@ User authorized implementation, subagents, testnet verification, and existing Gi
 - [x] Integration: chain configuration/ABIs, durable submissions, independently verified logs, idempotent DB indexing, public economy/score APIs, owner policy authorization.
 - [x] Open services: versioned category/unit/input-output terms for seller APIs and explicit contract-settlement eligibility; preserve legacy signatures and receipts.
 - [x] Workspace: Economy metrics, service categories, policy review, allocation/receipt links, developer integration instructions, responsive verification.
-- [ ] Release: contract deployment metadata and code checks, migration, bounded paid testnet execution, real observation and policy-response evidence, review fixes, commit/push/deploy.
+- [x] Release: contract deployment metadata and code checks, migration, bounded paid testnet execution, real observation and policy-response evidence, review fixes, commit/push/deploy.
 
 ## Task seams
 
@@ -34,3 +34,7 @@ Contract agent owns contracts/, scripts/contracts/, tests/economy-contract*. Met
 ## Validation
 
 Use real local EVM execution for Solidity behavior, meaningful pure-math tests, PostgreSQL isolation and indexing tests, Next production build and browser tests. Deploy only after review. Record real testnet transaction hashes separately from test fixtures. Do not overwrite/retry old economic intents. Missing deployment authority or funding is reported without fabricating success.
+
+## Release evidence
+
+The real production-path Arc testnet order, exact fee allocation, scoped-agent delivery, separate seller/buyer attestations, two selected-quote ARPI records, signed cap tightening and unpaid price-shock rejection are recorded in [release evidence](../../evidence/2026-09-11-economy-release.md). Final checks: 388 application tests across 56 files with real PostgreSQL integration, six desktop/mobile browser tests, executable local-EVM contract coverage, typecheck and production build. Release completion does not mean all paper metrics have populated historical data: independent valuations, full resource costs, capital observations, additional enabled categories and broader independent market activity remain explicit follow-on work.

@@ -73,6 +73,17 @@ async function screenshot(page: Page, name: string) {
 }
 
 for (const viewport of [{width: 1440, height: 1000}, {width: 390, height: 844}]) {
+  test(`settled receipt links stay within the table scroll area (${viewport.width}px)`, async ({page}) => {
+    await page.setViewportSize(viewport);
+    await fixture(page, 'delivery');
+    await page.route('**/api/economy', route => route.fulfill({json: {status: 'indexed', snapshot: {...snapshot,
+      orders: [{orderId: request.orderId, agentId: request.agentId, seller: user.address, principalAtomic: '1000', sellerAtomic: '950', buyerAcknowledged: true, delivered: true, transactionHash: request.settlement.transactionHash}],
+      reputation: [{seller: user.address, paid: 1, delivered: 1, acknowledged: 1, acceptanceBps: '10000'}]}}}));
+    await page.goto(origin + '/app/economy#settlements');
+    await expect(page.getByText('Buyer acknowledged', {exact: true})).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(viewport.width);
+  });
+
   test(`service registration and finality retry never resend a wallet transaction (${viewport.width}px)`, async ({page}) => {
     await page.setViewportSize(viewport);
     const posts = await fixture(page, 'publish');

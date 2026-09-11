@@ -6,8 +6,12 @@ export interface EconomicSettlement {
   orderId:string; agentId:string; seller:string; asset:EconomyAsset; category:ResourceCategory;
   unit:string; quantity:bigint; principalAtomic:bigint; sellerAtomic:bigint;
   timestamp:number; delivered:boolean; buyerAcknowledged:boolean; sameOwner:boolean;
+  // Every valuation is attested in this settlement asset’s atomic units (USDC 6, HBAR 8 decimals).
+  // Cross-currency costs require conversion evidence in valuationReference before aggregation.
   // A delivered API response is not a monetary output valuation.
   verifiedFinalOutputAtomic:bigint|null; verifiedIntermediateInputAtomic:bigint|null;
+  /** Attested total production cost in asset atomic units, including payment, gas, inference and other consumed resources. */
+  verifiedResourceCostAtomic?:bigint|null;
   valuationReference:string|null;
 }
 export interface ArpiObservation {

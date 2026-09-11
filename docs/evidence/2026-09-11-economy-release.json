@@ -1,0 +1,142 @@
+{
+  "protocol": "obolos.economy-release.v1",
+  "date": "2026-09-11",
+  "environment": "Production HTTPS application with Arc testnet settlements and Ledger Speculos approval",
+  "deployment": {
+    "chainId": 5042002,
+    "policy": "0x714c5d940a3a12dc0cc5ec05a5e29bf31e11d522",
+    "ledger": "0xfb5cc06a6bf8a3ff0d37043cd64fcd7ae7bbdb5e",
+    "settlement": "0xb1c8370f42c1349c82b421576458b5251aaf5e36",
+    "fromBlock": "61506219",
+    "controller": "0x90602880dbee4158d96fddbdffe300c03d68e46c",
+    "approver": "0xA7a1C8b8d1aa6c5B32aECB56F4396A353c5f81fa",
+    "reserve": "0x1F21897512e5AD2d9Aa087a0C8E818A3E2dD22FD",
+    "reviewPool": "0xc76e4cf85fceda68af2e5cae6d2fc5d054362c4c"
+  },
+  "application": "https://obolos.app/app/economy",
+  "publicSnapshot": "https://obolos.app/api/economy",
+  "identities": "Controlled test buyer, seller, reserve and executor; this exercise does not establish independent market demand.",
+  "agentId": "0x802fefd9a675c1f3aea6a485135ff55733c9c60130b0a2d4abb8d302ef10b7df",
+  "platformAgentId": "cc1fac58-71f5-4660-93e5-dd5ced4a0a24",
+  "orderId": "0x6aad115e565064b9bdd53bdee020c8be83b81747b89d9666c817302b9ddbc55d",
+  "deliveryInterface": "scoped-agent-api",
+  "allocation": {
+    "transactionHash": "0x56c0408fe42edad8e2a1d5fcef8644bd60500facace45348bde69a6a33c591fd",
+    "blockNumber": "61509307",
+    "status": "success",
+    "transfers": [
+      {
+        "from": "0x90602880dbee4158d96fddbdffe300c03d68e46c",
+        "to": "0xd2137e6d65165400641aff0e34781d09a0215858",
+        "value": "950"
+      },
+      {
+        "from": "0x90602880dbee4158d96fddbdffe300c03d68e46c",
+        "to": "0x1f21897512e5ad2d9aa087a0c8e818a3e2dd22fd",
+        "value": "30"
+      },
+      {
+        "from": "0x90602880dbee4158d96fddbdffe300c03d68e46c",
+        "to": "0xc76e4cf85fceda68af2e5cae6d2fc5d054362c4c",
+        "value": "20"
+      }
+    ]
+  },
+  "sellerDeliveryTransaction": "0x726b7bb335ba822a4993684901278b5f5a2a8a0c0100241d700e4563a981813a",
+  "buyerAcknowledgment": {
+    "transactionHash": "0x7e4ac345ab91e171697cf8eb1aaae13d64111bc4e5797ba923052181467aa255"
+  },
+  "executorBindingTransaction": "0x4e6ce7a836a7e1d5b018237a592a57a03e6dd70241f348be89509f077e9bb400",
+  "observationLinkedPolicyTransaction": "0xa0e64b3fabf4f2a9a18d5fef63fd4bb268c9aae2898fca9416e74edd307b2fb2",
+  "arpi": {
+    "baseline": {
+      "transactionHash": "0xea3189a69436a29c2f30cad2f2c815ed7b46d22a3f14f4820cb8e56034108f18",
+      "observationHash": "0x94f9b401a9c39330afae99dfb32a0d48b1a6a0f59172706dd89a09a91dd40b12"
+    },
+    "higherQuote": {
+      "transactionHash": "0xcc059eed60fd4fe5f7070cd946346ad3205146464ae8333a7d0e3cb2aec140c1",
+      "observationHash": "0x6dcafcd2c1619d7eef8fa2eb02d7efeee70c9ebed820763ab0b779d14f47076a"
+    },
+    "initialIndex": "100.00",
+    "nextIndex": "300.00",
+    "consecutiveWindowInflationPercent": "200",
+    "interpretation": "One selected registered compute quote, not market-clearing inflation. The original cheaper offer remains open."
+  },
+  "priceShock": {
+    "definition": {
+      "chainId": 5042002,
+      "settlementAddress": "0xb1c8370f42c1349c82b421576458b5251aaf5e36",
+      "ledgerAddress": "0xfb5cc06a6bf8a3ff0d37043cd64fcd7ae7bbdb5e",
+      "seller": "0xd2137e6d65165400641aff0e34781d09a0215858",
+      "endpoint": "https://obolos.app/api/economy/reference-compute",
+      "category": "compute",
+      "unit": "compute-unit",
+      "quantity": "1",
+      "unitPriceAtomic": "3000",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 32768
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "characters": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "words": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "maxLength": 64
+          }
+        },
+        "required": [
+          "characters",
+          "words",
+          "bytes",
+          "sha256"
+        ],
+        "additionalProperties": false
+      },
+      "protocol": "obolos.service.v1",
+      "serviceHash": "0x722f99ff6d2a8ecffa31ff97c5bdb8ab44d9378e30bd80ac3af87f792b32efcb"
+    },
+    "order": {
+      "orderId": "0xf065cc1fc654dd7b3a6a42b985b76125a1abbb4f9304d363c368e850b0ad4ee0",
+      "agentId": "0x802fefd9a675c1f3aea6a485135ff55733c9c60130b0a2d4abb8d302ef10b7df",
+      "category": 1,
+      "seller": "0xd2137E6D65165400641aff0e34781D09a0215858",
+      "serviceHash": "0x722f99ff6d2a8ecffa31ff97c5bdb8ab44d9378e30bd80ac3af87f792b32efcb",
+      "unitHash": "0x2f32e6106485ae386796e72bf0e149bc7a7c1551a0617797cf61510a0bba1bf0",
+      "quantity": "1",
+      "unitPrice": "3000",
+      "amount": "3000",
+      "inputHash": "0xaf5e8d2b739262329c9faa0089db2636e5822d123c34f73174522349159b36ff",
+      "deadline": "1789104588",
+      "policyVersion": "4",
+      "agentVersion": "2",
+      "feeVersion": "1"
+    },
+    "blocked": true,
+    "reason": "Limit",
+    "method": "eth_call: no payment submitted",
+    "orderHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "alternativeServiceHash": "0xd083bb6a6a2182d7cb82becc2ca6fbd4d3f950d220fb29bd309c1de524cc2934"
+  }
+}

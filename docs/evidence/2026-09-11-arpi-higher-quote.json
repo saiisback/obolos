@@ -1,0 +1,120 @@
+{
+  "protocol": "obolos.observation-evidence.v1",
+  "status": "confirmed",
+  "operationName": "observe-compute-arpi-higher-offer",
+  "deployment": {
+    "chainId": 5042002,
+    "policy": "0x714c5d940a3a12dc0cc5ec05a5e29bf31e11d522",
+    "ledger": "0xfb5cc06a6bf8a3ff0d37043cd64fcd7ae7bbdb5e",
+    "settlement": "0xb1c8370f42c1349c82b421576458b5251aaf5e36",
+    "fromBlock": "61506219",
+    "controller": "0x90602880dbee4158d96fddbdffe300c03d68e46c",
+    "approver": "0xa7a1c8b8d1aa6c5b32aecb56f4396a353c5f81fa",
+    "reserve": "0x1f21897512e5ad2d9aa087a0c8e818a3e2dd22fd",
+    "reviewPool": "0xc76e4cf85fceda68af2e5cae6d2fc5d054362c4c"
+  },
+  "finalized": {
+    "number": "61509694",
+    "timestamp": 1789101034
+  },
+  "quoteMeaning": "ARPI uses selected registered quotes; it is not a latest quote or a market-clearing price.",
+  "publicInputs": {
+    "protocol": "obolos.observation-input.v1",
+    "methodology": "obolos-agentgdp-v1",
+    "asset": "USDC",
+    "start": 1789100668,
+    "end": 1789101032,
+    "basketIdentity": "[[\"reference-text-compute\",\"compute\",\"compute-unit\",\"USDC\",\"1000\",\"10000\",\"0xd083bb6a6a2182d7cb82becc2ca6fbd4d3f950d220fb29bd309c1de524cc2934:obolos-reference-text-analysis-v1\"]]",
+    "components": [
+      {
+        "id": "reference-text-compute",
+        "category": "compute",
+        "unit": "compute-unit",
+        "weightBps": "10000",
+        "baselineServiceHash": "0xd083bb6a6a2182d7cb82becc2ca6fbd4d3f950d220fb29bd309c1de524cc2934",
+        "currentServiceHash": "0x722f99ff6d2a8ecffa31ff97c5bdb8ab44d9378e30bd80ac3af87f792b32efcb",
+        "sourceReference": "obolos-reference-text-analysis-v1",
+        "baseline": {
+          "seller": "0xd2137E6D65165400641aff0e34781D09a0215858",
+          "category": 1,
+          "unitHash": "0x2f32e6106485ae386796e72bf0e149bc7a7c1551a0617797cf61510a0bba1bf0",
+          "quantity": "1",
+          "unitPrice": "1000",
+          "endpointHash": "0x0c3cd1f2e8294ddfdfeb05deb1e829ce2772da484e9564826921f6b547dd3e80",
+          "blockNumber": "61508681",
+          "blockTimestamp": 1789100516,
+          "transactionHash": "0x058faeb657485e208a4fb07985f7d82bde63176718ff2de6c22a79662b71cd56"
+        },
+        "current": {
+          "seller": "0xd2137E6D65165400641aff0e34781D09a0215858",
+          "category": 1,
+          "unitHash": "0x2f32e6106485ae386796e72bf0e149bc7a7c1551a0617797cf61510a0bba1bf0",
+          "quantity": "1",
+          "unitPrice": "3000",
+          "endpointHash": "0x0c3cd1f2e8294ddfdfeb05deb1e829ce2772da484e9564826921f6b547dd3e80",
+          "blockNumber": "61509599",
+          "blockTimestamp": 1789100985,
+          "transactionHash": "0x5cddcccdbbfdf44524fb2934999786686316d6fdb0134ef80312554ca8cc6cb5"
+        }
+      }
+    ],
+    "previousObservation": {
+      "methodology": "obolos-agentgdp-v1",
+      "asset": "USDC",
+      "end": 1789100668,
+      "basketIdentity": "[[\"reference-text-compute\",\"compute\",\"compute-unit\",\"USDC\",\"1000\",\"10000\",\"0xd083bb6a6a2182d7cb82becc2ca6fbd4d3f950d220fb29bd309c1de524cc2934:obolos-reference-text-analysis-v1\"]]",
+      "arpiBps": "10000"
+    }
+  },
+  "inputRoot": "0x497f887aa3e2868fdddb5ef54fba3a6883a7bb27672fca14c5970edb1a74ace1",
+  "metrics": {
+    "methodology": "obolos-agentgdp-v1",
+    "asset": "USDC",
+    "start": 1789100668,
+    "end": 1789101032,
+    "basketIdentity": "[[\"reference-text-compute\",\"compute\",\"compute-unit\",\"USDC\",\"1000\",\"10000\",\"0xd083bb6a6a2182d7cb82becc2ca6fbd4d3f950d220fb29bd309c1de524cc2934:obolos-reference-text-analysis-v1\"]]",
+    "arpiBps": "30000",
+    "inflationBps": "20000",
+    "baselineChangeBps": "20000",
+    "grossPaymentsAtomic": "0",
+    "sellerRevenueAtomic": "0",
+    "gapAtomic": null,
+    "surplusAtomic": null,
+    "productivityBps": null,
+    "moneyVelocityBps": null,
+    "paymentTurnoverBps": null,
+    "utilizationBps": null,
+    "purchasingPower": [
+      {
+        "componentId": "reference-text-compute",
+        "unit": "compute-unit",
+        "tasksPerCurrencyMillionths": "333333333"
+      }
+    ],
+    "settlementCount": 0,
+    "valuedSettlementCount": 0,
+    "excludedSelfPayments": 0,
+    "limitations": [
+      "Delivery and buyer acknowledgment do not independently prove real-world usefulness.",
+      "Known same-owner payments are excluded from value-added and utilization; undisclosed common control and circular trade may remain.",
+      "GAP requires explicit final-output and intermediate-input valuations for every eligible order in this window.",
+      "Surplus and productivity require an explicit all-resource cost attestation for every eligible valued order."
+    ]
+  },
+  "record": {
+    "metricId": "0x5dc6772a0f4bc2e5ddebdfb16752d20fcc815e1dc623f75434a710905c915101",
+    "parameters": [
+      "0x5dc6772a0f4bc2e5ddebdfb16752d20fcc815e1dc623f75434a710905c915101",
+      "1789100668",
+      "1789101032",
+      "30000",
+      "10000",
+      "0x497f887aa3e2868fdddb5ef54fba3a6883a7bb27672fca14c5970edb1a74ace1",
+      "0x428169e4f171a68b488e0c45e309c17263c3feeb9c6a4600769ac6a54551c0bd"
+    ]
+  },
+  "transaction": {
+    "transactionHash": "0xcc059eed60fd4fe5f7070cd946346ad3205146464ae8333a7d0e3cb2aec140c1",
+    "observationHash": "0x6dcafcd2c1619d7eef8fa2eb02d7efeee70c9ebed820763ab0b779d14f47076a"
+  }
+}

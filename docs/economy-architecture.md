@@ -1,4 +1,4 @@
-# AgentGDP economy architecture
+# Obolos economy architecture
 
 Phase 2 separates human ownership, autonomous execution, settlement, delivery, and measurement. Deployed addresses and start block are in [deployment.json](../src/lib/economy/deployment.json). The provider format is in [economy-provider-protocol.md](economy-provider-protocol.md).
 
@@ -139,6 +139,6 @@ The helper exports `approveCircleUsdc`, `settleCircleOrder`, and `executeCircle`
 
 ## Evidence boundary
 
-Deployed contracts are Arc testnet state. Service registration, paid order, delivery, output attestation, acknowledgment, metric observation, and policy response each require separate retained evidence. Until those artifacts exist, the outcome remains pending. Phase 1 receipts do not satisfy Phase 2 `OrderSettled` evidence.
+The [2026-09-11 release evidence](evidence/2026-09-11-economy-release.md) retains distinct Arc testnet proofs for service registration, the paid compute order, seller delivery, buyer acknowledgment, two selected-quote ARPI observations, and a Ledger Speculos-approved policy response. The application and provider run on production HTTPS; settlement uses test assets. Phase 1 receipts are not reclassified as Phase 2 `OrderSettled` evidence.
 
-ARPI needs a complete fixed basket. Inflation needs an immediately preceding comparable index. GAP and GAP velocity need explicit final-output and intermediate-input valuations for every eligible order. Capital and active-agent denominators need timestamped observations. Missing inputs remain unavailable.
+ARPI needs a complete fixed basket. Inflation needs an immediately preceding comparable index. GAP and GAP velocity need explicit final-output and intermediate-input valuations for every eligible order. Surplus and productivity additionally require attested all-resource cost, including payment, gas, inference, and other consumed resources; payment principal alone is not treated as production cost. Capital and active-agent denominators need timestamped observations. Missing inputs remain unavailable.

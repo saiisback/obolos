@@ -77,7 +77,7 @@ Metrics are calculated independently for HBAR and USDC. Values from different cu
 - **Price inflation:** `(current ARPI − previous ARPI) / previous ARPI`. It is available only when the previous observation ends exactly where the current window starts and has the same asset, methodology, and basket identity. Baseline-relative change is separate.
 - **GAP:** final-output valuation minus intermediate-input valuation for eligible non-self orders. Every eligible order needs delivery, buyer acknowledgment, explicit final and intermediate valuations, and a valuation reference. Otherwise GAP is unavailable.
 - **Money velocity:** `GAP / observed capital`. Gross payment turnover, `gross settlement principal / observed capital`, is a separate diagnostic and is not called paper velocity.
-- **Productivity and surplus:** explicit final-output valuation divided by or less eligible principal cost. They remain unavailable with incomplete valuation evidence.
+- **Productivity and surplus:** explicit final-output valuation divided by or less attested all-resource production cost, including payment, gas, inference, and other consumed resources. All amounts must be denominated in the settlement asset’s atomic units, with conversion provenance for cross-currency costs. They remain unavailable with incomplete valuation evidence; zero attested cost leaves productivity undefined but surplus available.
 - **Utilization:** productive active-agent IDs divided by the supplied active-agent set. It is unavailable when that denominator is absent.
 - **Purchasing power:** normalized tasks per unit of the selected currency from current basket prices.
 
@@ -89,7 +89,7 @@ Reputation reports fulfillment, complete verified-output coverage, quote reliabi
 
 The public service list contains only definitions matching finalized on-chain state. Publishing requires an authenticated seller whose account address equals the registered seller. Definitions are immutable by service hash in application logic and database triggers.
 
-Paid-order submission currently requires an authenticated human owner. `keccak256(utf8(platformAgentId))` must equal the on-chain agent ID; the database agent must belong to that user; current policy state must retain the same immutable owner. The finalized settlement and ledger events prove that the request payer was the authorized executor when payment occurred. A later pause or executor rotation cannot strand delivery of an already paid order. The backend validates the finalized receipt and persists the immutable request/payment before delivery. Scoped agent API-key submission is not implemented.
+Paid-order submission accepts an authenticated human owner or that owner’s scoped agent API credential. `keccak256(utf8(platformAgentId))` must equal the on-chain agent ID; the database agent must belong to that user; current policy state must retain the same immutable owner. The finalized settlement and ledger events prove that the request payer was the authorized executor when payment occurred. A later pause or executor rotation cannot strand delivery of an already paid order. The backend validates the finalized receipt and persists the immutable request/payment before delivery. Scoped agent submission uses `/api/v1/agents/[id]/economy/orders`; the credential is restricted to that owned agent and cannot authorize a wallet payment.
 
 Contracts and event proofs establish policy state and token movement. The browser, Circle MPC/session, Ledger transport disclosure, RPC provider, database, provider endpoint, schema declarations, ownership metadata, metric attester, valuations, active-agent denominator, capital observation, reputation evidence, and indexer remain trusted or externally observed components. Historical denominators and valuations must retain source and window timestamps.
 
@@ -103,12 +103,9 @@ Implemented and tested:
 - Generic service publication, owner-scoped paid-order ingestion, finalized event verification, durable delivery retry, metric/reputation calculation, and append-only index storage.
 - PostgreSQL integration coverage plus protocol, transport, contract, and metric tests.
 
-Pending until separately evidenced:
+Real release evidence is retained in [2026-09-11-economy-release.md](../../evidence/2026-09-11-economy-release.md): public compute service, contract USDC allocation, scoped-agent delivery, seller attestation, buyer acknowledgment, selected-quote ARPI, signed policy tightening, and higher-quote rejection without another payment.
 
-- A newly registered public Phase 2 service and retained real `OrderSettled`/`OrderPaid` transaction with matching USDC transfer logs.
-- A real provider response whose output hash is attested and acknowledged on chain.
-- A retained closed-window metric observation and approver-signed policy response transaction.
-- Final production UI verification and public walkthrough evidence. Code or deployment configuration alone must not be presented as proof of these outcomes.
+Remaining scope: independent output and cost valuations, timestamped capital observations, a sustained fixed-basket daily history, additional enabled category policies, independent sellers, and dispute/refund mechanisms. Contract execution does not independently determine output quality. Speculos is emulated, not physical hardware security.
 
 ## Standards alignment
 

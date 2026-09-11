@@ -45,11 +45,11 @@ A user asks: *Compare these three developer tools using current repository activ
 
 The frontend and backend use **Next.js, React and TypeScript**. Separate Node services implement the metered API and private capability broker. The application interface uses the user-selected Foundation reference on Mobbin, black-and-white surfaces, orange actions and an original flat illustration. The landing page, Product catalog, Evidence page and Developer guide use the later supplied video and dot-matrix design brief. Product and documentation pages scroll to keep forms, receipts and code examples accessible.
 
-## Phase 2 · AgentGDP economy
+## Phase 2 · Obolos open economy
 
 The Arc testnet Phase 2 contracts are deployed and recorded in [deployment metadata](src/lib/economy/deployment.json). They separate human-owned agent limits, Circle wallet execution, canonical-USDC settlement, delivery evidence, and conservative economic measurements. The generic `obolos.service.v1` market supports data, compute, inference, verification, and storage providers with finalized receipt checks and delivery-only retries.
 
-Deployment is not a paid-order claim. A new Phase 2 service purchase, delivery attestation, metric observation, and policy response remain pending until their own evidence is retained. See the [implemented design](docs/superpowers/specs/2026-09-11-agentgdp-open-market-design.md), [architecture and operator commands](docs/economy-architecture.md), and [provider protocol](docs/economy-provider-protocol.md).
+**Paid production-path testnet execution verified:** a scoped agent API delivered a real compute request after a Circle Agent Stack payment of 0.001 test USDC. Contract transfers split 95% to the seller, 3% to reserve, and 2% to the review pool. Seller delivery and buyer acknowledgment are separate on-chain records. A Ledger Speculos-approved cap blocked a higher quote before payment; two selected-quote ARPI observations are recorded on chain. [Transaction evidence and limitations](docs/evidence/2026-09-11-economy-release.md). No new token is issued; resource-price inflation is measured, not minted. See the [implemented design](docs/superpowers/specs/2026-09-11-agentgdp-open-market-design.md), [architecture and operator commands](docs/economy-architecture.md), and [provider protocol](docs/economy-provider-protocol.md).
 
 ## Run the application
 

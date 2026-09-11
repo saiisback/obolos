@@ -27,7 +27,7 @@
 .value { min-width:132px; overflow-wrap:anywhere; }
 .unavailable { color:#6a6a6a; font-size:12px; min-width:115px; }
 .explanation { max-width:62ch; min-width:240px; color:#606060; }
-.explorer { display:inline-flex; align-items:center; gap:3px; white-space:nowrap; color:#333; text-decoration:underline; font-size:inherit; }
+.explorer { position:relative; display:inline-flex; align-items:center; gap:3px; white-space:nowrap; color:#333; text-decoration:underline; font-size:inherit; }
 .explorer:hover { color:#a83d1d; }
 .subline { display:block; font-size:11px; font-weight:400; margin-top:6px; color:#666; }
 .capitalize { text-transform:capitalize; }
