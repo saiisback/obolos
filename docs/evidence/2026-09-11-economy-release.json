@@ -138,5 +138,39 @@
     "method": "eth_call: no payment submitted",
     "orderHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
     "alternativeServiceHash": "0xd083bb6a6a2182d7cb82becc2ca6fbd4d3f950d220fb29bd309c1de524cc2934"
+  },
+  "validation": {
+    "applicationTests": 388,
+    "applicationTestFiles": 56,
+    "postgresIntegration": "enabled",
+    "browserTests": 6,
+    "localEvmContractSuite": "passed",
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "liveWorkspace": [
+      {
+        "width": 1440,
+        "pageErrors": [],
+        "bodyOverflow": false,
+        "status": "passed"
+      },
+      {
+        "width": 390,
+        "pageErrors": [],
+        "bodyOverflow": false,
+        "status": "passed"
+      }
+    ],
+    "liveRefresh": {
+      "status": 200,
+      "blockNumber": "61511525",
+      "elapsedMs": 2262
+    },
+    "scopedAgentReplay": {
+      "state": "fulfilled",
+      "deliveryAttempts": 1,
+      "samePaymentReceipt": true
+    },
+    "observedLimitation": "An earlier read-only RPC contract call failed intermittently during refresh. A later live refresh succeeded; sanitized phase/cause diagnostics are retained. This did not trigger a payment."
   }
 }
