@@ -16,6 +16,7 @@ for (const width of [1280, 390]) test(`published resources and honest offline st
   await expect(catalog.getByText('0.002', {exact: true})).toHaveCount(5);
   await catalog.getByText('Exact service terms', {exact: true}).first().click();
   await expect(catalog.getByText(services[0].serviceHash, {exact: true})).toBeVisible();
+  await catalog.getByText('How resource purchases work',{exact:true}).click();
   await expect(catalog.getByRole('link', {name: 'Resource execution guide'})).toHaveAttribute('href', '/app/developers#selling');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({path: `test-results/resource-marketplace-${width}.png`, fullPage: true});

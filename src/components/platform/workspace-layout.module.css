@@ -17,3 +17,11 @@
 @media(max-width:800px) { .priceAlert { flex-direction:column; gap:16px; } }
 .selectionHint { padding:16px 20px; background:#f5f5f5; margin-bottom:24px; border-radius:8px; font-size:13px; line-height:1.7; color:#555; }
 .sectionNav { flex-wrap:wrap; gap:0 20px; }
+.pageHeading>svg { width:120px; height:90px; }.pageHeading>div:first-child { flex:1; }
+.collectionGrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 32px; }
+.collectionGrid>article { min-width:0; border-top:1px solid #d9ddd6; }
+.collectionGrid>article>div:first-child { display:grid; grid-template-columns:1fr 1fr; gap:24px; padding:28px 0; height:100%; align-content:start; }
+.collectionGrid>article>div:first-child>div:first-child { grid-column:1/-1; }.collectionGrid>article>div:first-child>div:first-child>svg { float:left; margin:0 18px 12px 0; }.collectionGrid>article>div:first-child>div:first-child>p { clear:both; padding-top:12px; line-height:1.75; }.collectionGrid>article>div:first-child>div:last-child { grid-column:1/-1; display:flex; flex-direction:row; justify-content:space-between; align-items:center; margin-top:auto; }
+.collectionGrid>article>div:first-child>div:first-child>h3 { min-height:48px; display:flex; align-items:center; }
+.sectionNav a[aria-current] { color:#963d27; border-color:#963d27; }.sectionNav { border-color:#d9ddd6; }
+@media(max-width:950px) { .collectionGrid { grid-template-columns:1fr; }.pageHeading>svg { display:none; } }

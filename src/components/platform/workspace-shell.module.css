@@ -30,3 +30,7 @@
   .navigation a { flex-direction:column; padding:10px 0; gap:5px; font-size:10px; }
   .navigation svg { display:block; }
 }
+/* Flat application surfaces; typography and borders provide hierarchy. */
+.shell { background:#fcfcf8; }.header { background:#fcfcf8; }.shell main h1 { font-size:34px; }.shell main { padding-bottom:48px; }.shell :focus-visible { outline-color:#97432b; }
+@media(max-width:800px) { .shell main h1 { font-size:28px; } }
+@media(max-width:800px) { .sidebar { padding-top:12px; }.sidebar>a { font-size:21px; margin-bottom:10px; }.navigation { padding-bottom:8px; }.navigation a { padding-block:8px; }.header { min-height:44px; }.shell main>header { padding-top:20px; padding-bottom:20px; }.shell main>header p { font-size:12px; line-height:1.65; }.shell main>header h1 { font-size:26px; } }

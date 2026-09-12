@@ -52,7 +52,7 @@ test('workspace navigation uses private sections and agent-scoped content', asyn
   await page.getByRole('navigation',{name:'Workspace navigation'}).getByRole('link',{name:'Evidence',exact:true}).click();
   await expect(page.getByText('owner-one/repo',{exact:true})).toBeVisible();
   await page.getByLabel('Agent',{exact:true}).selectOption(second.id);
-  await expect(page.getByRole('heading',{name:'No execution history yet'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'No repository research runs yet'})).toBeVisible();
   await expect(page.getByText('owner-one/repo',{exact:true})).toHaveCount(0);
   await expect(page.getByText('Follow the work.',{exact:false})).toHaveCount(0);
 });

@@ -1,6 +1,38 @@
-.page { padding-bottom:60px; }.heading { padding:48px 0 30px; }.heading h1 { font-size:38px; letter-spacing:-.035em; }.heading p { margin-top:16px; color:#606060; max-width:70ch; font-size:15px; line-height:1.7; }
-.toolbar { display:flex; gap:20px; align-items:end; padding:24px 0; border-top:1px solid #ddd; margin-bottom:10px; }.toolbar label { flex:1; max-width:400px; font-size:13px; }.toolbar select { display:block; width:100%; margin-top:8px; min-height:46px; border:1px solid #ccc; border-radius:8px; background:#fff; padding:10px 12px; }.toolbar button { margin-left:auto; }.results { margin-top:26px; }.results>details { margin-bottom:16px; }
-@media(max-width:760px) { .heading { padding-top:32px; }.heading h1 { font-size:32px; }.toolbar { flex-wrap:wrap; gap:16px; }.toolbar label { min-width:100%; max-width:none; }.toolbar button { margin-left:0; } }
-
-.toolbar { padding:16px 0; gap:16px; margin-bottom:0; }.toolbar label { max-width:320px; }.toolbar label:nth-child(2) { max-width:220px; }.results { margin-top:16px; }
-@media(max-width:760px) { .toolbar label { min-width:0; max-width:none; flex:1 1 150px; }.toolbar label:nth-child(2) { max-width:none; }.toolbar button { width:auto; } }
+.page { padding-bottom:60px; }
+.heading { display:flex; justify-content:space-between; align-items:center; gap:28px; padding:40px 0 28px; }
+.heading h1 { font-size:38px; letter-spacing:-.035em; }
+.heading p { margin-top:12px; color:#606060; max-width:70ch; font-size:15px; line-height:1.7; }
+.toolbar { display:flex; gap:16px; align-items:end; padding:16px 0; border-top:1px solid #ddd; border-bottom:1px solid #ddd; }
+.toolbar label { flex:1; max-width:360px; font-size:13px; }
+.toolbar select,.filter select { display:block; width:100%; margin-top:8px; min-height:44px; border:1px solid #c8ceca; border-radius:4px; background:#fff; padding:10px 12px; color:#232a27; }
+.toolbar button { margin-left:auto; }
+.sources { min-width:0; }
+.indexNote { margin:0 0 16px; font-size:12px; color:#606860; }
+.indexNote summary { width:fit-content; cursor:pointer; padding:8px 0; }
+.indexNote summary:focus-visible { outline:2px solid #2457db; outline-offset:3px; }
+.indexNote p { margin:6px 0 12px; max-width:85ch; }
+.research { padding-top:28px; margin-top:28px; border-top:1px solid #d9dedb; }
+.research h2 { font-size:22px; letter-spacing:-.025em; }
+.filter { flex:0 0 210px; font-size:12px; color:#606860; }
+.results { margin-top:16px; }
+.results>details { margin-bottom:12px; }
+.empty { padding:24px 0; }
+.empty h3 { font-size:16px; }
+.empty p { color:#606860; font-size:14px; margin:10px 0; line-height:1.6; }
+@media(max-width:760px) {
+  .heading { padding:20px 0; gap:16px; align-items:flex-start; }
+  .heading p { font-size:13px; line-height:1.5; margin-top:10px; }
+  .heading>svg { width:64px; height:48px; }
+  .heading h1 { font-size:27px; }
+  .toolbar { flex-wrap:nowrap; gap:10px; padding:12px 0; }
+  .toolbar label { min-width:0; max-width:none; flex:1; }
+  .toolbar button { flex-shrink:0; margin-left:0; padding:10px 14px; font-size:12px; min-height:44px; }
+  .sources .resource { padding:18px 0; background:transparent; }
+  .resource .resourceHeading { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:10px; margin-bottom:10px; }
+  .resourceHeading>div { display:contents; }
+  .resourceHeading h2 { font-size:21px; align-self:center; }
+  .resourceHeading p { grid-column:1/-1; grid-row:2; font-size:12px; margin:0; }
+  .resourceHeading button { grid-column:2; grid-row:1; padding:10px 14px; font-size:12px; min-height:44px; }
+  .indexNote { margin-bottom:0; }
+  .filter { flex:1 1 160px; max-width:100%; }
+}

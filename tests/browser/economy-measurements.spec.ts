@@ -39,3 +39,31 @@ test('closed-day assessed productivity and velocity remain visible beside pendin
  await page.goto((process.env.WORKSPACE_TEST_URL||'http://127.0.0.1:3100')+'/app/economy');await expect(page.getByRole('region',{name:'Production accounting metrics',exact:true})).toContainText('After UTC close and output assessment');
  await page.getByText('Previous closed UTC day',{exact:true}).click();const region=page.getByRole('region',{name:'Closed-day economics'});await expect(region.getByRole('row').filter({hasText:'Productivity'})).toContainText('250%');await expect(region.getByRole('row').filter({hasText:'Money velocity'})).toContainText('1.25×');await expect(region.getByRole('row').filter({hasText:'Gross Agent Product'})).toContainText('0.00075 USDC');
 });
+
+test('stale finalized snapshots are labeled stale, and refresh failure keeps measured values',async({page})=>{
+ await page.route('**/api/**',route=>{const path=new URL(route.request().url()).pathname;if(path==='/api/economy'&&route.request().method()==='POST')return route.fulfill({status:503,json:{error:'RPC temporarily unavailable'}});return route.fulfill({json:path==='/api/account'?{user:{id:'fixture',address:a('2')},configured:true}:path==='/api/economy'?{status:'indexed',snapshot,freshness:{status:'stale',caughtUp:true,indexAgeSeconds:900,chainAgeSeconds:900}}:{agents:[],services:[]}});});
+ await page.goto((process.env.WORKSPACE_TEST_URL||'http://127.0.0.1:3100')+'/app/economy');await expect(page.getByText('Data stale',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Refresh data',exact:true}).click();await expect(page.locator('main').getByRole('alert')).toContainText('RPC temporarily unavailable');await expect(page.getByRole('region',{name:'Measured economy activity',exact:true})).toContainText('0.005 USDC');
+});
+
+test('a new UTC day explains empty totals and switches to existing lifetime activity',async({page})=>{
+ const rollover=structuredClone(snapshot);rollover.measurements.today={...rollover.measurements.today,settlementCount:0,deliveredCount:0,acknowledgedCount:0,grossPaymentsAtomic:'0',sellerRevenueAtomic:'0',refundAtomic:'0'};
+ await page.route('**/api/**',route=>route.fulfill({json:new URL(route.request().url()).pathname==='/api/account'?{user:{id:'fixture',address:a('2')},configured:true}:new URL(route.request().url()).pathname==='/api/economy'?{status:'indexed',snapshot:rollover}:{agents:[],services:[]}}));
+ await page.goto((process.env.WORKSPACE_TEST_URL||'http://127.0.0.1:3100')+'/app/economy');await page.getByRole('button',{name:'See all 5 earlier payments'}).click();await expect(page.getByLabel('Activity period')).toHaveValue('lifetime');await expect(page.getByRole('region',{name:'Measured economy activity',exact:true})).toContainText('0.005 USDC');
+});
+
+test('slow refresh serializes polling and retains the latest update',async({page})=>{
+ await page.clock.install();let release:()=>void=()=>{};let calls=0;const gate=new Promise<void>(resolve=>{release=resolve;});
+ await page.route('**/api/**',async route=>{const path=new URL(route.request().url()).pathname;if(path==='/api/economy'){calls++;if(route.request().method()==='POST'){await gate;return route.fulfill({json:{status:'indexed',snapshot:{...snapshot,blockNumber:'102'},freshness:{status:'fresh'}}});}return route.fulfill({json:{status:'indexed',snapshot,freshness:{status:'fresh'}}});}return route.fulfill({json:path==='/api/account'?{user:{id:'fixture',address:a('2')},configured:true}:{agents:[],services:[]}});});
+ await page.goto((process.env.WORKSPACE_TEST_URL||'http://127.0.0.1:3100')+'/app/economy');await expect(page.getByRole('heading',{name:'Measured economy',exact:true})).toBeVisible();const before=calls;await page.getByRole('button',{name:'Refresh data',exact:true}).click();await expect.poll(()=>calls).toBe(before+1);await page.clock.fastForward(60000);expect(calls).toBe(before+1);release();await expect(page.getByRole('link',{name:'102 (opens explorer in a new tab)',exact:true})).toBeVisible();
+});
+
+test('missing basket component and unavailable balances stay readable without invented values',async({page})=>{
+ const partial=structuredClone(snapshot);partial.measurements.prices.components=[];partial.measurements.capital.totalAtomic=null;partial.measurements.capital.todayTurnoverBps=null;partial.measurements.activity.utilizationBps=null;
+ await page.route('**/api/**',route=>route.fulfill({json:new URL(route.request().url()).pathname==='/api/account'?{user:{id:'fixture',address:a('2')},configured:true}:new URL(route.request().url()).pathname==='/api/economy'?{status:'indexed',snapshot:partial}:{agents:[],services:[]}}));
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));await page.goto((process.env.WORKSPACE_TEST_URL||'http://127.0.0.1:3100')+'/app/economy');await expect(page.getByRole('region',{name:'Resource basket and purchasing power',exact:true})).toContainText('Awaiting measurement');await expect(page.locator('main')).not.toContainText('NaN');expect(errors).toEqual([]);
+});
+
+test('the public economy shortcut reaches the authenticated workspace',async({page})=>{
+ await page.route('**/api/**',route=>route.fulfill({json:new URL(route.request().url()).pathname==='/api/account'?{user:{id:'fixture',address:a('2')},configured:true}:new URL(route.request().url()).pathname==='/api/economy'?{status:'indexed',snapshot}:{agents:[],services:[]}}));
+ await page.goto((process.env.WORKSPACE_TEST_URL||'http://127.0.0.1:3100')+'/economy');await expect(page).toHaveURL(/\/app\/economy$/);await expect(page.getByRole('heading',{name:'Measured economy',exact:true})).toBeVisible();
+});

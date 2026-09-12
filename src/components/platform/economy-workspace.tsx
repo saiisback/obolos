@@ -6,6 +6,7 @@ import {ArrowUpRight, RefreshCw} from 'lucide-react';
 import {formatUnits, keccak256, toHex} from 'viem';
 import type {EconomyMeasurements} from '@/lib/economy/measurements';
 import {EconomyMeasurementsView} from './economy-measurements';
+import {WorkspaceGlyph} from './workspace-glyph';
 import {EconomyAccounting} from './economy-accounting';
 import type {EconomyMetrics} from '@/lib/economy/model';
 import {api, errorMessage} from './api';
@@ -30,7 +31,7 @@ type Snapshot = {
   policyHistory: {version: string; actionHash: string; observationHash: string; actor: string; approvalDigest: string; transactionHash: string}[];
   observations?: {observationHash: string; metricId: string; windowStart: string; windowEnd: string; value: string; baseline: string; inputRoot: string; methodologyHash: string; transactionHash: string}[];
 };
-type EconomyResponse = {status: 'not_deployed' | 'awaiting_index' | 'indexed'; snapshot: Snapshot | null};
+type EconomyResponse = {status: 'not_deployed' | 'awaiting_index' | 'indexed'; snapshot: Snapshot | null; freshness?: {status: 'fresh' | 'stale' | 'catching_up' | 'awaiting_index'}};
 
 function decimal(value: Integer | null | undefined, places: number, suffix = '') {
   return value == null ? 'Unavailable' : `${formatUnits(BigInt(value), places)}${suffix}`;
@@ -118,23 +119,38 @@ export function EconomyWorkspace() {
 
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true); setError('');
-    void api<EconomyResponse>('/api/economy', {signal: controller.signal, method:attempt?'POST':'GET'}).then(value => {
-      if (!controller.signal.aborted) setResult(value);
-    }).catch(caught => {if (!controller.signal.aborted) setError(errorMessage(caught));})
-      .finally(() => {if (!controller.signal.aborted) setLoading(false);});
-    return () => controller.abort();
+    let inFlight = false;
+    async function refresh(manual = false) {
+      if (inFlight || controller.signal.aborted) return;
+      inFlight = true; setLoading(true); setError('');
+      try {
+        const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(manual ? 65000 : 15000)]);
+        const value = await api<EconomyResponse>('/api/economy', {signal, method: manual ? 'POST' : 'GET'});
+        if (!controller.signal.aborted) setResult(value);
+      } catch (caught) {
+        if (!controller.signal.aborted) setError(caught instanceof Error && caught.name === 'TimeoutError' ? 'The refresh timed out. Your saved snapshot remains available; try again.' : errorMessage(caught));
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+        inFlight = false;
+      }
+    }
+    void refresh(attempt > 0);
+    const timer = window.setInterval(() => {if (!document.hidden) void refresh();}, 60000);
+    const visible = () => {if (!document.hidden) void refresh();};
+    document.addEventListener('visibilitychange', visible);
+    return () => {controller.abort(); window.clearInterval(timer); document.removeEventListener('visibilitychange', visible);};
   }, [attempt]);
 
-  useEffect(()=>{const controller=new AbortController();const timer=window.setInterval(()=>{void api<EconomyResponse>('/api/economy',{signal:controller.signal}).then(value=>{if(!controller.signal.aborted){setResult(value);setError('');}}).catch(caught=>{if(!controller.signal.aborted)setError(errorMessage(caught));});},60000);return()=>{window.clearInterval(timer);controller.abort();};},[]);
-
   const snapshot = result?.snapshot;
+  const stale = result?.freshness?.status === 'stale';
+  const freshLabel = error ? 'Refresh failed · saved snapshot' : stale ? 'Data stale' : snapshot?.caughtUp ? 'Finalized snapshot' : 'Index catching up';
   return <main id="main" className={`${s.main} ${e.page}`}>
-    <header className={e.heading}><div><h1>Economy</h1><p>Resource prices, spending rules and the evidence behind agent payments.</p></div><button className={s.secondary} onClick={() => setAttempt(value => value + 1)} disabled={loading}><RefreshCw size={15} aria-hidden="true"/>{loading ? 'Refreshing…' : 'Refresh data'}</button></header>
+    <header className={e.heading}><div><h1>Economy</h1><p>Resource prices, spending rules and the evidence behind agent payments.</p></div><WorkspaceGlyph kind="economy"/><button className={s.secondary} onClick={() => setAttempt(value => value + 1)} disabled={loading}><RefreshCw size={15} aria-hidden="true"/>{loading ? 'Refreshing…' : 'Refresh data'}</button></header>
     <WorkspaceSections current={section} label="Economy sections" items={[{id: 'prices', label: 'Prices & activity'}, {id: 'rules', label: 'Spending rules'}, {id: 'settlements', label: 'Settlements'}]}/>
     {error && <div className={e.error} role="alert"><h2>Economy data could not be refreshed</h2><p>{error}</p>{snapshot && <p>The last loaded snapshot remains below. Use Refresh data to try again.</p>}</div>}
     {loading && !result ? <p className={e.empty} role="status">Loading finalized economy evidence…</p> : !snapshot && result ? <section className={e.startState}><h2>{result.status === 'not_deployed' ? 'The economy contracts are not deployed yet' : 'Waiting for the first indexed snapshot'}</h2><p>{result.status === 'not_deployed' ? 'On-chain prices, spending rules and allocations will appear after the Arc testnet deployment is configured and indexed.' : 'The deployment is configured. Its finalized transactions must be indexed before this workspace can show measurements.'}</p><p>Missing evidence is unavailable; it is not zero economic activity.</p><Link className={s.secondary} href="/app/marketplace">Browse the marketplace</Link></section> : snapshot ? <>
-      <div className={e.provenance}><span className={snapshot.caughtUp ? e.status : e.pending}>{snapshot.caughtUp ? 'Finalized snapshot' : 'Index catching up'}</span><span>Block <Explorer value={snapshot.blockNumber} kind="block">{snapshot.blockNumber}</Explorer></span><span>Chain time {date(snapshot.chainTimestamp)}</span><span>Loaded index {new Date(snapshot.indexedAt).toISOString().replace('T', ' ').replace(/\.\d+Z$/, ' UTC')}</span></div>
+      <div className={e.provenance}><span className={snapshot.caughtUp && !stale && !error ? e.status : e.pending}>{freshLabel}</span><span>Block <Explorer value={snapshot.blockNumber} kind="block">{snapshot.blockNumber}</Explorer></span><details className={e.sourceStamp}><summary>Snapshot times · checks every minute</summary><p>Chain time {date(snapshot.chainTimestamp)}<br/>Loaded index {new Date(snapshot.indexedAt).toISOString().replace('T', ' ').replace(/\.\d+Z$/, ' UTC')}</p></details></div>
+      {stale && <p className={e.note} role="status">This snapshot is more than ten minutes behind. Values are retained for reference; refresh before relying on current activity.</p>}
       {!snapshot.caughtUp && <p className={e.note} role="status">The index has not reached the latest finalized block. These measurements cover the indexed history only.</p>}
       <section id="prices" hidden={section !== 'prices'}>{section === 'prices' && <Prices snapshot={snapshot}/>}</section>
       <section id="rules" hidden={section !== 'rules'}>{section === 'rules' && <Rules snapshot={snapshot}/>}</section>
