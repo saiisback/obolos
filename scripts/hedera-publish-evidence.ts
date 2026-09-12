@@ -11,17 +11,24 @@ import {buildProfilePayload,buildPaymentAuditPayload,verifyHcsAnchor,verifyAudit
 import {validateSchedulePlan,validateScheduledProof} from '../src/lib/hedera/commerce';
 import {validateEvidence} from '../src/lib/integrations/hedera';
 import {validateRepos} from '../src/lib/repository-service';
+import {a2aConfiguration,verifyA2AOffer,type A2AConfig,type A2AOffer} from '../src/lib/hedera/a2a';
 const account=z.string().regex(/^0\.0\.[1-9]\d*$/);
 const txId=z.string().regex(/^0\.0\.[1-9]\d*@\d{10,}\.\d{1,9}(?:\?scheduled)?$/);
 const positive=z.number().int().positive().max(Number.MAX_SAFE_INTEGER);
 const receiptSchema=z.object({requestId:z.string().min(1).max(200),mode:z.literal('live'),network:z.literal('hedera:testnet'),asset:z.literal('HBAR'),amountAtomic:positive,units:z.number().int().min(1).max(3),provider:z.enum(['repo-standard','repo-economy']),status:z.literal('settled'),timestamp:z.iso.datetime({offset:true}),transactionId:txId});
-const a2aSchema=z.object({status:z.literal('completed'),offer:z.object({offerId:z.string().min(1).max(120),paymentRequestId:z.string().min(1).max(200),payer:account,payTo:account,providerId:z.enum(['repo-standard','repo-economy']),amountAtomic:positive,repos:z.array(z.string()).min(1).max(3)}),result:z.object({offerId:z.string(),payer:account,receipt:receiptSchema,evidence:z.unknown()})});
+const a2aSchema=z.object({status:z.literal('completed'),offer:z.object({offerToken:z.string().min(1).max(12000)}).passthrough(),result:z.object({offerId:z.string(),contextId:z.string(),resourceUrl:z.string(),payer:account,receipt:receiptSchema,evidence:z.unknown()})});
 const tokenSchema=z.object({status:z.literal('settled'),transactionId:txId,input:z.object({requestId:z.string().min(1).max(200),repos:z.array(z.string()).min(1).max(3),terms:z.object({asset:account,payer:account,payTo:account,amountAtomic:positive})}),result:z.object({status:z.literal('settled'),requestId:z.string(),transactionId:txId,network:z.literal('hedera:testnet'),asset:account,payer:account,payTo:account,amountAtomic:positive,evidence:z.unknown()})});
 export interface HederaPublicationPaths {identityServiceFile:string;identityBuyerFile?:string;a2aFile?:string;htsFile?:string;schedulesFile?:string;scheduledResultsFile?:string;auditFile?:string;auditPaymentFile?:string;replaceRelease?:boolean}
+export interface HederaPublicationVerification {a2aConfig?:A2AConfig;readServicePayment?:(transactionId:string)=>Promise<unknown>}
 export interface PreparedHederaPublication {identityService:NonNullable<PublicHederaEvidence['identityService']>;identityBuyer?:NonNullable<PublicHederaEvidence['identityBuyer']>;release:NonNullable<PublicHederaEvidence['release']>}
 async function localJson(filename:string):Promise<unknown> {const content=await readFile(path.resolve(filename),'utf8');if(Buffer.byteLength(content)>5*1024*1024)throw Error('Local evidence artifact is oversized.');return JSON.parse(content);}
 async function mirrorJson(url:string):Promise<unknown> {const response=await fetch(url,{redirect:'error',signal:AbortSignal.timeout(15000)});if(!response.ok)throw Error('Public mirror proof is unavailable.');return response.json();}
 const mirror='https://testnet.mirrornode.hedera.com/api/v1';
+function canonicalContent(value:unknown):unknown {
+ if(Array.isArray(value))return value.map(canonicalContent);
+ if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).sort(([a],[b])=>a.localeCompare(b)).map(([key,entry])=>[key,canonicalContent(entry)]));
+ return value;
+}
 const digest=(value:unknown)=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 async function verifiedIdentity(filename:string):Promise<NonNullable<PublicHederaEvidence['identityService']>> {
  const identity=publicHederaEvidence({identityService:await localJson(filename)}).identityService;
@@ -31,22 +38,34 @@ async function verifiedIdentity(filename:string):Promise<NonNullable<PublicHeder
 function auditInput(identity:HederaAgentIdentity,input:{transactionId:string;asset:string;amountAtomic:number;payer:string;payTo:string;requestId:string;evidence:unknown}):PaymentAuditInput {
  return {uaid:identity.uaid,paymentTransactionId:input.transactionId,network:'hedera:2',asset:input.asset,amountAtomic:String(input.amountAtomic),payer:input.payer,payTo:input.payTo,requestId:input.requestId,evidenceDigest:digest(input.evidence)};
 }
+async function readServicePayment(transactionId:string):Promise<unknown> {
+ if(!process.env.DATABASE_URL)throw Error('A2A publication requires the service settlement database.');
+ const db=new pg.Client({connectionString:process.env.DATABASE_URL,connectionTimeoutMillis:15000});await db.connect();
+ try{const result=await db.query('SELECT transaction_id,state,offer_id,offer_request_key,provider_id,repos,amount_atomic,asset,settlement,evidence FROM platform_service_payments WHERE transaction_id=$1',[transactionId]);return result.rows[0];}finally{await db.end();}
+}
+function verifyServiceAssociation(value:unknown,offer:A2AOffer,transactionId:string,evidence:unknown):void {
+ const row=z.object({transaction_id:txId,state:z.literal('settled'),offer_id:z.string(),offer_request_key:z.string(),provider_id:z.string(),repos:z.array(z.string()),amount_atomic:positive,asset:z.literal('0.0.0'),settlement:z.object({success:z.literal(true),network:z.literal('hedera:testnet'),payer:account,transaction:z.string()}),evidence:z.unknown()}).parse(value);
+ if(transactionId.endsWith('?scheduled')||row.transaction_id.endsWith('?scheduled')||row.settlement.transaction.endsWith('?scheduled')||normalizeHcsTransactionId(row.transaction_id)!==normalizeHcsTransactionId(transactionId)||row.offer_id!==offer.offerId||row.offer_request_key!==`${offer.payer}:${offer.requestId}`||row.provider_id!==offer.providerId||JSON.stringify(row.repos)!==JSON.stringify(offer.repos)||row.amount_atomic!==offer.amountAtomic||row.settlement.payer!==offer.payer||normalizeHcsTransactionId(row.settlement.transaction)!==normalizeHcsTransactionId(transactionId)||digest(canonicalContent(validateEvidence(row.evidence,offer.repos)))!==digest(canonicalContent(evidence)))throw Error('A2A service settlement does not bind the authenticated offer and delivered resource.');
+}
 /** Verify all supplied artifacts first. Only explicit public schemas leave this function. */
-export async function prepareHederaPublication(paths:HederaPublicationPaths):Promise<PreparedHederaPublication> {
+export async function prepareHederaPublication(paths:HederaPublicationPaths,verification:HederaPublicationVerification={}):Promise<PreparedHederaPublication> {
  if(Boolean(paths.schedulesFile)!==Boolean(paths.scheduledResultsFile)||Boolean(paths.auditFile)!==Boolean(paths.auditPaymentFile))throw Error('Schedule and audit artifacts must be paired.');
  const identityService=await verifiedIdentity(paths.identityServiceFile),identityBuyer=paths.identityBuyerFile?await verifiedIdentity(paths.identityBuyerFile):undefined;
  const release:NonNullable<PublicHederaEvidence['release']>={checkedAt:new Date().toISOString()};
  const purchaseIdentity=identityBuyer??identityService;
+ const confirmedPurchases:PaymentAuditInput[]=[];
  if(paths.a2aFile){
-  const entry=a2aSchema.parse(await localJson(paths.a2aFile)),{offer,result}=entry,{receipt}=result,repos=validateRepos(offer.repos),evidence=validateEvidence(result.evidence,repos);
-  if(result.offerId!==offer.offerId||result.payer!==offer.payer||receipt.requestId!==offer.paymentRequestId||receipt.provider!==offer.providerId||receipt.units!==repos.length||receipt.amountAtomic!==offer.amountAtomic)throw Error('A2A result differs from its completed accepted offer.');
-  await verifyAuditPayment(auditInput(purchaseIdentity,{transactionId:receipt.transactionId,asset:'HBAR',amountAtomic:receipt.amountAtomic,payer:offer.payer,payTo:offer.payTo,requestId:receipt.requestId,evidence}));
+  const entry=a2aSchema.parse(await localJson(paths.a2aFile)),{result}=entry,offer=verifyA2AOffer(entry.offer.offerToken,verification.a2aConfig??a2aConfiguration(),true),{receipt}=result,repos=validateRepos(offer.repos),evidence=validateEvidence(result.evidence,repos);
+  if(Object.entries(offer).some(([key,value])=>JSON.stringify(entry.offer[key])!==JSON.stringify(value))||result.offerId!==offer.offerId||result.contextId!==offer.contextId||result.resourceUrl!==offer.resourceUrl||result.payer!==offer.payer||receipt.requestId!==offer.paymentRequestId||receipt.provider!==offer.providerId||receipt.units!==repos.length||receipt.amountAtomic!==offer.amountAtomic)throw Error('A2A result differs from its authenticated completed accepted offer.');
+  verifyServiceAssociation(await (verification.readServicePayment??readServicePayment)(receipt.transactionId),offer,receipt.transactionId,evidence);
+  const confirmed=auditInput(purchaseIdentity,{transactionId:receipt.transactionId,asset:'HBAR',amountAtomic:receipt.amountAtomic,payer:offer.payer,payTo:offer.payTo,requestId:receipt.requestId,evidence});
+  await verifyAuditPayment(confirmed);confirmedPurchases.push(confirmed);
   release.a2a={offerId:result.offerId,receipt};
  }
  if(paths.htsFile){
   const entry=tokenSchema.parse(await localJson(paths.htsFile)),{input,result}=entry,evidence=validateEvidence(result.evidence,validateRepos(input.repos));
   if(result.transactionId!==entry.transactionId||result.requestId!==input.requestId||result.asset!==input.terms.asset||result.payer!==input.terms.payer||result.payTo!==input.terms.payTo||result.amountAtomic!==input.terms.amountAtomic)throw Error('Token result differs from its recorded exact purchase terms.');
-  await verifyAuditPayment(auditInput(purchaseIdentity,{...result,evidence}));
+  const confirmed=auditInput(purchaseIdentity,{...result,evidence});await verifyAuditPayment(confirmed);confirmedPurchases.push(confirmed);
   release.hts={transactionId:result.transactionId,asset:result.asset,amountAtomic:result.amountAtomic,payer:result.payer,payTo:result.payTo};
  }
  if(paths.schedulesFile&&paths.scheduledResultsFile){
@@ -62,7 +81,7 @@ export async function prepareHederaPublication(paths:HederaPublicationPaths):Pro
    const transfer=await mirrorJson(`${mirror}/transactions/${normalizeHcsTransactionId(ref.scheduledTransactionId)}?scheduled=true`);
    validateScheduledProof(schedule,transfer,plan,ref.round,ref.scheduleId);
    const amountAtomic=plan.unitPriceAtomic*plan.repos.length;
-   await verifyAuditPayment(auditInput(purchaseIdentity,{transactionId:ref.scheduledTransactionId,asset:'HBAR',amountAtomic,payer:plan.payer,payTo:plan.payTo,requestId:plan.id+':'+ref.round,evidence:saved.evidence}));
+   const confirmed=auditInput(purchaseIdentity,{transactionId:ref.scheduledTransactionId,asset:'HBAR',amountAtomic,payer:plan.payer,payTo:plan.payTo,requestId:plan.id+':'+ref.round,evidence:saved.evidence});await verifyAuditPayment(confirmed);confirmedPurchases.push(confirmed);
    const proof={scheduleId:ref.scheduleId,consensusTimestamp:schedule.executed_timestamp!,payer:plan.payer,payTo:plan.payTo,amountAtomic,network:'hedera:testnet' as const,asset:'HBAR' as const,round:ref.round};
    // Compare server delivery proof with independently recovered consensus data, excluding unknown fields.
    const parsed=publicHederaEvidence({release:{checkedAt:release.checkedAt,schedules:[{scheduleId:ref.scheduleId,transactionId:ref.scheduledTransactionId,proof:saved.proof}]}}).release?.schedules?.[0]?.proof;
@@ -72,6 +91,7 @@ export async function prepareHederaPublication(paths:HederaPublicationPaths):Pro
  }
  if(paths.auditFile&&paths.auditPaymentFile){
   const saved=z.object({result:z.unknown()}).parse(await localJson(paths.auditFile)),payment=z.object({uaid:z.string(),paymentTransactionId:txId,network:z.literal('hedera:2'),asset:z.string(),amountAtomic:z.string(),payer:account,payTo:account,requestId:z.string(),evidenceDigest:z.string()}).parse(await localJson(paths.auditPaymentFile));
+  if(!confirmedPurchases.some(source=>Object.entries(source).every(([key,value])=>key==='paymentTransactionId'?normalizeHcsTransactionId(String(value))===normalizeHcsTransactionId(payment.paymentTransactionId)&&String(value).endsWith('?scheduled')===payment.paymentTransactionId.endsWith('?scheduled'):payment[key as keyof typeof payment]===value)))throw Error('Audit payload does not bind a supplied verified purchase and its actual evidence digest.');
   const identity=[identityService,identityBuyer].find(id=>id?.uaid===payment.uaid);
   if(!identity)throw Error('Audit references an identity absent from this verified publication.');
   const anchor=publicHederaEvidence({release:{checkedAt:release.checkedAt,audit:saved.result}}).release?.audit;
