@@ -4,7 +4,8 @@ import {canonicalJsonHash,validateServiceDefinition,type ServiceDefinition} from
 import {createTaskPlan,type TaskPlan} from './model';
 
 export const PLANNER_ENDPOINT='https://api.openai.com/v1/chat/completions';
-export const PLANNER_MODEL='gpt-5-nano-2025-08-07';
+export const PLANNER_MODEL='gpt-5-nano';
+export const PLANNER_RESPONSE_MODEL='gpt-5-nano-2025-08-07';
 export interface PlannerProfile {serviceHash:string;title:string;description:string;tags:string[];examples:unknown[]}
 export interface PlannerContext {instruction:string;budgetAtomic:string;services:readonly ServiceDefinition[];profiles:readonly PlannerProfile[]}
 export type PlannerResult={kind:'plan';plan:TaskPlan;raw:{summary:string;steps:{serviceHash:string;input:unknown}[]}}|{kind:'blocked';reason:string};
@@ -43,7 +44,7 @@ export async function planGeneralTask(context:PlannerContext,apiKey:string,trans
   const response=await transport(PLANNER_ENDPOINT,{method:'POST',redirect:'error',signal:AbortSignal.timeout(60000),headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body:JSON.stringify({model:PLANNER_MODEL,store:false,max_completion_tokens:4000,reasoning_effort:'minimal',response_format:{type:'json_object'},messages:[{role:'system',content:SYSTEM},{role:'user',content}]})});
   body=await readBoundedJson(response,64*1024);
  }catch{throw Error('Planning inference unavailable; retry the task without changing its budget.');}
- const parsed=z.object({model:z.literal(PLANNER_MODEL),choices:z.array(z.object({finish_reason:z.literal('stop'),message:z.object({content:z.string().min(1).max(32000)})})).length(1)}).safeParse(body);
+ const parsed=z.object({model:z.literal(PLANNER_RESPONSE_MODEL),choices:z.array(z.object({finish_reason:z.literal('stop'),message:z.object({content:z.string().min(1).max(32000)})})).length(1)}).safeParse(body);
  if(!parsed.success)throw Error('Planning inference returned incomplete or unpinned output');
  try{return parsePlannerOutput(JSON.parse(parsed.data.choices[0].message.content),context);}catch{throw Error('Planning inference returned an invalid or unsupported service plan');}
 }
