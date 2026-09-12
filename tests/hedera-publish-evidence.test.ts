@@ -3,8 +3,8 @@ import {mkdtemp,writeFile,rm,readFile} from 'node:fs/promises';
 import path from 'node:path';
 import {tmpdir} from 'node:os';
 import {createHash,createHmac} from 'node:crypto';
-const dbState=vi.hoisted(()=>({row:undefined as Record<string,unknown>|undefined}));
-vi.mock('pg',()=>({default:{Client:class{async connect(){}async end(){}async query(){return {rows:dbState.row?[dbState.row]:[]};}}}}));
+const dbState=vi.hoisted(()=>({row:undefined as Record<string,unknown>|undefined,payments:{} as Record<string,Record<string,unknown>>,delivery:undefined as Record<string,unknown>|undefined}));
+vi.mock('pg',()=>({default:{Client:class{async connect(){}async end(){}async query(text:string,values:unknown[]=[]){const row=text.includes('platform_scheduled_deliveries')?dbState.delivery:dbState.row?.transaction_id===values[0]?dbState.row:dbState.payments[String(values[0])];return {rows:row?[row]:[]};}}}}));
 import {canonicalAgentData,createUaid} from '../src/lib/hedera/identity';
 import {buildProfilePayload} from '../src/lib/hedera/audit';
 import {prepareHederaPublication} from '../scripts/hedera-publish-evidence';
@@ -26,6 +26,7 @@ async function fixture(){const dir=await mkdtemp(path.join(tmpdir(),'hedera-publ
  vi.stubEnv('A2A_PUBLIC_URL','https://obolos.app/');vi.stubEnv('DATA_SERVICE_PUBLIC_URL','https://obolos.app/x402/');vi.stubEnv('HEDERA_PAY_TO','0.0.789');vi.stubEnv('A2A_OFFER_SECRET','test-private-offer-secret-0123456789');vi.stubEnv('DATABASE_URL','postgresql://test.invalid/publication-fixture');
  const payload={version:1,contextId:'offer-context',requestId:'PRIVATE_REQUEST',payer:'0.0.123',providerId:'repo-standard',repos:['octocat/Hello-World'],resourceUrl:'https://obolos.app/x402/evidence/repo-standard',unitPriceAtomic:100,amountAtomic:100,maxAmountAtomic:100,mandateExpiresAt:'2026-09-12T00:01:00.000Z',issuedAt:'2026-09-12T00:00:00.000Z',expiresAt:'2026-09-12T00:00:30.000Z',network:'hedera:testnet',asset:'0.0.0',payTo:'0.0.789'};
  const body=Buffer.from(JSON.stringify(payload)).toString('base64url'),offerId=createHash('sha256').update(JSON.stringify(payload)).digest('hex'),offer={...payload,offerId,paymentRequestId:'a2a:'+offerId,offerToken:body+'.'+createHmac('sha256',process.env.A2A_OFFER_SECRET!).update(body).digest('base64url')};
+ dbState.payments={};dbState.delivery=undefined;
  const transactionId='0.0.123@1789190002.000000001';
  const receipt={requestId:offer.paymentRequestId,mode:'live',network:'hedera:testnet',asset:'HBAR',amountAtomic:100,units:1,provider:'repo-standard',status:'settled',timestamp:'2026-09-13T00:00:00Z',transactionId};
  dbState.row={transaction_id:transactionId,state:'settled',offer_id:offerId,offer_request_key:'0.0.123:PRIVATE_REQUEST',provider_id:'repo-standard',repos:payload.repos,amount_atomic:100,asset:'0.0.0',settlement:{success:true,network:'hedera:testnet',payer:'0.0.123',transaction:transactionId},evidence};
@@ -46,6 +47,7 @@ it('verifies finite scheduled deliveries and excludes their private plan and rep
  const {dir,paths}=await fixture();mirror();const baseFetch=globalThis.fetch;
  const plan={id:'11111111-1111-4111-8111-111111111111',payer:'0.0.123',payTo:'0.0.789',repos:['octocat/Hello-World'],unitPriceAtomic:100,count:1,intervalSeconds:30,firstExecutionAt:new Date(1789190010*1000).toISOString(),maxTotalAtomic:100};
  const scheduledTransactionId='0.0.123@1789190003.000000001?scheduled',proof={scheduleId:'0.0.777',consensusTimestamp:'1789190010.000000001',payer:plan.payer,payTo:plan.payTo,amountAtomic:100,network:'hedera:testnet',asset:'HBAR',round:0};
+ dbState.delivery={schedule_id:proof.scheduleId,fingerprint:createHash('sha256').update(JSON.stringify([plan,0])).digest('hex'),state:'delivered',evidence,proof};
  const schedulesFile=path.join(dir,'schedules.json'),scheduledResultsFile=path.join(dir,'results.json');
  await writeFile(schedulesFile,JSON.stringify({plan,schedules:[{round:0,scheduleId:'0.0.777',transactionId:'0.0.123@1789190004.000000001',scheduledTransactionId}]}));
  await writeFile(scheduledResultsFile,JSON.stringify([{round:0,scheduleId:'0.0.777',scheduledTransactionId,evidence,proof}]));
@@ -56,26 +58,34 @@ it('verifies finite scheduled deliveries and excludes their private plan and rep
   return baseFetch(url);
  });
  try{const prepared=await prepareHederaPublication({...paths,schedulesFile,scheduledResultsFile});expect(prepared.release.schedules).toEqual([{scheduleId:'0.0.777',transactionId:scheduledTransactionId,proof}]);expect(JSON.stringify(prepared)).not.toContain(plan.id);expect(JSON.stringify(prepared)).not.toContain('RAW PRIVATE REPORT');
+  const delivered=dbState.delivery!;for(const change of [{state:'pending'},{fingerprint:'ab'.repeat(32)},{evidence:[{...evidence[0],description:'different resource'}]},{proof:{...proof,amountAtomic:101}}]){dbState.delivery={...delivered,...change};await expect(prepareHederaPublication({...paths,schedulesFile,scheduledResultsFile})).rejects.toThrow();}dbState.delivery=delivered;
   await writeFile(scheduledResultsFile,'[]');await expect(prepareHederaPublication({...paths,schedulesFile,scheduledResultsFile})).rejects.toThrow();
  }finally{await rm(dir,{recursive:true,force:true});}
 });
 it('verifies token settlement and exact public audit payload while stripping operator journals',async()=>{
  const {dir,paths}=await fixture();mirror();const baseFetch=globalThis.fetch;
+ const buyerCanonical=canonicalAgentData({...canonical,name:'Buyer'}),buyerAnchor={...anchor,topicId:'0.0.457',transactionId:'0.0.123@1789190008.000000001',consensusTimestamp:'1789190009.000000001',mirrorUrl:'https://testnet.mirrornode.hedera.com/api/v1/topics/0.0.457/messages/1'},buyerIdentity={...identity,canonical:buyerCanonical,uaid:createUaid(buyerCanonical),topicId:'0.0.457',profileAnchor:buyerAnchor},identityBuyerFile=path.join(dir,'buyer.json');
+ await writeFile(identityBuyerFile,JSON.stringify(buyerIdentity));
  const transactionId='0.0.123@1789190005.000000001',terms={asset:'0.0.888',payer:'0.0.123',payTo:'0.0.789',amountAtomic:1};
  const htsFile=path.join(dir,'hts.json'),auditFile=path.join(dir,'audit.json'),auditPaymentFile=path.join(dir,'audit-payment.json');
- await writeFile(htsFile,JSON.stringify({status:'settled',transactionId,input:{requestId:'PRIVATE HTS REQUEST',repos:['octocat/Hello-World'],terms},result:{status:'settled',requestId:'PRIVATE HTS REQUEST',transactionId,network:'hedera:testnet',...terms,evidence},signedBytes:'PRIVATE SIGNED AUTH'}));
+ await writeFile(htsFile,JSON.stringify({status:'settled',transactionId,input:{requestId:'PRIVATE HTS REQUEST',providerId:'repo-standard',unitPriceAtomic:1,repos:['octocat/Hello-World'],terms},result:{status:'settled',requestId:'PRIVATE HTS REQUEST',transactionId,network:'hedera:testnet',...terms,units:1,evidence},signedBytes:'PRIVATE SIGNED AUTH'}));
+ dbState.payments[transactionId]={transaction_id:transactionId,state:'settled',provider_id:'repo-standard',repos:['octocat/Hello-World'],amount_atomic:1,asset:terms.asset,settlement:{success:true,network:'hedera:testnet',payer:terms.payer,transaction:transactionId},evidence};
  const auditPayment={uaid:identity.uaid,paymentTransactionId:transactionId,network:'hedera:2',asset:terms.asset,amountAtomic:'1',payer:terms.payer,payTo:terms.payTo,requestId:'PRIVATE HTS REQUEST',evidenceDigest:createHash('sha256').update(JSON.stringify(evidence)).digest('hex')};
  const auditAnchor={...anchor,transactionId:'0.0.123@1789190006.000000001',sequenceNumber:'2',consensusTimestamp:'1789190007.000000001',mirrorUrl:'https://testnet.mirrornode.hedera.com/api/v1/topics/0.0.456/messages/2'};
  await writeFile(auditFile,JSON.stringify({result:auditAnchor,signedBytes:'PRIVATE SIGNED AUTH'}));await writeFile(auditPaymentFile,JSON.stringify({...auditPayment,privateKey:'PRIVATE RING KEY'}));
  vi.stubGlobal('fetch',async(url:string)=>{
   const root='https://testnet.mirrornode.hedera.com/api/v1';
+  if(url===root+'/topics/0.0.457')return Response.json({topic_id:'0.0.457',deleted:false,submit_key:{_type:'ED25519',key:identity.submitKey.key}});
+  if(url===buyerAnchor.mirrorUrl)return Response.json({topic_id:'0.0.457',sequence_number:1,consensus_timestamp:buyerAnchor.consensusTimestamp,message:Buffer.from(buildProfilePayload(buyerIdentity)).toString('base64'),chunk_info:null});
+  if(url===root+'/transactions/0.0.123-1789190008-000000001')return Response.json({transactions:[{transaction_id:'0.0.123-1789190008-000000001',name:'CONSENSUSSUBMITMESSAGE',result:'SUCCESS',scheduled:false,entity_id:'0.0.457',consensus_timestamp:buyerAnchor.consensusTimestamp}]});
   if(url===root+'/transactions/0.0.123-1789190005-000000001?scheduled=false')return Response.json({transactions:[{transaction_id:'0.0.123-1789190005-000000001',name:'CRYPTOTRANSFER',result:'SUCCESS',scheduled:false,transfers:[],token_transfers:[{token_id:terms.asset,account:terms.payer,amount:-1},{token_id:terms.asset,account:terms.payTo,amount:1}]}]});
   if(url===auditAnchor.mirrorUrl)return Response.json({topic_id:'0.0.456',sequence_number:2,consensus_timestamp:auditAnchor.consensusTimestamp,message:Buffer.from(buildPaymentAuditPayload(auditPayment)).toString('base64'),chunk_info:null});
   if(url===root+'/transactions/0.0.123-1789190006-000000001')return Response.json({transactions:[{transaction_id:'0.0.123-1789190006-000000001',name:'CONSENSUSSUBMITMESSAGE',result:'SUCCESS',scheduled:false,entity_id:'0.0.456',consensus_timestamp:auditAnchor.consensusTimestamp}]});
   return baseFetch(url);
  });
- try{const prepared=await prepareHederaPublication({...paths,htsFile,auditFile,auditPaymentFile});expect(prepared.release.hts).toEqual({transactionId,...terms});expect(prepared.release.audit).toEqual(auditAnchor);
-  for(const change of [{requestId:'unrelated-request'},{evidenceDigest:'ab'.repeat(32)},{amountAtomic:'2'},{asset:'0.0.999'}]){await writeFile(auditPaymentFile,JSON.stringify({...auditPayment,...change}));await expect(prepareHederaPublication({...paths,htsFile,auditFile,auditPaymentFile})).rejects.toThrow('supplied verified purchase');}
+ try{const prepared=await prepareHederaPublication({...paths,identityBuyerFile,htsFile,auditFile,auditPaymentFile});expect(prepared.release.hts).toEqual({transactionId,...terms});expect(prepared.release.audit).toEqual(auditAnchor);
+  for(const change of [{requestId:'unrelated-request'},{evidenceDigest:'ab'.repeat(32)},{amountAtomic:'2'},{asset:'0.0.999'}]){await writeFile(auditPaymentFile,JSON.stringify({...auditPayment,...change}));await expect(prepareHederaPublication({...paths,identityBuyerFile,htsFile,auditFile,auditPaymentFile})).rejects.toThrow('supplied verified purchase');}
+  const settled=dbState.payments[transactionId];for(const change of [{state:'pending'},{asset:'0.0.999'},{amount_atomic:2},{provider_id:'repo-economy'},{evidence:[{...evidence[0],description:'different token delivery'}]}]){dbState.payments[transactionId]={...settled,...change};await expect(prepareHederaPublication({...paths,identityBuyerFile,htsFile})).rejects.toThrow();}dbState.payments[transactionId]=settled;
   for(const secret of ['PRIVATE HTS REQUEST','PRIVATE SIGNED AUTH','PRIVATE RING KEY','RAW PRIVATE REPORT'])expect(JSON.stringify(prepared)).not.toContain(secret);
  }finally{await rm(dir,{recursive:true,force:true});}
 });
