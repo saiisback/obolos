@@ -9,6 +9,7 @@ import { sql } from './db';
 import { appOrigin, readJson } from './http';
 import {hederaTokenConfig,scheduledRepositoryRequest} from './hedera-commerce';
 import {verifyA2AOffer,type A2AOffer} from '../hedera/a2a';
+import {normalizeTransactionId,validateSettlement} from '../integrations/hedera';
 
 let resourceServer: Promise<x402ResourceServer> | undefined;
 function server() {
@@ -107,7 +108,7 @@ export async function publicDataRequest(req:NextRequest,path:string[]) {
     if(payload.x402Version!==2||payload.resource?.url!==resource.url||!accepted||['scheme','network','asset','amount','payTo','maxTimeoutSeconds'].some(key=>accepted[key as keyof typeof accepted]!==requirements[key as keyof typeof requirements])||accepted.extra?.feePayer!==requirements.extra.feePayer)
       return json({error:'Payment terms changed; fetch a fresh quote.'},402,{'PAYMENT-REQUIRED':encodePaymentRequiredHeader(challenge)});
     const verified=await service.verifyPayment(payload,requirements);
-    if(!verified.isValid)return json({error:'Payment verification failed.'},402);
+    if(!verified.isValid||typeof verified.payer!=='string'||!/^0\.0\.[1-9]\d*$/.test(verified.payer))return json({error:'Payment verification failed or native payer is unproven.'},402);
     if(offer&&verified.payer!==offer.payer)return json({error:'Payment payer differs from negotiated offer.'},402);
     let evidence;
     try{evidence=await fetchRepoEvidence(repos,process.env.GITHUB_TOKEN);}catch{return json({error:'GitHub evidence unavailable; payment was not submitted.'},502);}
@@ -124,6 +125,10 @@ export async function publicDataRequest(req:NextRequest,path:string[]) {
     const settlement=await service.settlePayment(payload,requirements);
     const responseHeader={'PAYMENT-RESPONSE':encodePaymentResponseHeader(settlement)};
     if(!settlement.success||!settlement.transaction||settlement.network!==HEDERA_NETWORK)return json({error:'Settlement failed or uncertain; reconcile before retrying.'},502,responseHeader);
+    try{
+      validateSettlement(settlement,verified.payer);
+      if(normalizeTransactionId(settlement.transaction)!==normalizeTransactionId(transactionId))throw Error('Settlement transaction mismatch.');
+    }catch{return json({error:'Settlement identity is unproven; reconcile the reserved original transaction before retrying.'},502,responseHeader);}
     await sql()`UPDATE platform_service_payments SET state='settled',settlement=${JSON.stringify(settlement)}::jsonb,evidence=${JSON.stringify(evidence)}::jsonb,settled_at=now() WHERE transaction_id=${transactionId} AND state='pending'`;
     return json({evidence,quote},200,responseHeader);
   } catch {

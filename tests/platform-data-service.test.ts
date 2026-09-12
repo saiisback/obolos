@@ -23,13 +23,13 @@ vi.mock('../src/lib/repository-service',async(importOriginal)=>{
 import { publicDataRequest } from '../src/lib/platform/data-service';
 const endpoint='https://obolos.app/x402/evidence/repo-standard';
 function request(repos=['octocat/Hello-World'],signature?:string){return new NextRequest(endpoint,{method:'POST',headers:{'content-type':'application/json',...(signature?{'payment-signature':signature}:{})},body:JSON.stringify({repos})});}
-async function signedRequest(){
-  const unpaid=await publicDataRequest(request(),['evidence','repo-standard']);
+async function signedRequest(path=['evidence','repo-standard']){
+  const unpaid=await publicDataRequest(request(),path);
   const challenge=decodePaymentRequiredHeader(unpaid.headers.get('payment-required')!);
   const payload={x402Version:2,resource:challenge.resource,accepted:challenge.accepts[0],payload:{transaction:Buffer.from('test-transaction').toString('base64')}};
   return {payload,signature:encodePaymentSignatureHeader(payload)};
 }
-beforeEach(()=>{state.intents.clear();state.updates=0;state.verify.mockReset().mockResolvedValue({isValid:true});state.settle.mockReset().mockResolvedValue({success:true,network:'hedera:testnet',transaction:'0.0.7162784@1788900000.123456789'});vi.stubEnv('APP_ORIGIN','https://obolos.app');vi.stubEnv('HEDERA_PAY_TO','0.0.10425234');});
+beforeEach(()=>{state.intents.clear();state.updates=0;state.verify.mockReset().mockResolvedValue({isValid:true,payer:'0.0.777'});state.settle.mockReset().mockResolvedValue({success:true,payer:'0.0.777',network:'hedera:testnet',transaction:'0.0.7162784@1788900000.123456789'});vi.stubEnv('APP_ORIGIN','https://obolos.app');vi.stubEnv('HEDERA_PAY_TO','0.0.10425234');});
 afterEach(()=>vi.unstubAllEnvs());
 describe('native metered Hedera service',()=>{
   it('offers explicitly metered HTS terms without changing the native HBAR route',async()=>{
@@ -62,4 +62,12 @@ describe('native metered Hedera service',()=>{
     expect((await publicDataRequest(request(undefined,signature),['evidence','repo-standard'])).status).toBe(409);
     expect(state.settle).toHaveBeenCalledTimes(1);expect(state.updates).toBe(0);
   });
+  it.each([{transaction:'0.0.7162784@1788900001.123456789'},{payer:'0.0.888'},{payer:undefined}])('does not mark a mismatched successful settlement %j as paid',async mutation=>{
+    const {signature}=await signedRequest();state.settle.mockResolvedValueOnce({success:true,payer:'0.0.777',network:'hedera:testnet',transaction:'0.0.7162784@1788900000.123456789',...mutation});
+    expect((await publicDataRequest(request(undefined,signature),['evidence','repo-standard'])).status).toBe(502);expect(state.updates).toBe(0);expect(state.intents.size).toBe(1);
+    expect((await publicDataRequest(request(undefined,signature),['evidence','repo-standard'])).status).toBe(409);expect(state.settle).toHaveBeenCalledTimes(1);
+  });
+  it('does not dispatch payment without a verified native payer',async()=>{const {signature}=await signedRequest();state.verify.mockResolvedValueOnce({isValid:true});expect((await publicDataRequest(request(undefined,signature),['evidence','repo-standard'])).status).toBe(402);expect(state.settle).not.toHaveBeenCalled();expect(state.intents.size).toBe(0);});
+  it('preserves the reserved HTS intent when settlement payer differs',async()=>{const path=['hts','evidence','repo-standard'],{signature}=await signedRequest(path);state.settle.mockResolvedValueOnce({success:true,payer:'0.0.888',network:'hedera:testnet',transaction:'0.0.7162784@1788900000.123456789'});expect((await publicDataRequest(request(undefined,signature),path)).status).toBe(502);expect(state.updates).toBe(0);expect(state.intents.size).toBe(1);});
+  it('accepts normalized mirror-format identity for the exact signed native transaction',async()=>{const {signature}=await signedRequest();state.settle.mockResolvedValueOnce({success:true,payer:'0.0.777',network:'hedera:testnet',transaction:'0.0.7162784-1788900000-123456789'});expect((await publicDataRequest(request(undefined,signature),['evidence','repo-standard'])).status).toBe(200);expect(state.updates).toBe(1);});
 });
