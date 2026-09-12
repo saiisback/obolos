@@ -185,7 +185,7 @@ export async function updateRunnerTask(agentId: string, taskId: string, value: u
       status = 'completed';
     }
   }
-  const updated = await db`UPDATE platform_tasks SET status=${status},plan=${JSON.stringify(plan)}::jsonb,plan_hash=${planHash},step_results=${JSON.stringify(results)}::jsonb,error=${error},claim_until=now()+interval '2 minutes',revision=revision+1,updated_at=now() WHERE id=${taskId} AND agent_id=${agentId} AND claim_token=${input.claimToken} AND revision=${row.revision} RETURNING *`;
+  const updated = await db`UPDATE platform_tasks SET status=${status},plan=${plan == null ? null : JSON.stringify(plan)}::jsonb,plan_hash=${planHash},step_results=${JSON.stringify(results)}::jsonb,error=${error},claim_until=now()+interval '2 minutes',revision=revision+1,updated_at=now() WHERE id=${taskId} AND agent_id=${agentId} AND claim_token=${input.claimToken} AND revision=${row.revision} RETURNING *`;
   if (!updated[0]) throw fail('The task changed concurrently. Read it and retry the same update.');
   return publicTask(updated[0]);
 }

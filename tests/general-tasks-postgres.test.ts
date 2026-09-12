@@ -107,6 +107,19 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)('general tasks in isolated Postg
     const unrelated = await newTask();
     await expect(listRunnerTasks(unrelated.agentId, {taskId: task.id})).rejects.toMatchObject({code: 'TASK_NOT_FOUND'});
   });
+  it.each(['No registered video generation provider is available.', 'Private planning inference is unavailable.'])('persists a pre-plan block and retries the same unpaid task: %s', async reason => {
+    const task = await newTask(), claim = (await claimTask(task.agentId, {action: 'claim', workerId: 'planner'}))!;
+    const blocked = await updateRunnerTask(task.agentId, task.id, {action: 'blocked', claimToken: claim.claimToken, error: reason});
+    expect(blocked).toMatchObject({id: task.id, status: 'blocked', plan: null, planHash: null, approvedPlanHash: null, error: reason, steps: []});
+    const persisted = (await pool.query('SELECT plan IS NULL AS no_plan,plan_hash IS NULL AS no_hash FROM platform_tasks WHERE id=$1', [task.id])).rows[0];
+    expect(persisted).toEqual({no_plan: true, no_hash: true});
+    expect((await updateRunnerTask(task.agentId, task.id, {action: 'blocked', claimToken: claim.claimToken, error: reason})).status).toBe('blocked');
+    expect((await updateTask(owner, task.id, {action: 'retry'}))).toMatchObject({id: task.id, status: 'queued', plan: null, planHash: null});
+    const retried = (await claimTask(task.agentId, {action: 'claim', workerId: 'planner'}))!;
+    const proposed = await updateRunnerTask(task.agentId, task.id, {action: 'plan', claimToken: retried.claimToken, plan: {summary: 'Translate text using an available provider.', steps: [{serviceHash: service.serviceHash, input: {text: 'Hello'}}]}});
+    expect(proposed).toMatchObject({id: task.id, status: 'needs_approval', approvedPlanHash: null});
+    expect((await pool.query('SELECT count(*) FROM economy_orders WHERE platform_agent_id=$1', [task.agentId])).rows[0].count).toBe('0');
+  });
   it('uses exclusive planning claims and rejects stale or tampered owner approvals', async () => {
     const task = await newTask();
     const claims = await Promise.all(['one', 'two'].map(workerId => claimTask(task.agentId, {action: 'claim', workerId})));
