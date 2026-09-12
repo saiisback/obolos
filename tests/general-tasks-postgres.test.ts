@@ -154,10 +154,20 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)('general tasks in isolated Postg
     expect(result.steps[0].output).toEqual(output);
     expect((await updateRunnerTask(task.agentId, task.id, {action: 'complete', claimToken: claim.claimToken})).status).toBe('completed');
   });
+  it('does not claim an expired approval that never started and leaves it cancellable', async () => {
+    const {task} = await planned();
+    await pool.query("UPDATE platform_tasks SET status='approved',approved_plan_hash=plan_hash,approval_expires_at=now()-interval '1 minute',claim_until=NULL WHERE id=$1", [task.id]);
+    expect(await claimTask(task.agentId, {action: 'claim', workerId: 'private-executor'})).toBeNull();
+    expect(await claimTask(task.agentId, {action: 'claim', workerId: 'another-host'})).toBeNull();
+    const row = (await pool.query('SELECT status,execution_worker FROM platform_tasks WHERE id=$1', [task.id])).rows[0];
+    expect(row).toEqual({status: 'approved', execution_worker: null});
+    expect((await updateTask(owner, task.id, {action: 'cancel'})).status).toBe('cancelled');
+  });
   it('recovers verified paid delivery after expiry without renewing the approved plan or moving execution hosts', async () => {
     const {task} = await planned();
-    // Seed an approval that has aged out; the application cannot extend it after approval.
-    await pool.query("UPDATE platform_tasks SET status='approved',approved_plan_hash=plan_hash,approval_expires_at=now()-interval '1 minute',claim_until=NULL WHERE id=$1", [task.id]);
+    // Seed an already-started execution whose approval and lease have aged out.
+    await pool.query("UPDATE platform_tasks SET status='running',approved_plan_hash=plan_hash,approval_expires_at=now()-interval '1 minute',execution_worker='private-executor',claim_worker='private-executor',claim_phase='execute',claim_until=now()-interval '1 minute' WHERE id=$1", [task.id]);
+    expect(await claimTask(task.agentId, {action: 'claim', workerId: 'another-host'})).toBeNull();
     const claim = (await claimTask(task.agentId, {action: 'claim', workerId: 'private-executor'}))!;
     const expiry = claim.task.approvalExpiresAt;
     const orderId = await paidOrder(claim.task, 0);

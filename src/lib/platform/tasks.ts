@@ -92,11 +92,13 @@ export async function claimTask(agentId: string, value: unknown) {
   const token = randomBytes(32).toString('hex');
   // SKIP LOCKED + conditional row update prevent two hosts owning the same claim.
   // An execution host is pinned forever: expiry never authorizes another payment journal.
+  // Expired approvals without a prior execution host stay unclaimed and cancellable.
   const rows = await sql()`WITH candidate AS (
     SELECT t.id FROM platform_tasks t JOIN platform_agents a ON a.id=t.agent_id AND a.user_id=t.user_id
     WHERE t.agent_id=${agentId} AND (
       (t.status IN ('queued','planning') AND (t.claim_until IS NULL OR t.claim_until<now() OR t.claim_worker=${workerId})) OR
       (t.status IN ('approved','running') AND (t.execution_worker IS NULL OR t.execution_worker=${workerId}) AND
+       (t.execution_worker IS NOT NULL OR t.approval_expires_at>now()) AND
        (t.claim_until IS NULL OR t.claim_until<now() OR t.claim_worker=${workerId}))
     ) ORDER BY CASE WHEN t.claim_worker=${workerId} THEN 0 ELSE 1 END,t.created_at,t.id FOR UPDATE OF t SKIP LOCKED LIMIT 1
   ) UPDATE platform_tasks t SET
