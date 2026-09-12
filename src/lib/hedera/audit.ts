@@ -23,13 +23,25 @@ export function buildPaymentAuditPayload(input:PaymentAuditInput):string {
  return compact({p:'obolos.hcs-payment',v:1,uaid:input.uaid,transactionId:input.paymentTransactionId,network:input.network,asset:input.asset,amountAtomic:input.amountAtomic,payer:input.payer,payTo:input.payTo,requestHash:createHash('sha256').update(input.requestId).digest('hex'),evidenceDigest:input.evidenceDigest});
 }
 export function validateMirrorTopic(value:unknown,expected:{topicId?:string;submitKey:HcsSubmitKey}):void {
- const topic=value as {topic_id?:string;deleted?:boolean;submit_key?:HcsSubmitKey};
- if(!expected.topicId||!topicPattern.test(expected.topicId)||topic?.topic_id!==expected.topicId||topic.deleted!==false||!['ED25519','ECDSA_SECP256K1'].includes(expected.submitKey.type)||!(expected.submitKey.type==='ED25519'?/^[a-f0-9]{64}$/i:/^[a-f0-9]{66}$/i).test(expected.submitKey.key)||topic.submit_key?.type!==expected.submitKey.type||topic.submit_key?.key?.toLowerCase()!==expected.submitKey.key.toLowerCase())throw Error('Mirror topic is not bound to the expected restricted submit key.');
+ const topic=value as {topic_id?:string;deleted?:boolean;submit_key?:{type?:string;_type?:string;key?:string}};
+ if(!expected.topicId||!topicPattern.test(expected.topicId)||topic?.topic_id!==expected.topicId||topic.deleted!==false||!['ED25519','ECDSA_SECP256K1'].includes(expected.submitKey.type)||!(expected.submitKey.type==='ED25519'?/^[a-f0-9]{64}$/i:/^[a-f0-9]{66}$/i).test(expected.submitKey.key)||(topic.submit_key?._type??topic.submit_key?.type)!==expected.submitKey.type||Boolean(topic.submit_key?._type&&topic.submit_key?.type&&topic.submit_key._type!==topic.submit_key.type)||topic.submit_key?.key?.toLowerCase()!==expected.submitKey.key.toLowerCase())throw Error('Mirror topic is not bound to the expected restricted submit key.');
+}
+interface MirrorChunkInfo {initial_transaction_id?:string|{account_id?:string;transaction_valid_start?:string;nonce?:number|null;scheduled?:boolean};number?:number;total?:number;nonce?:number|null;scheduled?:boolean}
+function singleChunkMatches(chunk:MirrorChunkInfo|null|undefined,transactionId?:string):boolean {
+ if(!chunk)return true;
+ if(chunk.total!==1||chunk.number!==1||chunk.scheduled===true||Boolean(chunk.nonce))return false;
+ const initial=chunk.initial_transaction_id;let initialId:string;
+ if(typeof initial==='string')initialId=initial;
+ else {
+  if(!initial||typeof initial.account_id!=='string'||!topicPattern.test(initial.account_id)||typeof initial.transaction_valid_start!=='string'||!timestampPattern.test(initial.transaction_valid_start)||initial.scheduled===true||Boolean(initial.nonce))return false;
+  initialId=`${initial.account_id}@${initial.transaction_valid_start}`;
+ }
+ try{const normalized=normalizeHcsTransactionId(initialId);return !scheduledId(initialId)&&(!transactionId||normalized===normalizeHcsTransactionId(transactionId));}catch{return false;}
 }
 export function validateMirrorTopicMessage(value:unknown,expected:{topicId:string;sequenceNumber?:string;consensusTimestamp?:string;transactionId?:string;payload:string}):{sequenceNumber:string;consensusTimestamp:string} {
- const message=value as {topic_id?:string;sequence_number?:number|string;consensus_timestamp?:string;message?:string;chunk_info?:{initial_transaction_id?:string;number?:number;total?:number;nonce?:number;scheduled?:boolean}|null};
+ const message=value as {topic_id?:string;sequence_number?:number|string;consensus_timestamp?:string;message?:string;chunk_info?:MirrorChunkInfo|null};
  const sequenceNumber=String(message?.sequence_number),consensusTimestamp=message?.consensus_timestamp??'';
- if(message?.topic_id!==expected.topicId||typeof message.sequence_number==='number'&&!Number.isSafeInteger(message.sequence_number)||!topicPattern.test(expected.topicId)||!/^\d+$/.test(sequenceNumber)||BigInt(sequenceNumber)<1n||!timestampPattern.test(consensusTimestamp)||expected.sequenceNumber&&sequenceNumber!==expected.sequenceNumber||expected.consensusTimestamp&&consensusTimestamp!==expected.consensusTimestamp||typeof message.message!=='string'||message.chunk_info&&(message.chunk_info.total!==1||message.chunk_info.number!==1||message.chunk_info.scheduled===true||Boolean(message.chunk_info.nonce)||typeof message.chunk_info.initial_transaction_id!=='string'||expected.transactionId&&message.chunk_info.initial_transaction_id!==normalizeHcsTransactionId(expected.transactionId))||Buffer.from(message.message,'base64').toString('base64')!==message.message||!Buffer.from(message.message,'base64').equals(Buffer.from(expected.payload,'utf8')))throw Error('Mirror message does not prove the exact bound HCS payload.');
+ if(message?.topic_id!==expected.topicId||typeof message.sequence_number==='number'&&!Number.isSafeInteger(message.sequence_number)||!topicPattern.test(expected.topicId)||!/^\d+$/.test(sequenceNumber)||BigInt(sequenceNumber)<1n||!timestampPattern.test(consensusTimestamp)||expected.sequenceNumber&&sequenceNumber!==expected.sequenceNumber||expected.consensusTimestamp&&consensusTimestamp!==expected.consensusTimestamp||typeof message.message!=='string'||!singleChunkMatches(message.chunk_info,expected.transactionId)||Buffer.from(message.message,'base64').toString('base64')!==message.message||!Buffer.from(message.message,'base64').equals(Buffer.from(expected.payload,'utf8')))throw Error('Mirror message does not prove the exact bound HCS payload.');
  return {sequenceNumber,consensusTimestamp};
 }
 export function validateMirrorHcsTransaction(value:unknown,expected:{topicId:string;transactionId:string;consensusTimestamp:string}):void {

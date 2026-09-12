@@ -83,3 +83,13 @@ it('allows only independently identified native payer fees and scheduled identit
  expect(()=>validateConfirmedAuditPayment({transactions:[tx]},scheduled)).toThrow();
  expect(()=>validateConfirmedAuditPayment({transactions:[{...tx,scheduled:true}]},payment)).toThrow();
 });
+
+it('verifies current live mirror key and single-chunk transaction object schemas',()=>{
+ const submitKey={type:'ECDSA_SECP256K1' as const,key:'02482fd151ea15e70f787272c9bbd101d677f772c9c6e232e166179b55e51de950'};
+ const topicId='0.0.10507462',transactionId='0.0.10413599@1789238201.419043115',payload='{"public":"profile"}';
+ expect(()=>validateMirrorTopic({topic_id:topicId,deleted:false,submit_key:{_type:submitKey.type,key:submitKey.key}},{topicId,submitKey})).not.toThrow();
+ const message={topic_id:topicId,sequence_number:1,consensus_timestamp:'1789238208.945806750',message:Buffer.from(payload).toString('base64'),chunk_info:{initial_transaction_id:{account_id:'0.0.10413599',transaction_valid_start:'1789238201.419043115',nonce:0,scheduled:false},number:1,total:1}};
+ expect(()=>validateMirrorTopicMessage(message,{topicId,transactionId,payload})).not.toThrow();
+ for(const change of [{account_id:'0.0.999'},{transaction_valid_start:'1789238200.419043115'},{nonce:1},{scheduled:true}])expect(()=>validateMirrorTopicMessage({...message,chunk_info:{...message.chunk_info,initial_transaction_id:{...message.chunk_info.initial_transaction_id,...change}}},{topicId,transactionId,payload})).toThrow();
+ expect(()=>validateMirrorTopic({topic_id:topicId,deleted:false,submit_key:{_type:'ED25519',type:submitKey.type,key:submitKey.key}},{topicId,submitKey})).toThrow();
+});
