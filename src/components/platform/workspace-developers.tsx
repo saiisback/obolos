@@ -6,11 +6,12 @@ import { api, errorMessage, type Agent } from './api';
 import {WorkspaceSections, useWorkspaceSection} from './workspace-sections';
 import { Credentials } from './agent-credentials';
 import { CodeBlock } from './code-block';
+import { HederaIntegrations } from './hedera-integrations';
 import s from './platform.module.css';
 import d from './workspace-developers.module.css';
 
 export function WorkspaceDevelopers() {
-  const section = useWorkspaceSection(['credentials', 'integration', 'runner', 'selling'], 'credentials');
+  const section = useWorkspaceSection(['credentials', 'integration', 'runner', 'selling', 'hedera'], 'credentials');
   const [agents, setAgents] = useState<Agent[]>([]);
   const [selectedId, setSelectedId] = useState('');
   const [loading, setLoading] = useState(true);
@@ -54,10 +55,10 @@ export OBOLOS_API_KEY` : '';
 
   return <main id="main" className={`${s.main} ${d.page}`}>
     <header className={d.heading}>
-      <div><h1>API credentials</h1><p>Manage your agents’ access and connect your integration.</p></div>
+      <div><h1>{section === 'hedera' ? 'Hedera integrations' : 'API credentials'}</h1><p>{section === 'hedera' ? 'Inspect public service connections and testnet payment evidence.' : 'Manage your agents’ access and connect your integration.'}</p></div>
     </header>
-    <WorkspaceSections current={section} label="Developer sections" items={[{id:'credentials',label:'API credentials'},{id:'integration',label:'API examples'},{id:'runner',label:'Runner setup'},{id:'selling',label:'Sell an API'}]}/>
-    <div hidden={section === 'runner' || section === 'selling'}>
+    <WorkspaceSections current={section} label="Developer sections" items={[{id:'credentials',label:'API credentials'},{id:'integration',label:'API examples'},{id:'runner',label:'Runner setup'},{id:'selling',label:'Sell an API'},{id:'hedera',label:'Hedera'}]}/>
+    <div hidden={section === 'runner' || section === 'selling' || section === 'hedera'}>
     {loading ? <div className={s.empty} role="status">Loading your agents…</div> : error ? <div className={s.error} role="alert"><p>{error}</p><button className={s.secondary} onClick={load}>Retry loading agents</button></div> : agents.length === 0 ? <div className={s.empty}><h2>Create an agent to get started</h2><p>Credentials belong to an agent. Create one in your workspace, then issue a key here.</p><Link className={s.primary} href="/app">Create an agent</Link></div> : selected ? <>
       <div className={d.selection}>
         <label htmlFor="credentials-agent">Agent<select aria-label="Agent" id="credentials-agent" value={selectedId} onChange={event => setSelectedId(event.target.value)}>{agents.map(agent => <option key={agent.id} value={agent.id}>{agent.name}</option>)}</select></label>
@@ -75,6 +76,7 @@ export OBOLOS_API_KEY` : '';
       </section>
     </> : null}
     </div>
+    <section hidden={section !== 'hedera'} id="hedera">{section === 'hedera' && <HederaIntegrations />}</section>
     <section hidden={section !== 'selling'} id="selling" className={d.runner}>
       <h2>Sell work from your own agent</h2>
       <p>Publish a public HTTPS endpoint in <Link href="/app/marketplace#seller-heading">your seller desk</Link>. Select <strong>My agent / API endpoint</strong>, choose an owned agent as the publishing identity, and set a price in test USDC. The signed-in owner wallet receives payment.</p>

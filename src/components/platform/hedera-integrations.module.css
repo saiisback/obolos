@@ -1,0 +1,22 @@
+.view { display:grid; gap:32px; max-width:1000px; padding-top:8px; }
+.intro h2 { font-size:21px; letter-spacing:-.02em; }
+.view p { max-width:76ch; margin:12px 0; color:#555; font-size:14px; line-height:1.75; }
+.view a { color:#111; text-decoration:underline; text-underline-offset:4px; overflow-wrap:anywhere; }
+.links { display:flex; flex-wrap:wrap; gap:12px 24px; margin-top:16px; font-size:13px; }
+.section { display:grid; grid-template-columns:minmax(160px,1fr) minmax(0,2.6fr); gap:32px; border-top:1px solid #ddd; padding-top:24px; }
+.section h3 { font-size:18px; letter-spacing:-.02em; }
+.section h4 { font-size:14px; font-weight:600; margin-bottom:12px; }
+.section>div { min-width:0; }
+.identity+.identity { border-top:1px solid #e7e7e7; padding-top:24px; margin-top:24px; }
+.detail { display:grid; grid-template-columns:minmax(100px,140px) minmax(0,1fr); gap:10px 16px; margin-top:16px; font-size:13px; line-height:1.7; }
+.detail dt { color:#666; }
+.detail dd { margin:0; overflow-wrap:anywhere; }
+.detail code { font-size:12px; overflow-wrap:anywhere; }
+.status { font-size:12px!important; color:#555!important; margin-top:0!important; }
+.proofList { list-style:none; padding:0; display:grid; gap:20px; }
+.proofList li { border-top:1px solid #e7e7e7; padding-top:16px; }
+.proofList li:first-child { border-top:0; padding-top:0; }
+.error { color:#a22424!important; }
+.retry { min-height:44px; padding:10px 16px; border:1px solid #ccc; border-radius:8px; background:white; font:inherit; cursor:pointer; }
+.retry:focus-visible,.view a:focus-visible { outline:3px solid #2457db; outline-offset:4px; }
+@media(max-width:800px) { .section { grid-template-columns:minmax(0,1fr); gap:16px; }.detail { grid-template-columns:minmax(80px,100px) minmax(0,1fr); }.view { gap:28px; } }
