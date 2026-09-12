@@ -72,7 +72,7 @@ export async function recoverHcsAnchor(topicId:string,transactionId:string,paylo
 /** Anchoring is permitted only after independently proving the exact settlement identity and amounts. */
 export function validateConfirmedAuditPayment(value:unknown,input:PaymentAuditInput):void {
  buildPaymentAuditPayload(input);
- const body=value as {transactions?:{transaction_id?:string;result?:string;name?:string;scheduled?:boolean;payer_account_id?:string;charged_tx_fee?:number;transfers?:{account:string;amount:number}[];token_transfers?:{token_id:string;account:string;amount:number}[]}[]};
+ const body=value as {transactions?:{transaction_id?:string;result?:string;name?:string;scheduled?:boolean;charged_tx_fee?:number;transfers?:{account:string;amount:number}[];token_transfers?:{token_id:string;account:string;amount:number}[]}[]};
  const transactionId=normalizeHcsTransactionId(input.paymentTransactionId),amount=BigInt(input.amountAtomic);
  const matches=body?.transactions?.some(tx=>{
   if(tx.transaction_id!==transactionId||tx.result!=='SUCCESS'||tx.name!=='CRYPTOTRANSFER'||Boolean(tx.scheduled)!==scheduledId(input.paymentTransactionId))return false;
@@ -81,7 +81,9 @@ export function validateConfirmedAuditPayment(value:unknown,input:PaymentAuditIn
   if(input.asset==='HBAR'&&tx.token_transfers?.length)return false;
   if(input.asset!=='HBAR'&&(tx.token_transfers?.some(t=>t.token_id!==input.asset||![input.payer,input.payTo].includes(t.account))))return false;
   const payerDebit=transfers.filter(t=>t.account===input.payer).reduce((sum,t)=>sum+BigInt(t.amount),0n),payeeCredit=transfers.filter(t=>t.account===input.payTo).reduce((sum,t)=>sum+BigInt(t.amount),0n);
-  const payerFee=input.asset==='HBAR'&&tx.payer_account_id===input.payer&&Number.isSafeInteger(tx.charged_tx_fee)&&tx.charged_tx_fee!>=0?BigInt(tx.charged_tx_fee!):0n;
+  // The transaction ID's initial account pays the native transaction fee; mirror transaction rows have no payer_account_id.
+  const feePayer=/^(0\.0\.[1-9]\d*)-\d{10,}-\d{1,9}$/.exec(transactionId)?.[1];
+  const payerFee=input.asset==='HBAR'&&feePayer===input.payer&&Number.isSafeInteger(tx.charged_tx_fee)&&tx.charged_tx_fee!>=0?BigInt(tx.charged_tx_fee!):0n;
   return payerDebit===-amount-payerFee&&payeeCredit===amount;
  });
  if(!matches)throw Error('Payment audit requires the exact independently confirmed transfer.');

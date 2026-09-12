@@ -74,10 +74,10 @@ it('accepts SDK single-chunk metadata while rejecting multipart or unrelated chu
 });
 
 it('allows only independently identified native payer fees and scheduled identity',()=>{
- const tx={transaction_id:'0.0.123-1789190000-000000001',result:'SUCCESS',name:'CRYPTOTRANSFER',payer_account_id:'0.0.123',charged_tx_fee:20,transfers:[{account:payment.payer,amount:-120},{account:payment.payTo,amount:100},{account:'0.0.98',amount:20}],token_transfers:[]};
+ const tx={transaction_id:'0.0.123-1789190000-000000001',result:'SUCCESS',name:'CRYPTOTRANSFER',charged_tx_fee:20,transfers:[{account:payment.payer,amount:-120},{account:payment.payTo,amount:100},{account:'0.0.98',amount:20}],token_transfers:[]};
  expect(()=>validateConfirmedAuditPayment({transactions:[tx]},payment)).not.toThrow();
  expect(()=>validateConfirmedAuditPayment({transactions:[{...tx,charged_tx_fee:19}]},payment)).toThrow();
- expect(()=>validateConfirmedAuditPayment({transactions:[{...tx,payer_account_id:'0.0.999'}]},payment)).toThrow();
+ expect(()=>validateConfirmedAuditPayment({transactions:[{...tx,transaction_id:'0.0.999-1789190000-000000001'}]},{...payment,paymentTransactionId:'0.0.999@1789190000.000000001'})).toThrow();
  const scheduled={...payment,paymentTransactionId:payment.paymentTransactionId+'?scheduled'};
  expect(()=>validateConfirmedAuditPayment({transactions:[{...tx,scheduled:true}]},scheduled)).not.toThrow();
  expect(()=>validateConfirmedAuditPayment({transactions:[tx]},scheduled)).toThrow();
