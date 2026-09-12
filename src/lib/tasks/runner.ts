@@ -48,10 +48,11 @@ export async function pollTaskOnce(config:TaskRunnerConfig,d:TaskRunnerDependenc
   if(!previous)await save(pinsPath,authority);
   const base=`/api/v1/agents/${pins.agentId}/tasks`;
   async function api(path:string,body?:unknown,authenticated=true){
-   try{return await readBoundedJson(await d.transport(pins.origin+path,{method:body===undefined?'GET':'POST',headers:{accept:'application/json',...(authenticated?{Authorization:`Bearer ${config.key}`} :{}),...(body===undefined?{}:{'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body),redirect:'error',signal:AbortSignal.timeout(25000)}));}
-   catch{throw Error('Task platform request unavailable; preserve local journals and retry the same task');}
+   let status:number|undefined;
+   try{const response=await d.transport(pins.origin+path,{method:body===undefined?'GET':'POST',headers:{accept:'application/json',...(authenticated?{Authorization:`Bearer ${config.key}`} :{}),...(body===undefined?{}:{'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body),redirect:'error',signal:AbortSignal.timeout(25000)});status=response.status;return await readBoundedJson(response,path.startsWith(base)?1024*1024:512*1024);}
+   catch{throw Object.assign(Error('Task platform request unavailable; preserve local journals and retry the same task'),{status});}
   }
-  async function identity(){const result=z.object({ownerAddress:address,tasks:z.array(taskSchema).max(100)}).parse(await api(base));if(result.ownerAddress!==pins.owner)throw Error('Scoped agent owner differs from the pinned owner');return result.tasks as GeneralTask[];}
+  async function identity(taskId?:string){const result=z.object({ownerAddress:address,tasks:z.array(taskSchema).max(100)}).parse(await api(base+(taskId?'?taskId='+taskId:'?identity=1')));if(result.ownerAddress!==pins.owner)throw Error('Scoped agent owner differs from the pinned owner');return result.tasks as GeneralTask[];}
   await identity();
   const value=await api(base,{action:'claim',workerId:pins.workerId});if(value===null)return 'idle';
   const claim=claimSchema.parse(value),task=claim.task as GeneralTask;
@@ -65,22 +66,29 @@ export async function pollTaskOnce(config:TaskRunnerConfig,d:TaskRunnerDependenc
   if(claim.phase==='plan'){
    if(task.status!=='planning'||journal.execution)throw Error('Invalid planning claim');
    try{
-    if(!journal.planning||'blocked' in journal.planning){
-     const services=z.object({services:z.array(z.unknown()).max(100)}).parse(await api('/api/economy/services',undefined,false)).services.map(validateServiceDefinition);
-     const profiles=z.object({profiles:z.array(z.unknown()).max(100)}).parse(await api('/api/economy/service-profiles',undefined,false)).profiles as PlannerContext['profiles'];
-     const result=await d.planner({instruction:task.instruction,budgetAtomic:task.budgetAtomic,services,profiles});
+    const services=z.object({services:z.array(z.unknown()).max(100)}).parse(await api('/api/economy/services',undefined,false)).services.map(validateServiceDefinition);
+    const profiles=z.object({profiles:z.array(z.unknown()).max(100)}).parse(await api('/api/economy/service-profiles',undefined,false)).profiles as PlannerContext['profiles'];
+    const context={instruction:task.instruction,budgetAtomic:task.budgetAtomic,services,profiles};
+    let validCachedPlan=false;
+    if(journal.planning&&!('blocked' in journal.planning)){try{parsePlannerOutput(journal.planning,context);validCachedPlan=true;}catch{/* Unapproved retired offers can be planned again against the current catalog. */}}
+    if(!validCachedPlan){
+     const result=await d.planner(context);
      // Revalidate even an injected planner implementation at the authority boundary.
      const checked=parsePlannerOutput(result.kind==='plan'?result.raw:{blocked:result.reason},{instruction:task.instruction,budgetAtomic:task.budgetAtomic,services,profiles});
      journal.planning=checked.kind==='plan'?checked.raw:{blocked:checked.reason};await save(path,journal);
     }
    }catch{await update({action:'blocked',error:'Planning could not produce a valid available service plan within this budget. Retry after checking the catalog and private planner.'});throw Error('Task planning failed; no payment was attempted');}
+   if(!journal.planning)throw Error('Missing private planning result');
    if('blocked' in journal.planning){await update({action:'blocked',error:journal.planning.blocked});return 'blocked';}
-   await update({action:'plan',plan:journal.planning});return 'planned';
+   try{await update({action:'plan',plan:journal.planning});}catch(error){
+    if((error as {status?:number}).status===400)await update({action:'blocked',error:'The available service catalog changed before this plan was accepted. Retry this task to plan against current services; no payment was attempted.'}).catch(()=>{});
+    throw error;
+   }return 'planned';
   }
   const execution=bindExecution(task);
   if(journal.execution&&!same(journal.execution,execution))throw Error('Approved execution is immutable; preserve its original plan and journals');
   if(!journal.execution){journal.execution=execution;await save(path,journal);}
-  async function assertTaskAuthority(){const current=(await identity()).find(t=>t.id===task.id);if(!current||!same(request,{id:current.id,agentId:current.agentId,instruction:current.instruction,budgetAtomic:current.budgetAtomic})||!same(bindExecution(current),execution))throw Error('Current task approval differs from immutable execution');}
+  async function assertTaskAuthority(){const current=(await identity(task.id)).find(t=>t.id===task.id);if(!current||!same(request,{id:current.id,agentId:current.agentId,instruction:current.instruction,budgetAtomic:current.budgetAtomic})||!same(bindExecution(current),execution))throw Error('Current task approval differs from immutable execution');}
   const outputs:unknown[]=[];
   try{
    for(let index=0;index<execution.plan.steps.length;index++){
