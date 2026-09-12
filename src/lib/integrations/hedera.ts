@@ -93,7 +93,7 @@ export async function purchaseHederaData(input: DataPurchase, credentials?: Hede
     throw new Error('Purchase already attempted; reconcile the recorded intent before any retry.');
   } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
   const endpoint = new URL(`evidence/${input.providerId}`,base);
-  const options: RequestInit = {method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':input.requestId},body:JSON.stringify({repos}),redirect:'error',signal:AbortSignal.timeout(30000)};
+  const options: RequestInit = {method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':input.requestId},body:JSON.stringify({repos,...(input.a2aOfferToken ? {a2aOfferToken:input.a2aOfferToken} : {})}),redirect:'error',signal:AbortSignal.timeout(30000)};
   const unpaid = await fetch(endpoint,options);
   if (unpaid.status !== 402) throw new Error('Provider did not return an x402 payment challenge.');
   const {decodePaymentRequiredHeader,encodePaymentSignatureHeader,decodePaymentResponseHeader} = await import('@x402/core/http');

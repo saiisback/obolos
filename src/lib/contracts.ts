@@ -55,6 +55,7 @@ export interface DashboardState {
 export interface DataPurchase {
   runId: string; requestId: string; repos: string[]; providerId: string;
   maxAmountAtomic: number; unitPriceAtomic: number; mandateExpiresAt: string;
+  a2aOfferToken?: string;
 }
 export interface VerificationPurchase {runId: string; requestId: string; maxAmountAtomic: number; report: Report; mandateExpiresAt: string; market?: {mandate:SignedMandate;runnerToken:string}}
 export interface BrokerHealth {ready: boolean; integrations: IntegrationStatus[]}
