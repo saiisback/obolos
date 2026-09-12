@@ -1,0 +1,60 @@
+import {mkdtemp,readFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {describe,it,expect,vi} from 'vitest';
+import {keccak256,toHex} from 'viem';
+import {createServiceDefinition,canonicalJsonHash} from '../src/lib/economy/service-contract';
+import type {ExecutorDependencies} from '../src/lib/economy/executor';
+import {createTaskPlan,taskPlanHash,taskStepOrderId,type GeneralTask} from '../src/lib/tasks/model';
+import {pollTaskOnce,type TaskRunnerConfig,type TaskRunnerDependencies} from '../src/lib/tasks/runner';
+const owner='0x1111111111111111111111111111111111111111',payer='0x2222222222222222222222222222222222222222',agentId='12345678-1234-4234-8234-123456789012',taskId='22345678-1234-4234-8234-123456789012';
+const hash=(s:string)=>keccak256(toHex(s));
+const definition=createServiceDefinition({chainId:5042002,settlementAddress:'0x3333333333333333333333333333333333333333',ledgerAddress:'0x4444444444444444444444444444444444444444',seller:'0x5555555555555555555555555555555555555555',endpoint:'https://provider.example/text',category:'inference',unit:'inference-request',quantity:'1',unitPriceAtomic:'1000',inputSchema:{type:'object',properties:{prompt:{type:'string'}},required:['prompt'],additionalProperties:false},outputSchema:{type:'object',properties:{text:{type:'string'}},required:['text'],additionalProperties:false}});
+const raw={summary:'Translate and summarize text',steps:[{serviceHash:definition.serviceHash,input:{prompt:'Translate Hello'}},{serviceHash:definition.serviceHash,input:{prompt:{$from:0,path:['text']}}}]};
+async function setup(){
+ const directory=await mkdtemp(join(tmpdir(),'general-task-')),plan=createTaskPlan(raw,[definition],'2000');
+ const task:GeneralTask={id:taskId,agentId,instruction:'Translate Hello then summarize',budgetAtomic:'2000',status:'running',plan,planHash:taskPlanHash(plan),approvedPlanHash:taskPlanHash(plan),approvalExpiresAt:'2033-05-18T03:33:20.000Z',steps:[],error:null,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+ const config:TaskRunnerConfig={pins:{origin:'https://obolos.app',owner,agentId,payer,workerId:'32345678-1234-4234-8234-123456789012'},key:'ob_test_'+'a'.repeat(43),directory,executorDirectory:join(directory,'executor')};
+ const actions:string[]=[],updates:Record<string,unknown>[]=[],requests:unknown[]=[];const acknowledged=new Set<string>();
+ const executor:ExecutorDependencies={async prepareApproval(){},async preparePayment(){},async assertActiveService(){},async hasOperation(){return true;},async prepareAbort(){return false;},async abort(){throw Error('no abort');},async verifyAborted(){},async authenticate(){},async preflight(){return {policyVersion:'1',agentVersion:'1',feeVersion:'1'};},async approve(s){actions.push('approve:'+s.intent.orderId);const stored=JSON.parse(await readFile(join(directory,'tasks',task.id+'.json'),'utf8'));expect(stored.execution.approvedPlanHash).toBe(task.planHash);},async pay(s){actions.push('pay:'+s.intent.orderId);return hash('payment:'+s.intent.orderId);},async recover(s,kind){actions.push('recover:'+kind);return hash('payment:'+s.intent.orderId);},async verifyPayment(){},async deliver(request){requests.push(request.input);const output={text:'Bonjour'};return {orderId:request.orderId,serviceHash:request.serviceHash,transactionHash:request.settlement.transactionHash,state:'fulfilled',output,outputHash:canonicalJsonHash(output)};},async verifyDelivery(s){return acknowledged.has(s.intent.orderId);},async acknowledge(s){acknowledged.add(s.intent.orderId);actions.push('ack:'+s.intent.orderId);return hash('ack:'+s.intent.orderId);}};
+ let phase:'plan'|'execute'='execute';
+ const transport:typeof fetch=vi.fn(async(url,init)=>{
+  expect(String(url).startsWith(config.pins.origin+'/')).toBe(true);expect(init?.redirect).toBe('error');
+  const path=new URL(String(url)).pathname,body=init?.body?JSON.parse(String(init.body)):undefined;
+  if(path==='/api/economy/services')return Response.json({services:[definition]});
+  if(path==='/api/economy/service-profiles')return Response.json({profiles:[]});
+  expect((init?.headers as Record<string,string>).Authorization).toBe('Bearer '+config.key);
+  if(path.endsWith('/tasks')&&!body)return Response.json({ownerAddress:owner,tasks:[task]});
+  if(path.endsWith('/tasks'))return Response.json({task,claimToken:'a'.repeat(64),phase});
+  updates.push(body);return Response.json({task});
+ });
+ const deps:TaskRunnerDependencies={transport,planner:vi.fn(async()=>({kind:'plan' as const,plan,raw})),executorDependencies:()=>executor,now:()=>Date.parse('2026-09-13T00:00:00.000Z')};
+ return {directory,task,config,actions,updates,requests,executor,deps,setPhase:(v:'plan'|'execute')=>{phase=v;}};
+}
+describe('private general task runner',()=>{
+ it('saves approved authority before funds, routes real outputs and reports deterministic receipts',async()=>{const s=await setup();expect(await pollTaskOnce(s.config,s.deps)).toBe('completed');expect(s.requests).toEqual([{prompt:'Translate Hello'},{prompt:'Bonjour'}]);expect(s.updates.filter(u=>u.action==='progress').map(u=>u.orderId)).toEqual([0,1].map(i=>taskStepOrderId(taskId,s.task.planHash!,i)));expect(s.updates.at(-1)?.action).toBe('complete');expect(s.deps.planner).not.toHaveBeenCalled();});
+ it.each(['agent','hash','approval','total','expiry','owner'])('rejects tampered %s before any payment',async field=>{const s=await setup();switch(field){case'agent':s.task.agentId=taskId;break;case'hash':s.task.planHash=hash('tampered');break;case'approval':s.task.approvedPlanHash=hash('tampered');break;case'total':s.task.plan!.totalAtomic='1';break;case'expiry':s.task.approvalExpiresAt='2020-01-01T00:00:00Z';break;case'owner':s.config.pins.owner=payer;break;}await expect(pollTaskOnce(s.config,s.deps)).rejects.toThrow();expect(s.actions).toEqual([]);expect(s.updates.some(u=>u.action==='complete')).toBe(false);});
+ it('plans without payment and requires owner approval before execution',async()=>{const s=await setup();s.setPhase('plan');Object.assign(s.task,{status:'planning',plan:null,planHash:null,approvedPlanHash:null,approvalExpiresAt:null});expect(await pollTaskOnce(s.config,s.deps)).toBe('planned');expect(s.actions).toEqual([]);expect(s.updates[0]).toMatchObject({action:'plan',plan:raw});});
+ it('reports unsupported capabilities without fabricating a plan or payment',async()=>{const s=await setup();s.setPhase('plan');s.task.status='planning';s.deps.planner=async()=>({kind:'blocked',reason:'No registered video provider.'});expect(await pollTaskOnce(s.config,s.deps)).toBe('blocked');expect(s.updates[0]).toMatchObject({action:'blocked',error:'No registered video provider.'});expect(s.actions).toEqual([]);});
+ it('retries failed paid delivery with the same order and no duplicate payment',async()=>{const s=await setup(),deliver=s.executor.deliver;let count=0;s.executor.deliver=async request=>{if(count++===0)throw Error('delivery pending');return deliver(request);};await expect(pollTaskOnce(s.config,s.deps)).rejects.toThrow();expect(s.updates.some(u=>u.action==='complete')).toBe(false);expect(await pollTaskOnce(s.config,s.deps)).toBe('completed');expect(s.actions.filter(a=>a.startsWith('pay:'))).toHaveLength(2);expect(new Set(s.actions.filter(a=>a.startsWith('pay:'))).size).toBe(2);});
+ it('recovers uncertain submitted payment instead of submitting another payment',async()=>{const s=await setup();let first=true;const pay=s.executor.pay;s.executor.pay=async state=>{if(first){first=false;s.actions.push('pay:'+state.intent.orderId);throw Error('uncertain');}return pay(state);};await expect(pollTaskOnce(s.config,s.deps)).rejects.toThrow();expect(await pollTaskOnce(s.config,s.deps)).toBe('completed');expect(s.actions.filter(a=>a.startsWith('pay:'))).toHaveLength(2);expect(s.actions).toContain('recover:pay');});
+ it('rejects local authority changes on restart',async()=>{const s=await setup();await pollTaskOnce(s.config,s.deps);s.config.pins.workerId='52345678-1234-4234-8234-123456789012';await expect(pollTaskOnce(s.config,s.deps)).rejects.toThrow('immutable');});
+ it('rejects changes to approved expiry after a paid interruption',async()=>{const s=await setup();s.executor.deliver=async()=>{throw Error('pending');};await expect(pollTaskOnce(s.config,s.deps)).rejects.toThrow();s.task.approvalExpiresAt='2034-05-18T03:33:20.000Z';await expect(pollTaskOnce(s.config,s.deps)).rejects.toThrow('immutable');expect(s.actions.filter(a=>a.startsWith('pay:'))).toHaveLength(1);});
+ it('recovers already-paid work after expiry but does not begin the next unpaid step',async()=>{const s=await setup(),deliver=s.executor.deliver;s.executor.deliver=async()=>{throw Error('pending');};await expect(pollTaskOnce(s.config,s.deps)).rejects.toThrow();s.executor.deliver=deliver;s.deps.now=()=>Date.parse('2035-01-01T00:00:00Z');await expect(pollTaskOnce(s.config,s.deps)).rejects.toThrow('expired');expect(s.actions.filter(a=>a.startsWith('pay:'))).toHaveLength(1);expect(s.updates.filter(u=>u.action==='progress')).toHaveLength(1);expect(s.updates.some(u=>u.action==='complete')).toBe(false);});
+ it('retains a planned result when submitting it is interrupted',async()=>{const s=await setup();s.setPhase('plan');s.task.status='planning';const transport=s.deps.transport;let first=true;s.deps.transport=async(url,init)=>{if(first&&String(init?.body).includes('"action":"plan"')){first=false;throw Error('network');}return transport(url,init);};await expect(pollTaskOnce(s.config,s.deps)).rejects.toThrow();expect(await pollTaskOnce(s.config,s.deps)).toBe('planned');expect(s.deps.planner).toHaveBeenCalledTimes(1);expect(s.actions).toEqual([]);});
+ it('does not trust a server step as a substitute for a durable payment journal',async()=>{const s=await setup();s.task.steps=[{index:0,orderId:taskStepOrderId(taskId,s.task.planHash!,0),transactionHash:hash('external'),outputHash:canonicalJsonHash({text:'fake'}),output:{text:'fake'}}];await expect(pollTaskOnce(s.config,s.deps)).rejects.toThrow('journal');expect(s.actions).toEqual([]);});
+});
+
+import {liveExecutorDependencies} from '../src/lib/economy/executor-live';
+import {taskRunnerOptions} from '../services/task-runner';
+describe('live runner dependency boundary and bounded CLI',()=>{
+ it('uses real live scoped identity authentication before payment, entirely offline',async()=>{
+  const s=await setup();
+  const network=vi.fn(async(_url:unknown)=>Response.json({platformAgentId:agentId,ownerAddress:payer}));vi.stubGlobal('fetch',network);
+  s.deps.executorDependencies=intent=>liveExecutorDependencies({wallet:payer,approver:owner,cli:'/not-executed',cliHome:'/not-read',rpc:'https://rpc.testnet.arc.network',journal:s.directory},intent,s.config.key);
+  try{await expect(pollTaskOnce(s.config,s.deps)).rejects.toThrow('owner differs');expect(network).toHaveBeenCalledTimes(1);expect(String(network.mock.calls[0]?.[0])).toContain('/economy/orders');expect(s.updates.some(u=>u.action==='complete')).toBe(false);}finally{vi.unstubAllGlobals();}
+ });
+ it('fails closed when the real Circle wallet differs from pinned task payer',async()=>{const s=await setup();s.deps.executorDependencies=intent=>liveExecutorDependencies({wallet:owner,approver:owner,cli:'/not-executed',cliHome:'/not-read',rpc:'https://rpc.testnet.arc.network',journal:s.directory},intent,s.config.key);await expect(pollTaskOnce(s.config,s.deps)).rejects.toThrow('payer differs');expect(s.actions).toEqual([]);});
+ it('allows explicit once and bounded polling modes',()=>{expect(taskRunnerOptions(['--once','--execute-testnet'])).toEqual({polls:1,intervalMs:10000});expect(taskRunnerOptions(['--polls','10','--interval-ms','5000','--execute-testnet'])).toEqual({polls:10,intervalMs:5000});expect(taskRunnerOptions(['--help'])).toBeNull();});
+ it.each([['--once'],['--polls','361','--interval-ms','5000','--execute-testnet'],['--polls','10','--interval-ms','0','--execute-testnet'],['--shell','echo example','--execute-testnet']].map(args=>({args})))('rejects unbounded or unsupported CLI options',({args})=>{expect(()=>taskRunnerOptions(args)).toThrow();});
+});
