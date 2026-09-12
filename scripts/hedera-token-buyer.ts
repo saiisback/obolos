@@ -353,9 +353,14 @@ export async function purchaseHtsRepositories(
       ![0, "0"].includes(metadata.decimals ?? -1) ||
       metadata.symbol !== input.symbol ||
       !metadata.custom_fees ||
-      Object.values(metadata.custom_fees).some(
-        (fees) => !Array.isArray(fees) || fees.length !== 0,
-      )
+      typeof metadata.custom_fees !== "object" ||
+      Array.isArray(metadata.custom_fees) ||
+      ["fixed_fees", "fractional_fees", "royalty_fees"].some((field) => {
+        const fees = metadata.custom_fees?.[field];
+        return (
+          fees !== undefined && (!Array.isArray(fees) || fees.length !== 0)
+        );
+      })
     )
       throw Error(
         "Token metadata is not the pinned fee-free zero-decimal finite test credit.",

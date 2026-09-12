@@ -101,6 +101,7 @@ function fixture(changes: Changes = {}) {
           decimals: "0",
           symbol: input.symbol,
           custom_fees: {
+            created_timestamp: null,
             fixed_fees: [],
             fractional_fees: [],
             royalty_fees: [],
@@ -274,6 +275,60 @@ describe("private native HTS x402 buyer", () => {
     expect(
       await purchaseHtsRepositories(input, credentials, directory),
     ).toEqual(result);
+    expect(paid).toBe(1);
+  });
+  it.each([null, "1750000000.000000001"])(
+    "accepts documented fee-free metadata with created_timestamp=%s",
+    async (timestamp) => {
+      fixture({
+        metadata: {
+          custom_fees: {
+            created_timestamp: timestamp,
+            fixed_fees: [],
+            fractional_fees: [],
+            royalty_fees: [],
+          },
+        },
+      });
+      expect(
+        await purchaseHtsRepositories(input, credentials, directory),
+      ).toMatchObject({ status: "settled", asset: input.terms.asset });
+      expect(paid).toBe(1);
+    },
+  );
+  it.each(["fixed_fees", "fractional_fees", "royalty_fees"])(
+    "rejects actual %s despite scalar timestamp metadata",
+    async (field) => {
+      fixture({
+        metadata: {
+          custom_fees: {
+            created_timestamp: null,
+            fixed_fees: [],
+            fractional_fees: [],
+            royalty_fees: [],
+            [field]: [{ amount: 1 }],
+          },
+        },
+      });
+      await expect(
+        purchaseHtsRepositories(input, credentials, directory),
+      ).rejects.toThrow(/fee-free/i);
+      expect(paid).toBe(0);
+    },
+  );
+  it("accepts absent optional fee arrays in fee-free mirror metadata", async () => {
+    fixture({
+      metadata: {
+        custom_fees: {
+          created_timestamp: null,
+          fixed_fees: [],
+          fractional_fees: [],
+        },
+      },
+    });
+    expect(
+      await purchaseHtsRepositories(input, credentials, directory),
+    ).toMatchObject({ status: "settled" });
     expect(paid).toBe(1);
   });
   it("never dispatches another payment after interrupted transport, recovering only stored server data and mirror proof", async () => {
