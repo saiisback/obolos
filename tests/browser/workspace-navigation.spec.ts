@@ -176,3 +176,15 @@ test('seller endpoint publishing and delivery-only recovery use distinct actions
   await expect(page.getByText('Paid & delivered',{exact:true})).toBeVisible();
   expect(calls.map(call=>call.path)).toEqual(['/api/market/services',`/api/market/orders/${orderId}/delivery`]);
 });
+
+test('developers documents the general task runner and scoped task API before repository examples',async({page})=>{
+  await fixture(page);await page.goto(origin+'/app/developers#integration');
+  await expect(page.getByLabel('GET · General tasks code')).toContainText('/api/v1/agents/$AGENT_ID/tasks');
+  await expect(page.getByLabel('GET · Service catalog code')).toContainText('/api/economy/service-profiles');
+  await page.getByRole('navigation',{name:'Developer sections'}).getByRole('link',{name:'Runner setup'}).click();
+  await expect(page.getByRole('heading',{name:'General digital tasks',exact:true})).toBeVisible();
+  await expect(page.locator('#runner')).toContainText('npm run task:runner');
+  await expect(page.getByRole('link',{name:'general task runner setup',exact:true})).toHaveAttribute('href','https://github.com/saiisback/obolos/blob/main/docs/task-runner.md');
+  await page.getByRole('navigation',{name:'Developer sections'}).getByRole('link',{name:'Sell an API'}).click();
+  await expect(page.locator('#selling')).toContainText('New digital service');
+});

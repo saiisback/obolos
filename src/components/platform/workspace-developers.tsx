@@ -43,6 +43,11 @@ export AGENT_ID="${selected.id}"
 # Enter the credential when prompted; it is not echoed or saved in history.
 read -r -s OBOLOS_API_KEY
 export OBOLOS_API_KEY` : '';
+  const discover = `curl --fail-with-body "$OBOLOS_URL/api/economy/service-profiles"
+curl --fail-with-body "$OBOLOS_URL/api/economy/services"`;
+  const listTasks = `curl --fail-with-body \\
+  "$OBOLOS_URL/api/v1/agents/$AGENT_ID/tasks" \\
+  -H "Authorization: Bearer $OBOLOS_API_KEY"`;
   const listRuns = `curl --fail-with-body \\
   "$OBOLOS_URL/api/v1/agents/$AGENT_ID/runs" \\
   -H "Authorization: Bearer $OBOLOS_API_KEY"`;
@@ -70,8 +75,10 @@ export OBOLOS_API_KEY` : '';
         <div><h2 id="integration-heading">Connect {selected.name}</h2><p>These examples use your selected agent and this deployment. Keep the credential in your server environment; it is never added to these examples.</p></div>
         <div className={d.examples}>
           <section><h3>Set your environment</h3><p>Run this in Bash or Zsh and enter your saved credential at the prompt. Each credential expires after 30 days.</p>{environment && <CodeBlock key={`${selected.id}-environment`} code={environment} label="Shell · Selected agent" />}</section>
-          <section><h3>Read execution history</h3><p>This request only reads jobs belonging to the selected agent. Inspect reports and receipts in <Link href="/app/evidence">your execution evidence</Link>.</p><CodeBlock code={listRuns} label="GET · Agent runs" /></section>
-          <section><h3>Queue an authorized run</h3><p>First <Link href="/app">pair a runner and sign a spending mandate</Link>. Replace the example repository with one in that mandate. The API requires an online runner and available allowance before it accepts a job.</p><CodeBlock code={queueRun} label="POST · Queue run" /><p className={s.caption}>Keep the same Idempotency-Key when retrying the same request. Choose a new key for a new job. An API credential cannot change spending limits or pair runners.</p></section>
+          <section><h3>Discover services</h3><p>Find published capabilities, prices and exact input/output schemas. Service descriptions guide selection; a registration does not guarantee availability.</p><CodeBlock code={discover} label="GET · Service catalog" /></section>
+          <section><h3>Read general tasks</h3><p>Create a task and set its maximum budget in <Link href="/app">Agents</Link>. Your private runner proposes service calls; review and approve the exact plan in the workspace before payment. This scoped request reads plans, results and receipts.</p><CodeBlock code={listTasks} label="GET · General tasks" /><p className={s.caption}>The agent credential cannot approve a plan or change spending policy. The task runner handles claims and result reporting.</p></section>
+          <section><h3>Read repository execution history</h3><p>This request only reads jobs belonging to the selected agent. Inspect reports and receipts in <Link href="/app/evidence">your execution evidence</Link>.</p><CodeBlock code={listRuns} label="GET · Agent runs" /></section>
+          <section><h3>Queue an optional repository run</h3><p>First <Link href="/app">pair a runner and sign a spending mandate</Link>. Replace the example repository with one in that mandate. The API requires an online runner and available allowance before it accepts a job.</p><CodeBlock code={queueRun} label="POST · Queue run" /><p className={s.caption}>Keep the same Idempotency-Key when retrying the same request. Choose a new key for a new job. An API credential cannot change spending limits or pair runners.</p></section>
         </div>
       </section>
     </> : null}
@@ -79,11 +86,11 @@ export OBOLOS_API_KEY` : '';
     <section hidden={section !== 'hedera'} id="hedera">{section === 'hedera' && <HederaIntegrations />}</section>
     <section hidden={section !== 'selling'} id="selling" className={d.runner}>
       <h2>Sell work from your own agent</h2>
-      <p>Publish a public HTTPS endpoint in <Link href="/app/marketplace#seller-heading">your seller desk</Link>. Select <strong>My agent / API endpoint</strong>, choose an owned agent as the publishing identity, and set a price in test USDC. The signed-in owner wallet receives payment.</p>
+      <p>Open <Link href="/app/marketplace#seller-heading">your seller desk</Link> and fill in <strong>New digital service</strong>: describe what your API does, set its price, and supply its endpoint and schemas. Buyers can discover it and use it in general tasks. The signed-in seller wallet receives the seller allocation.</p>
       <h3>Generic resource services</h3>
-      <p>For data, compute, inference, verification or storage, use <code>obolos.service.v1</code> in <Link href="/app/economy#prices">Economy · Publish your service</Link>. Register immutable category, unit, quantity, price and endpoint terms with the seller wallet, then publish the input and output schemas. The <a href="https://github.com/saiisback/obolos/blob/main/docs/economy-provider-protocol.md" target="_blank" rel="noopener noreferrer">provider protocol</a> describes the exact request and response format.</p>
+      <p>For data, compute, inference, verification or storage, use <code>obolos.service.v1</code> in <Link href="/app/marketplace#seller-heading">Marketplace · Your seller desk</Link>. Register immutable category, unit, quantity, price and endpoint terms with the seller wallet, then publish the input and output schemas. The <a href="https://github.com/saiisback/obolos/blob/main/docs/economy-provider-protocol.md" target="_blank" rel="noopener noreferrer">provider protocol</a> describes the exact request and response format.</p>
       <p>The human owner must own both the platform agent and its on-chain mandate. The Circle wallet is the bound executor and payer. Service publication does not fund a wallet or enroll an agent. After an authorized contract settlement is finalized, submit its original request in <Link href="/app/economy#settlements">Economy · Deliver a paid service order</Link>; recovery retries delivery using the same order and payment.</p>
-      <h3>Legacy repository verifier contract</h3>
+      <h3>Optional repository verifier contract</h3><p>Choose <strong>Publish a repository verifier</strong>, then <strong>My agent / API endpoint</strong>, to sell that specialized workflow with an owned agent as its publishing identity.</p>
       <p>The repository-verifier marketplace uses <code>obolos.verifier.v1</code>: your endpoint receives a repository report, its purchased evidence, and an immutable paid order. Your agent returns one to fifty checks. Other resource categories use the generic service protocol above.</p>
       <ol><li>Accept a JSON <code>POST</code> with <code>protocol</code>, <code>order</code>, and <code>report</code>. The <code>Idempotency-Key</code> identifies the same paid order across delivery retries.</li><li>Check the receipt at your pinned Obolos origin: <code>GET /api/market/orders/:id/receipt</code>. Pin your own service ID and payout address, then match the order, amount, transaction and report digest before doing work. Never trust a caller-provided receipt host.</li><li>Return <code>{'{"checks":[{"label":"My check","passed":true,"detail":"What was checked"}]}'}</code> as JSON. Labels are limited to 200 characters and details to 1,000. Complete within 12 seconds; cache your result by order ID.</li><li>A retry requests delivery of the same order. It does not create a new sale. Keep your own idempotency record so interrupted requests cannot charge or perform side effects twice.</li></ol>
       <p>Endpoint URLs must use public HTTPS on port 443, without credentials, query parameters, fragments, or redirects. Obolos forwards the purchased report and evidence; it never forwards wallet keys, runner credentials, or an API key.</p>
@@ -93,6 +100,11 @@ export OBOLOS_API_KEY` : '';
     </section>
     <section hidden={section !== 'runner'} id="runner" className={d.runner}>
       <h2>Runner prerequisites</h2>
+      <h3>General digital tasks</h3>
+      <p>Use your agent credential with the private task runner. It reads available services, proposes a plan, waits for owner approval, then executes paid calls and reports their actual results. It supports the capabilities offered by registered APIs; repository research is optional.</p>
+      <ol><li>Create an agent and issue its scoped credential in <strong>API credentials</strong>.</li><li>Configure an Arc testnet Circle payer, Ledger Key Ring access, and the agent’s on-chain spending policy and permitted sellers.</li><li>Follow the <a href="https://github.com/saiisback/obolos/blob/main/docs/task-runner.md" target="_blank" rel="noreferrer">general task runner setup</a> to pin the owner, agent, payer, worker identity and durable private journal.</li><li>Start <code>npm run task:runner -- --polls 60 --interval-ms 10000 --execute-testnet</code>. Create a task in Agents, review its proposed calls and price, then approve it. Keep the runner online through completion.</li></ol>
+      <p>The polling command is bounded and stops after 60 claims or a failure. Retain its journals for recovery. Planning model fees are separate from the task’s service budget.</p>
+      <h3>Optional repository research runner</h3>
       <p>Your API key queues work; a separately funded private runner executes it. Prepare Hedera test HBAR, Arc test USDC, a Circle agent wallet session, and your Ledger Key Ring broker. Speculos is the supported development emulator and is not hardware-backed.</p>
       <ol><li>Use a dedicated checkout and OS user for your wallet broker. Keep keys, token files, and payment journals outside source control.</li><li>In <Link href="/app">Agents</Link>, choose <strong>Manage agent</strong>, pair a runner, and save the one-time runner credential. Copy that agent’s exact runner configuration into your private <code>.env.runner</code>.</li><li>Configure the broker and run <code>npm run agent:runner</code>. A heartbeat confirms connectivity, not funding.</li><li>Select a verifier, review the separate HBAR and USDC limits, and sign the spending mandate before queuing a run.</li></ol>
       <p>Keep the runner journal across restarts. An uncertain payment requires reconciliation; do not delete its history to retry.</p>

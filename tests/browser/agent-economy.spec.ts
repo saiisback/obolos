@@ -13,6 +13,8 @@ async function fixture(page: Page, unavailable = false) {
     const json = (body: unknown) => route.fulfill({json: body});
     if (path === '/api/account') return json({configured: true, user: {id: 'fixture-owner', address: `0x${'a'.repeat(40)}`}});
     if (path === '/api/agents') return json({agents: [agent]});
+    if (path === '/api/tasks') return json({tasks: []});
+    if (path === '/api/economy/service-profiles') return json({profiles: []});
     if (path === `/api/agents/${agent.id}/economy`) return json({agentId: hash('5'), indexedAt: '2026-09-12T00:00:00Z', policy: unavailable ? {status: 'unavailable'} : {status: 'registered', owner: `0x${'a'.repeat(40)}`, executor: `0x${'b'.repeat(40)}`, active: true, totalCapAtomic: '2000', spentAtomic: '1000', windowCapAtomic: '2000', windowSeconds: '86400', blockNumber: '123', timestamp: 1789171200}, orders: [order]});
     if (path.endsWith('/runner')) return json({runner: null});
     if (path.endsWith('/mandate')) return json({mandate: null});
