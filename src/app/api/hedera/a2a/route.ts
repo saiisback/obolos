@@ -23,17 +23,33 @@ export async function POST(request: Request) {
     );
   let input: unknown;
   try {
-    const raw = await request.text();
-    if (Buffer.byteLength(raw) > 16000)
-      return Response.json(
-        {
-          jsonrpc: "2.0",
-          id: null,
-          error: { code: -32600, message: "Request too large" },
-        },
-        { status: 413, headers },
-      );
-    input = JSON.parse(raw);
+    const reader = request.body?.getReader();
+    const chunks: Uint8Array[] = [];
+    let bytes = 0;
+    if (reader) {
+      try {
+        for (;;) {
+          const chunk = await reader.read();
+          if (chunk.done) break;
+          bytes += chunk.value.byteLength;
+          if (bytes > 16000) {
+            await reader.cancel();
+            return Response.json(
+              {
+                jsonrpc: "2.0",
+                id: null,
+                error: { code: -32600, message: "Request too large" },
+              },
+              { status: 413, headers },
+            );
+          }
+          chunks.push(chunk.value);
+        }
+      } finally {
+        reader.releaseLock();
+      }
+    }
+    input = JSON.parse(Buffer.concat(chunks).toString("utf8"));
   } catch {
     return Response.json(
       {
