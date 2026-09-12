@@ -9,7 +9,7 @@ import {scheduleMemo,type SchedulePlan} from '../src/lib/hedera/commerce';
 const mocks=vi.hoisted(()=>({durable:vi.fn(),sql:vi.fn()}));
 vi.mock('../scripts/hedera-register',()=>({executeDurableHcsOperation:mocks.durable}));
 vi.mock('../src/lib/platform/db',()=>({sql:()=>mocks.sql}));
-import {createPaymentSchedules,provisionTestCredits} from '../scripts/hedera-commerce';
+import {createPaymentSchedules,privateWrite,provisionTestCredits} from '../scripts/hedera-commerce';
 
 type Intent={transactionId:string;signedBytes:string};
 type Captured={file:string;body:proto.TransactionBody;intent:Intent};
@@ -23,6 +23,10 @@ function decode(bytes:string):proto.TransactionBody {
  return proto.TransactionBody.decode(signed.bodyBytes);
 }
 function account(id:proto.IAccountID|undefined|null){return `0.0.${id?.accountNum?.toString()}`;}
+const failedTokenId='0.0.123@1789238131.788715881',failedMirrorId='0.0.123-1789238131-788715881';
+async function seedFailedToken(){await privateWrite(path.join(directory,'token.json'),{transactionId:failedTokenId,signedBytes:'retained-original-signed-intent'});return readFile(path.join(directory,'token.json'),'utf8');}
+function originalFailureResponse(result='INSUFFICIENT_TX_FEE',entity_id:string|null=null,transaction_id=failedMirrorId){return Response.json({transactions:[{transaction_id,result,entity_id}]});}
+function mockOriginalFailure(response:()=>Response){vi.mocked(fetch).mockImplementation(async(url,options)=>{expect(String(url)).toBe(`https://testnet.mirrornode.hedera.com/api/v1/transactions/${failedMirrorId}`);expect(options?.redirect).toBe('error');return response();});}
 beforeEach(async()=>{
  directory=await mkdtemp(path.join(tmpdir(),'obolos-hedera-operator-'));captured=[];mocks.sql.mockReset();mocks.sql.mockResolvedValue([]);mocks.durable.mockReset();
  vi.stubEnv('HEDERA_PAY_TO','0.0.456');
@@ -73,5 +77,28 @@ describe('private Hedera operator SDK transaction boundaries',()=>{
  });
  it('refuses insufficient balance before provisioning any new recipient or token',async()=>{
   vi.mocked(AccountBalanceQuery.prototype.execute).mockResolvedValue({hbars:new Hbar(1)} as never);await expect(provisionTestCredits(credentials,directory)).rejects.toThrow(/Insufficient/);expect(captured).toHaveLength(0);expect(mocks.durable).not.toHaveBeenCalled();expect(Transaction.prototype.execute).not.toHaveBeenCalled();expect(fetch).not.toHaveBeenCalled();
+ });
+ it.each([
+  ['unavailable mirror',()=>new Response(null,{status:404})],
+  ['successful original creation',()=>originalFailureResponse('SUCCESS','0.0.901')],
+  ['uncertain original result',()=>originalFailureResponse('UNKNOWN')],
+  ['failure with a created entity',()=>originalFailureResponse('INSUFFICIENT_TX_FEE','0.0.901')],
+  ['failure for another identity',()=>originalFailureResponse('INSUFFICIENT_TX_FEE',null,'0.0.123-1789238132-788715881')],
+  ['missing original result',()=>Response.json({transactions:[]})],
+ ])('refuses the raised token fee when there is %s before replacement signing',async(_label,response)=>{
+  const original=await seedFailedToken();mockOriginalFailure(response);vi.mocked(AccountBalanceQuery.prototype.execute).mockResolvedValue({hbars:new Hbar(100)} as never);
+  await expect(provisionTestCredits(credentials,directory,true)).rejects.toThrow(/failure|insufficient-fee/);
+  expect(await readFile(path.join(directory,'token.json'),'utf8')).toBe(original);expect(captured).toHaveLength(0);expect(mocks.durable).not.toHaveBeenCalled();expect(Transaction.prototype.execute).not.toHaveBeenCalled();expect(mocks.sql).not.toHaveBeenCalled();
+ });
+ it('requires the exact remaining 52 HBAR bound before signing an explicit fee retry',async()=>{
+  await seedFailedToken();mockOriginalFailure(()=>originalFailureResponse());vi.mocked(AccountBalanceQuery.prototype.execute).mockResolvedValue({hbars:Hbar.fromTinybars(5199999999)} as never);
+  await expect(provisionTestCredits(credentials,directory,true)).rejects.toThrow(/Insufficient/);expect(captured).toHaveLength(0);expect(mocks.durable).not.toHaveBeenCalled();expect(Transaction.prototype.execute).not.toHaveBeenCalled();
+ });
+ it('preserves the failed intent, caps the explicit retry at 50 HBAR and recovers the same retry without signing another',async()=>{
+  const original=await seedFailedToken();mockOriginalFailure(()=>originalFailureResponse());vi.mocked(AccountBalanceQuery.prototype.execute).mockResolvedValue({hbars:new Hbar(52)} as never);
+  const first=await provisionTestCredits(credentials,directory,true);expect(captured).toHaveLength(2);const retry=captured.find(row=>row.file.endsWith('token-fee-retry.json'))!;
+  expect(retry.intent.transactionId).not.toBe(failedTokenId);expect(retry.body.transactionFee.toString()).toBe('5000000000');expect(retry.body.tokenCreation).toMatchObject({decimals:0,supplyType:proto.TokenSupplyType.FINITE,tokenType:proto.TokenType.FUNGIBLE_COMMON});expect(retry.body.tokenCreation?.initialSupply?.toString()).toBe('1000');expect(retry.body.tokenCreation?.maxSupply?.toString()).toBe('1000');expect(retry.body.tokenCreation?.supplyKey).toBeNull();expect(retry.body.tokenCreation?.customFees?.length??0).toBe(0);
+  const journal=await readFile(retry.file,'utf8');expect(JSON.parse(journal).transactionId).toBe(retry.intent.transactionId);expect(await readFile(path.join(directory,'token.json'),'utf8')).toBe(original);
+  vi.mocked(AccountBalanceQuery.prototype.execute).mockResolvedValue({hbars:new Hbar(0)} as never);expect(await provisionTestCredits(credentials,directory,true)).toEqual(first);expect(captured).toHaveLength(2);expect(await readFile(retry.file,'utf8')).toBe(journal);expect(await readFile(path.join(directory,'token.json'),'utf8')).toBe(original);expect(Transaction.prototype.execute).not.toHaveBeenCalled();
  });
 });
