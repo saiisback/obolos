@@ -80,6 +80,32 @@ Follow [account setup](docs/self-service-setup.md), pair your private runner, si
 
 ## Architecture and payment flow
 
+See [general-task release verification](docs/evidence/2026-09-13-general-tasks.md) for actual paid translation and writing-to-analysis runs, finalized allocations, replay checks, and known output-quality limits.
+
+General digital tasks:
+
+```mermaid
+flowchart LR
+  Owner[Owner] -->|Task and maximum budget| App[Workspace and task API]
+  Sellers[Sellers] -->|Endpoint, schemas, price and profile| Catalog[Service catalog]
+  Runner[Private task runner] -->|Read task and catalog| App
+  Catalog --> Runner
+  Ring[Ledger Key Ring] -->|Private inference credential| Planner[Bounded model planner]
+  Runner --> Planner
+  Planner -->|Proposed service calls and output routing| App
+  Owner -->|Approve exact plan and price| App
+  App -->|Immutable approved plan| Runner
+  Runner -->|Policy checks and durable order IDs| Circle[Circle Agent Stack executor]
+  Circle -->|Test USDC payment| Arc[Arc settlement and allocation]
+  Arc -->|Seller payment| Sellers
+  Runner -->|Paid request| Service[Seller HTTPS service]
+  Service -->|Actual output| Runner
+  Runner -->|Verified result and receipts| App
+  App --> Neon[Neon tasks, orders and indexed payments]
+```
+
+The optional repository workflow keeps its separate Hedera x402 data purchase and verifier integration:
+
 ```mermaid
 flowchart LR
   Owner[Owner wallet] -->|Identity and separate spending signatures| UI[Next.js workspace]

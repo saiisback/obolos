@@ -1,0 +1,167 @@
+{
+  "chain": {
+    "verifiedAt": "2026-09-12T20:14:19.604Z",
+    "chainId": 5042002,
+    "finalizedBlock": "61784059",
+    "ownerOperated": true,
+    "servicePrincipalAtomic": "3000",
+    "sellerAtomic": "2850",
+    "reserveAtomic": "90",
+    "reviewAtomic": "60",
+    "payments": [
+      {
+        "orderId": "0xf37b7ae88e0c52cf5f45b3935dfa7b54f2bd051f790d65d3dc4db799ba8217ec",
+        "transactionHash": "0x2fa65b3d0f64371770727b8c8f4e2f429fa910ab2db0a2869ab29da5250c5a0b",
+        "blockNumber": "61782510",
+        "sellerAtomic": "950",
+        "reserveAtomic": "30",
+        "reviewAtomic": "20",
+        "acknowledgmentHash": "0x0c03e97042c36a9d833dc9510a8916ccd4cac966982fc10a57412ce6846bce55"
+      },
+      {
+        "orderId": "0x424a4d5f244041979707718629b5d3f6deeb247584928fcb8b05a95fa177d9d3",
+        "transactionHash": "0x1805579ad01630fe9509e107a08e9a6d952d0f68f1e00d1db3edf125b3c6669b",
+        "blockNumber": "61783340",
+        "sellerAtomic": "950",
+        "reserveAtomic": "30",
+        "reviewAtomic": "20",
+        "acknowledgmentHash": "0x05c204453238cb5337e5ae5258e3a97eea1b2e8a3f9099e19e9db69dc5ad0ccf"
+      },
+      {
+        "orderId": "0x605d14dccda01ea3414816400f6f1bbbf2ce9e7418ade3aa9532e5495e48d6dc",
+        "transactionHash": "0xd2de785fadf0c435e352bc9605d3dff9f2270122f262fe6097c90b912e1a45dc",
+        "blockNumber": "61783517",
+        "sellerAtomic": "950",
+        "reserveAtomic": "30",
+        "reviewAtomic": "20",
+        "acknowledgmentHash": "0x735300b75057b255d47afcb7b8ddc62c420f47ed8cbf1108410c762265c1e0f4"
+      }
+    ],
+    "replay": {
+      "sameOrderId": "0xf37b7ae88e0c52cf5f45b3935dfa7b54f2bd051f790d65d3dc4db799ba8217ec",
+      "samePaymentHash": "0x2fa65b3d0f64371770727b8c8f4e2f429fa910ab2db0a2869ab29da5250c5a0b",
+      "attemptedTransactionWrites": 0
+    },
+    "outputRouting": {
+      "byteForByteMatch": true,
+      "statistics": {
+        "bytes": 241,
+        "words": 42,
+        "sha256": "5f9f83339d8b605e5de44339f4f246d0afd332ff9dade1815fdd79bd141652ad",
+        "characters": 237
+      }
+    },
+    "quality": {
+      "requestedMaximumWords": 40,
+      "actualWords": 42,
+      "meetsWordLimit": false,
+      "note": "Paid service execution completed; generated prose exceeded the requested limit. Outputs require review; receipts do not certify semantic correctness."
+    },
+    "unsupported": {
+      "taskId": "e557a5f7-1a79-45eb-ba33-686220e8c00e",
+      "status": "blocked",
+      "error": "Planning could not produce a valid available service plan within this budget. Retry after checking the catalog and private planner.",
+      "paidSteps": 0
+    },
+    "rejectedBeforeApproval": {
+      "taskId": "c4259354-3fe5-46df-b3df-7971d04fa259",
+      "status": "cancelled",
+      "paidSteps": 0
+    }
+  },
+  "liveUI": {
+    "checkedAt": "2026-09-12T20:17:14.157Z",
+    "checks": [
+      "two completed general tasks and three actual payment receipt links",
+      "mobile task view without horizontal overflow",
+      "/app/marketplace renders without overflow",
+      "/app/developers renders without overflow",
+      "/app/economy renders without overflow",
+      "all three orders indexed with 2850 atomic USDC paid to seller"
+    ],
+    "errors": [],
+    "paidOrders": [
+      {
+        "orderId": "0x605d14dccda01ea3414816400f6f1bbbf2ce9e7418ade3aa9532e5495e48d6dc",
+        "serviceHash": "0xb123b15825e25853130c94e4217b50b24a45efcb420f0fd6a692e5dee64f55d5",
+        "title": "Compute service",
+        "category": "compute",
+        "quantity": "1",
+        "unit": "compute-unit",
+        "amountAtomic": "1000",
+        "sellerAtomic": "950",
+        "reserveAtomic": "30",
+        "reviewAtomic": "20",
+        "rebateAtomic": "0",
+        "transactionHash": "0xd2de785fadf0c435e352bc9605d3dff9f2270122f262fe6097c90b912e1a45dc",
+        "settledAt": "2026-09-12T20:09:38.000Z"
+      },
+      {
+        "orderId": "0x424a4d5f244041979707718629b5d3f6deeb247584928fcb8b05a95fa177d9d3",
+        "serviceHash": "0x56206fa33d28037757b99d2840fc4ac38cbd906d11d980b45d00d2a3aec041ed",
+        "title": "Language Studio \u2014 Writing & Translation",
+        "category": "inference",
+        "quantity": "1",
+        "unit": "inference-request",
+        "amountAtomic": "1000",
+        "sellerAtomic": "950",
+        "reserveAtomic": "30",
+        "reviewAtomic": "20",
+        "rebateAtomic": "0",
+        "transactionHash": "0x1805579ad01630fe9509e107a08e9a6d952d0f68f1e00d1db3edf125b3c6669b",
+        "settledAt": "2026-09-12T20:08:07.000Z"
+      },
+      {
+        "orderId": "0xf37b7ae88e0c52cf5f45b3935dfa7b54f2bd051f790d65d3dc4db799ba8217ec",
+        "serviceHash": "0x56206fa33d28037757b99d2840fc4ac38cbd906d11d980b45d00d2a3aec041ed",
+        "title": "Language Studio \u2014 Writing & Translation",
+        "category": "inference",
+        "quantity": "1",
+        "unit": "inference-request",
+        "amountAtomic": "1000",
+        "sellerAtomic": "950",
+        "reserveAtomic": "30",
+        "reviewAtomic": "20",
+        "rebateAtomic": "0",
+        "transactionHash": "0x2fa65b3d0f64371770727b8c8f4e2f429fa910ab2db0a2869ab29da5250c5a0b",
+        "settledAt": "2026-09-12T20:01:04.000Z"
+      }
+    ],
+    "sellerEarnings": {
+      "grossAtomic": "19000",
+      "sellerAtomic": "18050",
+      "reserveAtomic": "570",
+      "reviewAtomic": "380",
+      "rebateAtomic": "0",
+      "orderCount": 19
+    }
+  },
+  "httpGuards": {
+    "checkedAt": "2026-09-12T20:00:53.525Z",
+    "checks": [
+      {
+        "path": "/api/tasks",
+        "status": 401
+      },
+      {
+        "path": "/api/economy/earnings",
+        "status": 401
+      },
+      {
+        "path": "/api/v1/agents/84dc72bf-9340-4a51-ae2b-ea571d2e4f17/tasks?identity=1",
+        "status": 401
+      },
+      {
+        "path": "/api/tasks",
+        "status": 403
+      }
+    ]
+  },
+  "release": {
+    "runtimeCommit": "1b13704",
+    "deploymentId": "dpl_Dgh3BxT17y6DhrKcayhUkj2eQedh",
+    "url": "https://obolos.app",
+    "network": "Arc testnet",
+    "hardware": "Ledger Speculos emulator"
+  }
+}
