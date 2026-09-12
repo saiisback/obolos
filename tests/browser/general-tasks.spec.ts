@@ -29,6 +29,7 @@ async function fixtures(page:Page, initial:Record<string,unknown>[] = []) {
     if(path==='/api/economy/earnings') return json({indexedAt:'2026-09-13T00:00:00Z',totals:{grossAtomic:'10000',sellerAtomic:'9500',reserveAtomic:'300',reviewAtomic:'200',rebateAtomic:'0',orderCount:1},orders:[{orderId:hash('7'),serviceHash:service.serviceHash,title:profile.title,category:'inference',quantity:'1',unit:'inference-request',amountAtomic:'10000',sellerAtomic:'9500',reserveAtomic:'300',reviewAtomic:'200',rebateAtomic:'0',transactionHash:hash('8'),settledAt:'2026-09-13T00:00:00Z'}]});
     if(path==='/api/tasks') {if(req.method()==='POST') {tasks=[{...baseTask,...body}]; return json({task:tasks[0]},201);} return json({tasks});}
     if(path===`/api/tasks/${baseTask.id}`) {
+      if(body.action==='cancel') {tasks=[{...tasks[0],status:'cancelled'}]; return json({task:tasks[0]});}
       if(body.action==='approve') {tasks=[{...tasks[0],status:'approved',approvedPlanHash:body.planHash}]; return json({task:tasks[0]});}
       if(body.action==='retry') {tasks=[{...tasks[0],status:'queued',error:null}]; return json({task:tasks[0]});}
     }
@@ -119,4 +120,15 @@ test('seller publishes custom schemas and retries profile save without another w
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.evaluate(() => {window.scrollTo(0, 0); const label=document.createElement('div'); label.textContent='TEST FIXTURE — NO LIVE TRANSACTIONS'; label.style.cssText='padding:10px;text-align:center;background:#fff0ce;color:#402c00;font:12px sans-serif'; document.body.prepend(label);});
   await page.screenshot({path:'test-results/general-seller-390-fixture.png',fullPage:true});
+});
+
+test('an approved task can be cancelled before the runner claims execution',async({page})=>{
+ const state=await fixtures(page,[{...baseTask,status:'approved',plan,planHash:hash('4'),approvedPlanHash:hash('4')}]);
+ await page.goto(origin+'/app');
+ const tasks=page.getByRole('region',{name:'General tasks',exact:true});
+ await expect(tasks.getByText('Approved · waiting for runner',{exact:true})).toBeVisible();
+ await tasks.getByRole('button',{name:'Cancel task',exact:true}).click();
+ expect(state.requests).toEqual([{path:`/api/tasks/${baseTask.id}`,method:'POST',body:{action:'cancel'},key:undefined}]);
+ await expect(tasks.getByText('Cancelled',{exact:true})).toBeVisible();
+ await expect(tasks.getByRole('button',{name:'Cancel task',exact:true})).toHaveCount(0);
 });
