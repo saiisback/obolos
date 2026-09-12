@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@circle-fin/cli": "^1.0.0",
+    "@hiero-ledger/sdk": "^2.85.0",
     "@ledgerhq/hw-app-eth": "^7.8.17",
     "@ledgerhq/hw-transport": "6.35.7",
     "@ledgerhq/hw-transport-node-hid": "^6.33.5",

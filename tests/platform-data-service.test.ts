@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 import { encodePaymentSignatureHeader, decodePaymentRequiredHeader } from '@x402/core/http';
 const state=vi.hoisted(()=>({intents:new Set<string>(),settle:vi.fn(),verify:vi.fn(),updates:0}));
+vi.mock('../src/lib/platform/hedera-commerce',()=>({hederaTokenConfig:async()=>({asset:'0.0.777',payTo:'0.0.10425234',unitPriceAtomic:2,decimals:0,symbol:'TEST',network:'hedera:testnet'}),scheduledRepositoryRequest:vi.fn()}));
 vi.mock('../src/lib/platform/db',()=>({sql:()=>async(parts:TemplateStringsArray,...values:unknown[])=>{
   const text=parts.join('?');
   if(text.includes('SELECT provider_id'))return [{provider_id:'repo-standard',unit_price_atomic:100000},{provider_id:'repo-economy',unit_price_atomic:120000}];
@@ -10,7 +11,7 @@ vi.mock('../src/lib/platform/db',()=>({sql:()=>async(parts:TemplateStringsArray,
   throw new Error('Unexpected SQL');
 }}));
 vi.mock('@x402/core/server',()=>({HTTPFacilitatorClient:class{},x402ResourceServer:class{
-  register(){return this;} async initialize(){} async buildPaymentRequirements(input:{price:{amount:string};payTo:string}){return [{scheme:'exact',network:'hedera:testnet',asset:'0x0000000000000000000000000000000000000000',amount:input.price.amount,payTo:input.payTo,maxTimeoutSeconds:60,extra:{feePayer:'0.0.7162784'}}];}
+  register(){return this;} async initialize(){} async buildPaymentRequirements(input:{price:{amount:string;asset:string};payTo:string}){return [{scheme:'exact',network:'hedera:testnet',asset:input.price.asset,amount:input.price.amount,payTo:input.payTo,maxTimeoutSeconds:60,extra:{feePayer:'0.0.7162784'}}];}
   verifyPayment(...args:unknown[]){return state.verify(...args);}settlePayment(...args:unknown[]){return state.settle(...args);}
 }}));
 vi.mock('@x402/hedera/exact/server',()=>({ExactHederaScheme:class{}}));
@@ -31,6 +32,15 @@ async function signedRequest(){
 beforeEach(()=>{state.intents.clear();state.updates=0;state.verify.mockReset().mockResolvedValue({isValid:true});state.settle.mockReset().mockResolvedValue({success:true,network:'hedera:testnet',transaction:'0.0.7162784@1788900000.123456789'});vi.stubEnv('APP_ORIGIN','https://obolos.app');vi.stubEnv('HEDERA_PAY_TO','0.0.10425234');});
 afterEach(()=>vi.unstubAllEnvs());
 describe('native metered Hedera service',()=>{
+  it('offers explicitly metered HTS terms without changing the native HBAR route',async()=>{
+    const result=await publicDataRequest(request(['octocat/Hello-World','vercel/next.js']),['hts','evidence','repo-standard']);
+    expect(result.status).toBe(402);
+    const challenge=decodePaymentRequiredHeader(result.headers.get('payment-required')!);
+    expect(challenge.accepts[0].asset).toBe('0.0.777');expect(challenge.accepts[0].amount).toBe('4');
+    expect(challenge.resource?.url).toBe('https://obolos.app/x402/hts/evidence/repo-standard');
+    expect(state.settle).not.toHaveBeenCalled();
+  });
+
   it('returns real-format metered402 and makes no settlement for an unpaid request',async()=>{
     const result=await publicDataRequest(request(['octocat/Hello-World','vercel/next.js']),['evidence','repo-standard']);
     expect(result.status).toBe(402);const challenge=decodePaymentRequiredHeader(result.headers.get('payment-required')!);
