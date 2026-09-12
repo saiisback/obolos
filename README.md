@@ -13,9 +13,9 @@ Signed-in navigation stays inside the workspace:
 - `/app`: owned agents, runner pairing and spending mandates.
 - `/app/marketplace`: separate **Browse services**, **Your purchases**, and **Your seller desk** views; publishing opens on demand beside listings and earnings.
 - `/app/evidence`: the selected owned agent’s latest 100 runs, reports, receipts and checks.
-- `/app/developers`: agent-scoped credential issue/revocation and API examples.
+- `/app/developers`: agent-scoped credentials, API examples, and verified Hedera integrations at `#hedera`.
 
-Inside an opened agent, **Connect runner → Authorize spending → Run research** separates setup from daily execution. Recent runs stay beside the queue; full execution history lives in Evidence. Developers separates **API credentials**, **API examples**, **Runner setup**, and **Sell an API**, with shareable section anchors. Switching developer sections or agents hides unsaved one-time credentials.
+Inside an opened agent, **Connect runner → Authorize spending → Run research** separates setup from daily execution. Recent runs stay beside the queue; full execution history lives in Evidence. Developers separates **API credentials**, **API examples**, **Runner setup**, **Sell an API**, and **Hedera integrations**, with shareable section anchors. Switching developer sections or agents hides unsaved one-time credentials.
 
 The public `/marketplace`, `/evidence` and `/developers` pages remain separate; public evidence is a captured release record. Workspace sessions are checked before rendering account sections; every private API independently enforces ownership. Sign-in return destinations are restricted to the four workspace routes and a validated service selection.
 
@@ -27,7 +27,7 @@ To check workspace navigation and credential UI against isolated browser fixture
 
 **Submission video correction (September 9, 2026):** ETHGlobal prohibits synthetic/AI voiceovers and speeding up footage. The earlier narrated MP4 is an internal preview and **must not be submitted**. The [visual bed and human recording guide](docs/presentation.md) require the team’s own voice before upload. See the [official video rules](https://ethglobal.com/events/ethonline2026/info/details).
 
-The application and x402 service support native Vercel hosting with Neon. Paid execution still requires the owner’s local runner and funded broker to be online. A wallet signature does not prove physical Ledger use; Speculos is emulated development signing. Ledger acceptance and prior-paper eligibility remain external decisions.
+The application and x402 service support native Vercel hosting with Neon. Paid execution still requires the owner’s local runner and funded broker to be online. A wallet signature does not prove physical Ledger use; Speculos is emulated development signing. The device remains disclosed as emulated; paid API requests and settlement use real testnet services.
 
 **External service marketplace:** sellers can register their own repository-verification HTTPS endpoints, attribute listings to owned agents, and receive Arc test USDC. The v3 mandate binds the exact endpoint and terms; payment is persisted before delivery, and paid delivery can be retried without another transfer. See [the endpoint contract](docs/external-services.md) and [revision history](docs/marketplace-revisions.md). A real 0.001-HBAR + 0.05-USDC run completed through the external HTTPS reference provider with eight passing checks: [paid endpoint evidence](docs/evidence/2026-09-11-external-marketplace.md). Token issuance/inflation rules are still unspecified.
 
@@ -39,8 +39,8 @@ A user asks: *Compare these three developer tools using current repository activ
 
 | Target track | Integration in Obolos | Evidence still needed |
 |---|---|---|
-| Ledger — AI Agents x Ledger | `wallet-cli ring` integration plus explicit Speculos development support using upstream commands, real Sync/Ethereum apps and Ledger staging; signed mandate increases | Accepted emulator mandate and retained signature verified; sponsor decision and delivery of tooling feedback remain |
-| Hedera — AI & Agentic Payments | Per-repository HBAR pricing, native x402 challenges, Blocky402 settlement and a consuming planner | Public HTTPS 402 and paid request verified; retain the narrated demo artifact and host availability |
+| Ledger — AI Agents x Ledger | `wallet-cli ring` integration plus explicit Speculos development support using upstream commands, real Sync/Ethereum apps and Ledger staging; signed mandate increases | Accepted Speculos setup and retained signature verified; tooling feedback saved in the submission form |
+| Hedera — AI & Agentic Payments | Per-repository HBAR/HTS pricing, Blocky402, A2A negotiation, HCS-14 identity, HCS audits and finite native schedules | Real paid bonus workflows recorded below; retain the narrated demo and service availability |
 | Circle — Best Agentic Economy Application with Circle Agent Stack | Circle Agent Wallet pays the verification capability in USDC on Arc testnet | Fresh self-service USDC payment verified; historical intent also reconciled and settled |
 
 The frontend and backend use **Next.js, React and TypeScript**. Separate Node services implement the metered API and private capability broker. The application interface uses the user-selected Foundation reference on Mobbin, black-and-white surfaces, orange actions and an original flat illustration. The landing page, Product catalog, Evidence page and Developer guide use the later supplied video and dot-matrix design brief. Product and documentation pages scroll to keep forms, receipts and code examples accessible.
@@ -50,6 +50,14 @@ The frontend and backend use **Next.js, React and TypeScript**. Separate Node se
 The Arc testnet Phase 2 contracts are deployed and recorded in [deployment metadata](src/lib/economy/deployment.json). They separate human-owned agent limits, Circle wallet execution, canonical-USDC settlement, delivery evidence, and conservative economic measurements. The generic `obolos.service.v1` market supports data, compute, inference, verification, and storage providers with finalized receipt checks and delivery-only retries.
 
 **Paid production-path testnet execution verified:** a scoped agent API delivered a real compute request after a Circle Agent Stack payment of 0.001 test USDC. Contract transfers split 95% to the seller, 3% to reserve, and 2% to the review pool. Seller delivery and buyer acknowledgment are separate on-chain records. A Ledger Speculos-approved cap blocked a higher quote before payment; two selected-quote ARPI observations are recorded on chain. [Transaction evidence and limitations](docs/evidence/2026-09-11-economy-release.md). No new token is issued; resource-price inflation is measured, not minted. See the [implemented design](docs/superpowers/specs/2026-09-11-agentgdp-open-market-design.md), [architecture and operator commands](docs/economy-architecture.md), and [provider protocol](docs/economy-provider-protocol.md).
+
+## Hedera agent commerce
+
+The live Developers **Hedera integrations** section connects the discoverable A2A service to its HCS-14 identities, payment audit, HTS resource endpoint and finite native schedules. Public proof metadata is available at [`/api/hedera/evidence`](https://obolos.app/api/hedera/evidence); private keys, offer tokens and signed transaction journals stay in the operator environment.
+
+The September 13 verification purchased one repository for **0.001 HBAR** through A2A negotiation and Blocky402, purchased two repositories for **2 OTEST** through native HTS x402 settlement, anchored the payment audit on HCS, and delivered two separately scheduled repository purchases. OTEST is a fixed-supply testnet service credit with no monetary value. The schedule is a finite two-payment plan, not an indefinitely running subscription. [Exact receipts and edge-case checks](docs/evidence/2026-09-13-hedera-bonus.md).
+
+Setup and reproduction: [A2A buyer](docs/hedera-a2a.md), [HTS buyer](docs/hedera-token-buyer.md), [identity and HCS audit](docs/hedera-identity-audit.md), [verified evidence publication](docs/hedera-evidence-publication.md). The operator-only `scripts/hedera-commerce.ts` provisions test credits and creates/delivers bounded native schedules. Apply migrations through `016_hedera_commerce.sql` before enabling these endpoints. Never restart an uncertain paid operation with a new identity; reconcile its saved transaction first.
 
 ## Run the application
 
