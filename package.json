@@ -30,7 +30,8 @@
     "economy:observe": "tsx --env-file=.env.broker scripts/economy-observe.ts",
     "economy:smoke": "tsx --env-file=.env.broker scripts/economy-testnet-smoke.ts",
     "economy:execute": "tsx --env-file-if-exists=.env.broker scripts/economy-execute.ts",
-    "economy:provider": "tsx --env-file-if-exists=.env.broker --env-file-if-exists=.env.economy services/economy-provider.ts"
+    "economy:provider": "tsx --env-file-if-exists=.env.broker --env-file-if-exists=.env.economy services/economy-provider.ts",
+    "task:runner": "tsx --env-file-if-exists=.env.broker --env-file-if-exists=.env.tasks services/task-runner.ts"
   },
   "dependencies": {
     "@circle-fin/cli": "^1.0.0",

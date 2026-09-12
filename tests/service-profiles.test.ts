@@ -19,9 +19,10 @@ describe('Seller-defined capability profiles',()=>{
   expect(result.description).toContain('seller-defined');
   expect(result.examples).toEqual([]);
  });
- it('recognizes only the exact hosted reference path and matching schema',()=>{
+ it('does not grant a built-in capability without server-verified binding',()=>{
   const {protocol:_protocol,serviceHash:_hash,...terms}=definition;
   const hosted=createServiceDefinition({...terms,endpoint:'https://obolos.app/api/economy/reference/inference'});
   expect(profileForService(hosted).examples).toEqual([]);
+  expect(profileForService(hosted,undefined,true).examples).toEqual([]);
  });
 });

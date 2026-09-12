@@ -8,6 +8,8 @@ vi.mock('@/lib/platform/db',()=>({sql:()=>transport.query}));
 import {saveServiceProfile,listServiceProfiles} from '@/lib/platform/service-profiles';
 import {listEconomySellerEarnings} from '@/lib/platform/economy-earnings';
 import {createServiceDefinition} from '@/lib/economy/service-contract';
+import {providerSchemas,providerUnits} from '@/lib/economy/provider-work';
+import {referenceSeller} from '@/lib/economy/provider-queue';
 import {economyDeployment} from '@/lib/economy/chain';
 const deployment=economyDeployment()!,hash=(s:string)=>keccak256(toHex(s));
 const seller={id:randomUUID(),address:'0x'+'a'.repeat(40)},other={id:randomUUID(),address:'0x'+'b'.repeat(40)};
@@ -35,4 +37,13 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)('General seller profiles and fin
   await add('mine',seller.address);await add('other',other.address);await add('too-new',seller.address,101);await add('mismatch',seller.address,99,'different-tx');
   const result=await listEconomySellerEarnings(seller);expect(result.totals).toMatchObject({grossAtomic:'9007199254740993',sellerAtomic:'8556839292003944',orderCount:1});expect(result.orders).toHaveLength(1);expect(result.orders[0]).toMatchObject({orderId:hash('mine'),title:'Translate my text',transactionHash:hash('mine')});expect(JSON.stringify(result)).not.toContain('inputHash');
  });
+ it('assigns built-in capabilities only to the actual hosted provider with exact service terms',async()=>{
+  const terms={chainId:deployment.chainId,settlementAddress:deployment.settlement,ledgerAddress:deployment.ledger,seller:seller.address,endpoint:'https://obolos.app/api/economy/reference/inference',category:'inference' as const,unit:providerUnits.inference,quantity:'1',unitPriceAtomic:'1000',inputSchema:providerSchemas.inference.input,outputSchema:providerSchemas.inference.output};
+  const impostor=createServiceDefinition(terms),actual=createServiceDefinition({...terms,seller:referenceSeller});
+  await db.query('INSERT INTO economy_services(service_hash,user_id,definition) VALUES($1,$2,$3),($4,$2,$5)',[impostor.serviceHash,seller.id,impostor,actual.serviceHash,actual]);
+  const profiles=await listServiceProfiles();
+  expect(profiles.find(p=>p.serviceHash===impostor.serviceHash)?.description).toContain('seller-defined');
+  expect(profiles.find(p=>p.serviceHash===actual.serviceHash)?.title).toBe('Writing and language assistance');
+ });
+
 });

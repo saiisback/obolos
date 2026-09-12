@@ -6,16 +6,16 @@
 
 ![Three robot coworkers exchanging a payment token and a research report](public/illustrations/agent-workforce.png)
 
-A self-service workspace for research agents with wallet accounts, scoped API access, and signed spending limits. User-owned runners execute through private local brokers; the former `/demo` URL redirects to the live workspace. Built for the **Ledger AI Agents x Ledger**, **Hedera AI & Agentic Payments**, and **Arc Best Agentic Economy Application with Circle Agent Stack** tracks at ETHOnline 2026.
+A marketplace for digital work: describe a task, review its service plan and price, and let a private agent buy the services and return paid results. Sellers publish HTTPS APIs with their own input/output schemas and prices. Wallet accounts, scoped API access and signed spending limits bind who can spend. User-owned runners execute through private local brokers; the former `/demo` URL redirects to the live workspace. Built for the **Ledger AI Agents x Ledger**, **Hedera AI & Agentic Payments**, and **Arc Best Agentic Economy Application with Circle Agent Stack** tracks at ETHOnline 2026.
 
 Signed-in navigation stays inside the workspace:
 
-- `/app`: owned agents, runner pairing and spending mandates.
+- `/app`: general tasks, exact-plan approval, paid results, owned agents and spending setup.
 - `/app/marketplace`: separate **Browse services**, **Your purchases**, and **Your seller desk** views; publishing opens on demand beside listings and earnings.
 - `/app/evidence`: the selected owned agent’s latest 100 runs, reports, receipts and checks.
 - `/app/developers`: agent-scoped credentials, API examples, and verified Hedera integrations at `#hedera`.
 
-Inside an opened agent, **Connect runner → Authorize spending → Run research** separates setup from daily execution. Recent runs stay beside the queue; full execution history lives in Evidence. Developers separates **API credentials**, **API examples**, **Runner setup**, **Sell an API**, and **Hedera integrations**, with shareable section anchors. Switching developer sections or agents hides unsaved one-time credentials.
+The primary task flow is **Describe task → Review service plan → Approve exact cost → Receive results and receipts**. A task can compose up to five registered services, including writing, translation and text processing; additional capabilities come from seller-published services. Unsupported work is blocked with an explanation. The earlier repository research workflow remains optional, with its existing history in Evidence. See [private general task runner setup](docs/task-runner.md). Developers separates **API credentials**, **API examples**, **Runner setup**, **Sell an API**, and **Hedera integrations**, with shareable section anchors. Switching developer sections or agents hides unsaved one-time credentials.
 
 The public `/marketplace`, `/evidence` and `/developers` pages remain separate; public evidence is a captured release record. Workspace sessions are checked before rendering account sections; every private API independently enforces ownership. Sign-in return destinations are restricted to the four workspace routes and a validated service selection.
 
@@ -29,7 +29,9 @@ To check workspace navigation and credential UI against isolated browser fixture
 
 The application and x402 service support native Vercel hosting with Neon. Paid execution still requires the owner’s local runner and funded broker to be online. A wallet signature does not prove physical Ledger use; Speculos is emulated development signing. The device remains disclosed as emulated; paid API requests and settlement use real testnet services.
 
-**External service marketplace:** sellers can register their own repository-verification HTTPS endpoints, attribute listings to owned agents, and receive Arc test USDC. The v3 mandate binds the exact endpoint and terms; payment is persisted before delivery, and paid delivery can be retried without another transfer. See [the endpoint contract](docs/external-services.md) and [revision history](docs/marketplace-revisions.md). A real 0.001-HBAR + 0.05-USDC run completed through the external HTTPS reference provider with eight passing checks: [paid endpoint evidence](docs/evidence/2026-09-11-external-marketplace.md). Token issuance/inflation rules are still unspecified.
+**General service marketplace:** sellers choose a title, description, examples, HTTPS endpoint, resource category, fixed unit price and strict input/output schemas. The platform validates examples against the actual service contract. Seller payments come from finalized on-chain allocation events and are shown before refunds; they are not inferred profit. Public descriptions cannot change the registered seller or payment terms. General task execution currently uses Arc test USDC, while the separate Hedera x402 workflows below remain available.
+
+**Earlier research marketplace:** sellers can register their own repository-verification HTTPS endpoints, attribute listings to owned agents, and receive Arc test USDC. The v3 mandate binds the exact endpoint and terms; payment is persisted before delivery, and paid delivery can be retried without another transfer. See [the endpoint contract](docs/external-services.md) and [revision history](docs/marketplace-revisions.md). A real 0.001-HBAR + 0.05-USDC run completed through the external HTTPS reference provider with eight passing checks: [paid endpoint evidence](docs/evidence/2026-09-11-external-marketplace.md). Token issuance/inflation rules are still unspecified.
 
 **Marketplace release:** signed-in sellers can publish hosted metric-verification services and receive Arc test USDC directly. Buyers select a seller in a v2 spending mandate; orders bind the purchased evidence, report, recipient and price. The public service verifies settlement, and the workspace checks both payment proofs before showing chain-confirmed results. [Open the marketplace](https://obolos.app/marketplace) · [Setup and API flow](docs/marketplace-setup.md). **Paid release verified:** a separately signed-in buyer selected a seller, bought fresh evidence and completed a 0.05 test-USDC order with all seven report checks passing. [Receipts and validation](docs/evidence/2026-09-10-marketplace-testnet.md).
 
@@ -160,7 +162,8 @@ Existing installations retain their data directory, cookies, signed messages and
 
 - `src/components/platform/`: self-service account, agent, runner, mandate and job interfaces.
 - `src/lib/platform/`, `db/migrations/`: Neon-backed control plane and native x402 service.
-- `services/agent-runner.ts`, `src/lib/runner/`: isolated execution, signed-scope enforcement and durable recovery.
+- `services/task-runner.ts`, `src/lib/tasks/`: general planning, exact approval and durable paid service orchestration.
+- `services/agent-runner.ts`, `src/lib/runner/`: earlier research execution, signed-scope enforcement and durable recovery.
 - `src/components/platform/economy-workspace.tsx`: live economy evidence, publication and paid-order recovery.
 - `src/lib/engine.ts`, `policy.ts`, `store.ts`: mandate, stage machine, audit and persistence.
 - `src/app/api/`: session-scoped run actions and operator authentication.

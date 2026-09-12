@@ -2,6 +2,7 @@ import type {User} from './auth';
 import {sql} from './db';
 import {PlatformError} from './http';
 import {z} from 'zod';
+import {validateProviderBinding} from '../economy/provider-queue';
 import {validateServiceDefinition} from '../economy/service-contract';
 import {profileForService,validateServiceProfile,type ServiceProfile} from '../economy/service-profile';
 
@@ -10,7 +11,11 @@ export async function listServiceProfiles():Promise<ServiceProfile[]> {
  LEFT JOIN economy_service_profiles p ON p.service_hash=s.service_hash
  WHERE NOT EXISTS(SELECT 1 FROM economy_service_retirements r WHERE r.service_hash=s.service_hash)
  ORDER BY s.created_at DESC LIMIT 100`;
- return rows.map(row=>profileForService(validateServiceDefinition(row.definition),row.profile));
+ return rows.map(row=>{
+  const service=validateServiceDefinition(row.definition);let verified=false;
+  try{validateProviderBinding(service,service.category,'https://obolos.app');verified=true;}catch{/* Unknown providers supply their own descriptions. */}
+  return profileForService(service,row.profile,verified);
+ });
 }
 export async function saveServiceProfile(user:User,serviceHash:string,value:unknown):Promise<ServiceProfile> {
  const hash=z.string().regex(/^0x[0-9a-fA-F]{64}$/).parse(serviceHash).toLowerCase(),db=sql();

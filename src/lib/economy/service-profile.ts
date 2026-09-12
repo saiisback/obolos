@@ -21,12 +21,12 @@ const referenceProfiles:Record<string,z.infer<typeof profileInput>>={
  storage:{title:'Store a text artifact',description:'Store supplied text for one hour and retrieve it through the authenticated paid-order access path.',tags:['storage','text'],examples:[{text:'My project notes'}]},
  data:{title:'GitHub repository activity',description:'Fetch current public GitHub repository metadata such as stars, forks, issues and last push time.',tags:['github','repository','data'],examples:[{repo:'octocat/Hello-World'}]},
 };
-/** Category alone is not evidence of a capability. Known reference descriptions require the exact host/path and compatible input. */
-export function profileForService(service:ServiceDefinition,stored?:unknown):ServiceProfile {
+/** Category alone is not evidence of a capability. Known reference descriptions require server-verified provider binding. */
+export function profileForService(service:ServiceDefinition,stored?:unknown,referenceBindingVerified=false):ServiceProfile {
  if(stored!==undefined&&stored!==null)return validateServiceProfile(service,stored);
  const fallback={serviceHash:service.serviceHash,title:`${service.category[0].toUpperCase()+service.category.slice(1)} service`,description:'A seller-defined service. Review its input and output schemas and provider documentation before requesting work.',tags:[service.category],examples:[]};
  const endpoint=new URL(service.endpoint);
- if(endpoint.origin!=='https://obolos.app'||endpoint.pathname!==`/api/economy/reference/${service.category}`||endpoint.search||endpoint.hash)return fallback;
+ if(!referenceBindingVerified||endpoint.origin!=='https://obolos.app'||endpoint.pathname!==`/api/economy/reference/${service.category}`||endpoint.search||endpoint.hash)return fallback;
  const profile=referenceProfiles[service.category];
  try{return validateServiceProfile(service,profile);}catch{return fallback;}
 }
