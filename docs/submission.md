@@ -2,32 +2,52 @@
 
 Selected tracks: **AI Agents x Ledger**; Hedera **AI & Agentic Payments**; **Best Agentic Economy Application with Circle Agent Stack** on Arc. One project targets these three partner selections. This matrix separates observed execution from external qualification decisions.
 
-## Current evidence — September 8, 2026
+## Current checkpoint — September 13, 2026
+
+The public native Next.js/Neon workspace at [obolos.app](https://obolos.app) has retained paid execution through the self-service research flow and the Arc resource economy. The [September 9 self-service run](evidence/2026-09-09-self-service-testnet.md) independently confirmed **0.001 HBAR** for repository evidence and **0.05 USDC** for verification. The [September 11 five-service release](evidence/2026-09-11-live-only-release.md) and [September 12 marketplace exercise](evidence/2026-09-12-marketplace-exercise.md) retain actual data, compute, inference, verification and storage payments, separate seller delivery, and buyer acknowledgment. The older Arc verification intent is [reconciled and settled](evidence/2026-09-08-arc-reconciliation.md).
+
+The user has confirmed the selected tracks and saved developer feedback in the submission form. This checkpoint does not establish final submission or video upload; those statuses remain unconfirmed. The user explicitly accepts Speculos for this project. Its Ring integration uses a disclosed source adapter, real Ledger staging, and `hardwareBacked: false`; physical hardware was not used. This accepted development setup is not an implementation blocker.
+
+| Requirement | Current evidence or implementation | Current status |
+|---|---|---|
+| Ledger Agent Stack / Key Ring | [Pinned adapter provenance](../tools/ledger-speculos/README.md), [staging Ring execution](../tools/ledger-speculos/ring-evidence.json), private broker credential retrieval and retained paid runs. | Implemented in the accepted Speculos setup. |
+| Secrets kept outside agent messages | Fixed broker capabilities; model and public app do not receive the inference key or payer key. | Implemented; private brokers and executors remain operator-hosted. |
+| Human approval before escalation | [Signed mandate version 2 and resumed Hedera payment](evidence/2026-09-08-approved-price-increase.md); [original Arc intent recovery](evidence/2026-09-08-arc-reconciliation.md). | Retained execution evidence; Arc recovery is complete. |
+| Developer feedback | [Tooling/DX feedback](ledger-feedback.md). | User confirmed feedback saved in the submission form. |
+| Live Blocky402-gated Hedera service and consumer | [Public HTTPS purchase](evidence/2026-09-08-public-data-purchase.md), [native self-service paid run](evidence/2026-09-09-self-service-testnet.md). | Mandatory paid-service evidence retained. |
+| Arc + canonical USDC + Circle Agent Stack | [Self-service payment](evidence/2026-09-09-self-service-testnet.md), [95/3/2 settlement release](evidence/2026-09-11-economy-release.md), [five specialist agents](evidence/2026-09-12-marketplace-exercise.md). | Real testnet settlement and delivery retained. |
+| Working public UI/backend, source and diagram | [Public repository](https://github.com/saiisback/obolos), README, native Vercel/Neon deployment and [presentation architecture](presentation/index.html#slide-3). | Present; private reference provider/executor availability remains operational. |
+| Hedera identity and audit bonus | HCS-14 identity/profile and exact HCS audit verification implemented. Service topic **0.0.10507462** and buyer topic **0.0.10507655** have actual anchored profiles. | See the [September 13 bonus evidence checkpoint](evidence/2026-09-13-hedera-bonus.md) for exact retained identities and proof status. |
+| A2A, HTS and native schedule bonus | Agent Card and bounded signed offers; exact-token transfer validation; finite native schedule operator and proof-gated resource delivery implemented. | Execution claims follow the [bonus evidence checkpoint](evidence/2026-09-13-hedera-bonus.md); source/tests alone do not mark paid demonstrations complete. |
+| Video and final submission | [Presentation](presentation/index.html), original-speed [silent visual bed](presentation/obolos-human-narration-visual-bed.mp4), [human script](presentation/demo-transcript.md). | Human-narrated upload and final submitted state are unconfirmed. |
+| Prior-work disclosure | [AI/prior-work disclosure](ai-disclosure.md). | Disclosed; event classification remains an organizer decision. |
+
+## Historical paid checkpoint — September 8, 2026
 
 The [first paid testnet run](evidence/2026-09-08-first-paid-run.md) completed through the Next.js HTTP workflow, private broker, real Ledger staging Ring decryption in explicit Speculos mode, hosted Blocky402, GPT-5 nano and Circle Agent Wallet. It purchased three repository records for **0.003 test HBAR**, paid **0.05 test USDC** on Arc for verification, passed eight structural/source checks and exported a valid local audit chain. It did not include price escalation. A subsequent [live price-increase export](evidence/2026-09-08-blocked-price-increase.json) proves the planner paused with zero receipts and zero spend after the approved provider changed from 0.001 to 0.004 HBAR per repository. That export does not include an accepted signature or resumption. The [expired-approval negative check](evidence/2026-09-08-expired-approval.json) returned HTTP 400, retained mandate version 1, and recorded zero receipts. It establishes rejection of an expired request, not a signed approval.
 
 | Requirement | Actual implementation and evidence | Remaining gate |
 |---|---|---|
-| Ledger Agent Stack / wallet-cli ring central | Broker decrypts its inference/Hedera bundle through a disclosed adaptation of upstream Ring commands and the real staging SDK. [Ring execution evidence](../tools/ledger-speculos/ring-evidence.json); [paid workflow](evidence/2026-09-08-first-paid-run.md). | Ledger must confirm whether Speculos plus the source adapter satisfies the bounty. This is not the stock CLI binary or physical-device security. |
+| Ledger Agent Stack / wallet-cli ring central | Broker decrypts its inference/Hedera bundle through a disclosed adaptation of upstream Ring commands and the real staging SDK. [Ring execution evidence](../tools/ledger-speculos/ring-evidence.json); [paid workflow](evidence/2026-09-08-first-paid-run.md). | Source-adapter and Speculos provenance retained; current accepted setup is recorded above. |
 | Agent uses secrets without receiving raw keys | Fixed broker capabilities; the model receives no inference key, payer key or capability token. | Production OS isolation and trusted broker operation remain deployment responsibilities. |
 | Human approval before escalation | Exact expiring message, pinned controller, version/nonce/signature validation and retained authorization proofs implemented. Real harmless Ethereum emulator signing verified. | [Actual signed escalation and post-approval Hedera settlement](evidence/2026-09-08-approved-price-increase.md) are exported. Arc verification became uncertain and was subsequently reconciled; see the recovery record. Recording remains. |
 | New work during event | New implementation history and [AI/prior-work disclosure](ai-disclosure.md). | Organizer determination for the September 3 concept paper. |
-| Ledger tooling feedback | [Actual emulator/SDK experience, reproducible environment and exact sponsor question](ledger-feedback.md). | Team review and external delivery; physical hardware experience is not claimed. |
+| Ledger tooling feedback | [Actual emulator/SDK experience and reproducible environment](ledger-feedback.md). | Superseded by the user's confirmed saved feedback above. |
 | Live x402-gated Hedera service | Metered repository API executes actual native HBAR x402 requests. | [Public HTTPS challenge and paid purchase verified](evidence/2026-09-08-public-data-purchase.md). Mac/tunnels must remain online. |
 | Blocky402 settlement and consuming agent | Real paid request with [Hedera receipt](https://hashscan.io/testnet/transaction/0.0.7162784%401788889605.646083348) and saved export. | A later [public data-only purchase](evidence/2026-09-08-public-data-purchase.md) also settled; it paused before inference/Arc. |
 | Public repository, setup, architecture and payment flow | [saiisback/obolos](https://github.com/saiisback/obolos), README and setup docs. | Keep deployment URL and latest evidence synchronized. |
 | Arc + USDC + Circle Agent Stack | Circle Agent Wallet CLI paid actual canonical USDC on Arc testnet; [Arc receipt](https://testnet.arcscan.app/tx/0x4d97395a52897a1b9c1255b1a9ba8023cec742ef64cb838a65962001930b81fe). | No extra Circle API-key path, Nanopayments or Paymaster is claimed. |
-| Decision logic tied to real signals | Quotes, provider allowlist, expiry, separate currency budgets and current evidence drive the workflow. | Actual increase, zero-spend pause, signed mandate version 2 and resumed Hedera settlement exported. Arc reconciliation and recording remain. |
+| Decision logic tied to real signals | Quotes, provider allowlist, expiry, separate currency budgets and current evidence drive the workflow. | Actual increase, zero-spend pause, signed mandate version 2 and resumed Hedera settlement exported. Arc reconciliation subsequently completed. |
 | Working frontend/backend and diagram | Next.js console, broker, data service and first paid HTTP workflow; [visible SVG diagram in the presentation](presentation/index.html#slide-3). | Public service and final narrated product recording. |
 | Video and presentation | [Seven-slide deck](presentation/index.html), original-speed [silent visual bed](presentation/obolos-human-narration-visual-bed.mp4), and [timed human script](presentation/demo-transcript.md). Actual public purchase and emulator signing are recorded. | Human narration and final upload remain required. The old synthetic preview is prohibited by event rules and must not be submitted. |
 
-### Approved escalation with a pending Arc transfer
+### Approved escalation and subsequent Arc recovery
 
 A fresh [approved price-increase run](evidence/2026-09-08-approved-price-increase.md) records the user-authorized Speculos signature, backend acceptance of mandate version 2, and a settled **0.008 HBAR** purchase after the increase. The report was generated. Its **0.05 USDC Arc verification attempt initially became uncertain**. On September 9, explicit user-authorized recovery completed the original challenge; independent chain verification allowed the pending intent to be settled and the job completed. See [recovery evidence](evidence/2026-09-08-arc-reconciliation.md). The original exports remain historical snapshots.
 
-### Public deployment
+### Historical proxy deployment
 
-[obolos.app](https://obolos.app) and its `/x402` service completed a [public paid one-record request](evidence/2026-09-08-public-data-purchase.md) for 0.001 HBAR. This separate run paused before inference/Arc. Vercel currently proxies through temporary Cloudflare tunnels to persistent Mac processes; the Mac and tunnels must remain online. Durable VPS deployment remains separate.
+[obolos.app](https://obolos.app) and its `/x402` service completed a [public paid one-record request](evidence/2026-09-08-public-data-purchase.md) for 0.001 HBAR. This separate run paused before inference/Arc. At that checkpoint, Vercel proxied temporary Cloudflare tunnels to persistent Mac processes. The September 9 native Vercel/Neon deployment supersedes that public proxy arrangement; private brokers/providers still require their configured hosts.
 
 ## Video rule correction
 
@@ -40,28 +60,26 @@ The [official ETHOnline instructions](https://ethglobal.com/events/ethonline2026
 - [x] HashScan and ArcScan receipt links attached to the first paid run.
 - [x] Real Ledger staging Ring enrollment, encryption/decryption and negative checks under disclosed Speculos mode.
 - [x] Presentation artifact with visible architecture, product flow, track roles, evidence links and trust boundaries.
-- [x] Developer feedback and sponsor/organizer questions drafted from actual execution.
+- [x] Developer feedback drafted from actual execution and confirmed saved by the user in the submission form.
 - [x] Public HTTPS Hedera data service at https://obolos.app/x402, recorded unpaid challenge and actual paid request.
 - [x] Live quote increase, Speculos controller approval and resumed Hedera purchase exported with signature.
 - [x] Reconcile the older Arc verification transfer: original challenge recovered, exact transfer confirmed, intent settled with backups and audit retained. See [recovery evidence](evidence/2026-09-08-arc-reconciliation.md).
 - [x] Recorded actual Speculos signing and disclosed the partial escalation outcome in the visual bed and human narration script.
-- [ ] Deployment with broker OS isolation, durable journals and continuing availability for review.
-- [ ] Developer feedback sent by the team; sponsor response on emulator/source-adapter eligibility recorded.
-- [ ] Human-narrated 2–4 minute demo at 720p or higher. Old TTS preview is internal only and must not be uploaded.
+- [x] Native public Vercel/Neon deployment with retained self-service paid execution and durable server payment state.
+- [ ] Continuing private runner/provider availability for reviewer execution.
+- [ ] Human-narrated 2–4 minute demo at 720p or higher uploaded; status unconfirmed. Old TTS preview is internal only.
 - [x] Silent visual bed prepared with original-speed Speculos/public execution clips and timed human narration script.
 - [x] Finalized actual screen recording of a fresh public x402 paid request: mandate, discovery, purchase and settled receipt visible.
-- [ ] Team review/upload of the narrated video and submission package.
+- [ ] Final submitted state and narrated video upload confirmed.
 - [ ] Organizer determination of the disclosed prior-paper eligibility.
-
-No physical Ledger was used. Do not mark a physical demonstration complete from emulator execution. The [prepared sponsor question](ledger-feedback.md#exact-sponsor-question--ready-to-send) requests a clear determination of what additional evidence, if any, is required.
 
 ## Trust boundaries and optional features
 
-Only payments settle on-chain. Inference, deterministic orchestration/verifier, capability broker, Blocky402, Circle infrastructure and the local journal remain off-chain. Circle uses its separate MPC/session infrastructure; Ring does not hold or sign the Circle wallet key. The broker holds plaintext secrets in memory while using them. The local audit hash chain is not publicly anchored or tamper-proof against a compromised host.
+Payments settle on-chain; HCS profiles and any proof-confirmed audit messages anchor their public bytes separately. Inference, deterministic orchestration/verifier, capability broker, Blocky402, Circle infrastructure and the local journal remain off-chain. Circle uses its separate MPC/session infrastructure; Ring does not hold or sign the Circle wallet key. The broker holds plaintext secrets in memory while using them. A local audit hash chain alone is not publicly anchored; confirmed HCS messages prove the submitted public bytes, not every local event or narrative claim.
 
 HBAR and USDC budgets are independent; there is no bridge or atomic cross-chain settlement. Caps constrain payment principal, not gas fees. The verifier checks source integrity, freshness, coverage and structure; it does not independently certify every generated narrative claim.
 
-Implemented extra-credit directions: per-repository metering (one, two or three records) and discoverable provider directory. The pricing tiers belong to one service, not independent businesses. Optional protocols not claimed: A2A/ACP, ERC-8004/HCS-14, UCP, HCS audit anchoring, Scheduled Transactions, streaming, custom HTS fee schedules, Circle Nanopayments or Paymaster.
+Implemented extra-credit directions include per-repository metering (one, two or three records), provider discovery, A2A negotiation, HCS-14 profiles, HCS audit verification, exact HTS units and finite native scheduled payments. The [bonus evidence checkpoint](evidence/2026-09-13-hedera-bonus.md) separates actual anchored/paid results from implementation. Pricing tiers remain one service. ACP, ERC-8004, UCP, streaming, custom HTS fee schedules, Circle Nanopayments and Paymaster are not claimed.
 
 Connections readiness and positive balances establish configuration observations, not successful transactions. Saved live receipts and verified authorization records supply execution evidence. Keep the historical checks below distinct from current paid-run evidence.
 
