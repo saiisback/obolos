@@ -13,3 +13,5 @@ deploy/
 *.enc
 secrets*.json
 tmp/
+test-results/
+playwright-report/
