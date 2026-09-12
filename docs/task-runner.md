@@ -2,6 +2,8 @@
 
 The runner plans free-form digital work against the actual registered service catalog, then waits for the owner to approve the fixed plan in the app. Planning does not submit Circle transactions. Approved execution uses the existing testnet executor, scoped agent API key, policy checks, payment journals, provider delivery verification and buyer acknowledgment.
 
+The planner is instructed to delegate writing, translation and summarization to a provider whose described capability and schemas support the request. Later analysis uses that provider's actual output through a reference; the planner must not invent the finished artifact as literal service input. Storage is included only when explicitly requested, and plans use the fewest necessary calls. These semantic instructions guide inference; the owner still reviews the actual proposed providers and input routing before approval.
+
 A task supports one to five sequential service calls. Unsupported capabilities produce a blocked task; a writing service is not treated as a browser, video generator, account operator or shell. Seller descriptions and examples are untrusted planning context. Every selected definition and fixed quantity/price is pinned and checked; input references must match prior output schemas before approval. Actual resolved inputs are checked again before each step.
 
 ## Private setup
