@@ -25,7 +25,7 @@ LEDGER_CONTROLLER_ADDRESS=<existing-ledger-controller-address>
 ECONOMY_OPERATION_DIR=/absolute/private/existing-economy-operations
 ```
 
-The owner and Circle payer may be different addresses. Generate the worker UUID once and retain it. Use the same `ECONOMY_OPERATION_DIR` as existing purchases made by this wallet; its shared executor reservation prevents concurrent unresolved allowances. State directories must be owned by the current user with no group or world permissions (`0700`). Existing files remain private (`0600`). The authenticated platform origin must be canonical HTTPS with no path, query or credentials.
+The owner and Circle payer may be different addresses. Generate the worker UUID once and retain it. Use the same `ECONOMY_OPERATION_DIR` as existing purchases made by this wallet; its shared executor reservation prevents concurrent unresolved allowances. State directories must be owned by the current user with no group or world permissions (`0700`). Existing files remain private (`0600`). Private journal reads allow up to 8 MiB because the executor preserves formatted JSON whose whitespace can expand a valid bounded output; HTTP response limits are separate. The authenticated platform origin must be canonical HTTPS with no path, query or credentials.
 
 Run one bounded claim:
 

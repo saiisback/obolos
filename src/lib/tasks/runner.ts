@@ -21,7 +21,7 @@ type Journal={version:1;request:{id:string;agentId:string;instruction:string;bud
 function same(a:unknown,b:unknown){return canonicalJsonHash(a)===canonicalJsonHash(b);}
 async function readPrivate(path:string):Promise<unknown|undefined>{
  let file;try{file=await open(path,constants.O_RDONLY|constants.O_NOFOLLOW);}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return;throw Error('Private journal unavailable; preserve it for inspection');}
- try{const info=await file.stat();if(!info.isFile()||(info.mode&0o077)!==0||info.size>1024*1024||(process.getuid&&info.uid!==process.getuid()))throw Error();return JSON.parse(await file.readFile('utf8'));}catch{throw Error('Invalid private journal; preserve it for inspection');}finally{await file.close();}
+ try{const info=await file.stat();if(!info.isFile()||(info.mode&0o077)!==0||info.size>8*1024*1024||(process.getuid&&info.uid!==process.getuid()))throw Error();return JSON.parse(await file.readFile('utf8'));}catch{throw Error('Invalid private journal; preserve it for inspection');}finally{await file.close();}
 }
 async function save(path:string,value:unknown){
  const temp=path+'.'+randomUUID()+'.tmp',file=await open(temp,'wx',0o600);

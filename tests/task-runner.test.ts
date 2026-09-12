@@ -3,7 +3,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {describe,it,expect,vi} from 'vitest';
 import {keccak256,toHex} from 'viem';
-import {createServiceDefinition,canonicalJsonHash} from '../src/lib/economy/service-contract';
+import {createServiceDefinition,canonicalJsonHash,type ConstrainedJsonSchema} from '../src/lib/economy/service-contract';
 import type {ExecutorDependencies} from '../src/lib/economy/executor';
 import {createTaskPlan,taskPlanHash,taskStepOrderId,type GeneralTask} from '../src/lib/tasks/model';
 import {pollTaskOnce,type TaskRunnerConfig,type TaskRunnerDependencies} from '../src/lib/tasks/runner';
@@ -42,6 +42,15 @@ describe('private general task runner',()=>{
   const transport=s.deps.transport;s.deps.transport=async(url,init)=>{const response=await transport(url,init);const body=init?.body?JSON.parse(String(init.body)):null;if(body?.action==='progress')s.task.steps.push({index:body.index,orderId:body.orderId,transactionHash:hash('payment:'+body.orderId),output:largeOutput,outputHash:canonicalJsonHash(largeOutput)});return body?.action==='progress'||body?.action==='complete'?Response.json({task:s.task}):response;};
   expect(await pollTaskOnce(s.config,s.deps)).toBe('completed');expect(Buffer.byteLength(JSON.stringify(s.task))).toBeGreaterThan(512*1024);expect(s.task.steps).toHaveLength(5);expect(s.actions.filter(a=>a.startsWith('pay:'))).toHaveLength(5);
  });
+ it('recovers a valid deeply nested output from its original pretty journal over1MiB',async()=>{
+  const s=await setup();let output:unknown=Array.from({length:64},()=>Array(1000).fill(0));let outputSchema:ConstrainedJsonSchema={type:'array',maxItems:64,items:{type:'array',maxItems:1000,items:{type:'integer'}}};
+  for(let depth=0;depth<4;depth++){output=[output];outputSchema={type:'array',maxItems:1,items:outputSchema};}
+  const {protocol:_protocol,serviceHash:_hash,...terms}=definition,service=createServiceDefinition({...terms,outputSchema}),proposal={summary:'Produce a bounded nested artifact',steps:[{serviceHash:service.serviceHash,input:{prompt:'Produce the artifact'}}]},plan=createTaskPlan(proposal,[service],'2000');
+  Object.assign(s.task,{plan,planHash:taskPlanHash(plan),approvedPlanHash:taskPlanHash(plan)});
+  s.executor.deliver=async request=>({orderId:request.orderId,serviceHash:request.serviceHash,transactionHash:request.settlement.transactionHash,state:'fulfilled',output,outputHash:canonicalJsonHash(output)});
+  const transport=s.deps.transport;let interrupted=false;s.deps.transport=async(url,init)=>{if(!interrupted&&String(init?.body).includes('"action":"progress"')){interrupted=true;throw Error('Lost progress response');}return transport(url,init);};
+  await expect(pollTaskOnce(s.config,s.deps)).rejects.toThrow();const orderId=taskStepOrderId(taskId,s.task.planHash!,0);expect((await readFile(join(s.config.executorDirectory,orderId+'.json'))).byteLength).toBeGreaterThan(1024*1024);expect(await pollTaskOnce(s.config,s.deps)).toBe('completed');expect(s.actions.filter(action=>action.startsWith('pay:'))).toHaveLength(1);
+ },15000);
  it('plans without payment and requires owner approval before execution',async()=>{const s=await setup();s.setPhase('plan');Object.assign(s.task,{status:'planning',plan:null,planHash:null,approvedPlanHash:null,approvalExpiresAt:null});expect(await pollTaskOnce(s.config,s.deps)).toBe('planned');expect(s.actions).toEqual([]);expect(s.updates[0]).toMatchObject({action:'plan',plan:raw});});
  it('reports unsupported capabilities without fabricating a plan or payment',async()=>{const s=await setup();s.setPhase('plan');s.task.status='planning';s.deps.planner=async()=>({kind:'blocked',reason:'No registered video provider.'});expect(await pollTaskOnce(s.config,s.deps)).toBe('blocked');expect(s.updates[0]).toMatchObject({action:'blocked',error:'No registered video provider.'});expect(s.actions).toEqual([]);});
  it('retries failed paid delivery with the same order and no duplicate payment',async()=>{const s=await setup(),deliver=s.executor.deliver;let count=0;s.executor.deliver=async request=>{if(count++===0)throw Error('delivery pending');return deliver(request);};await expect(pollTaskOnce(s.config,s.deps)).rejects.toThrow();expect(s.updates.some(u=>u.action==='complete')).toBe(false);expect(await pollTaskOnce(s.config,s.deps)).toBe('completed');expect(s.actions.filter(a=>a.startsWith('pay:'))).toHaveLength(2);expect(new Set(s.actions.filter(a=>a.startsWith('pay:'))).size).toBe(2);});
