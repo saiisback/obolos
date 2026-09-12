@@ -82,6 +82,8 @@ Follow [account setup](docs/self-service-setup.md), pair your private runner, si
 
 See [general-task release verification](docs/evidence/2026-09-13-general-tasks.md) for actual paid translation and writing-to-analysis runs, finalized allocations, replay checks, and known output-quality limits.
 
+The subsequent [live end-to-end audit](docs/evidence/2026-09-13-full-end-to-end.md) covers browser-driven coding tasks, all five paid resource APIs, fresh Hedera A2A settlement, delivery recovery, a real refund, and before/after economy reconciliation.
+
 General digital tasks:
 
 ```mermaid
