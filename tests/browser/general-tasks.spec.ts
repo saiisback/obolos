@@ -61,6 +61,9 @@ for(const width of [1280,390]) test(`general task request, immutable approval, a
   await tasks.getByRole('button',{name:'Refresh tasks'}).click();
   await expect(tasks.getByText('Completed',{exact:true})).toBeVisible();
   await expect(tasks.getByRole('heading',{name:'Final output'})).toBeVisible();
+  await expect(tasks.locator('pre').filter({hasText:/^Hola$/})).toBeVisible();
+  await tasks.getByText('Service response',{exact:true}).first().click();
+  await expect(tasks.locator('pre').filter({hasText:'"text": "Hola"'})).toBeVisible();
   await expect(tasks.getByRole('link',{name:'Payment receipt · step 2'})).toHaveAttribute('href',`https://testnet.arcscan.app/tx/${hash('9')}`);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.evaluate(() => {window.scrollTo(0, 0); const label=document.createElement('div'); label.textContent='TEST FIXTURE — NO LIVE TRANSACTIONS'; label.style.cssText='padding:10px;text-align:center;background:#fff0ce;color:#402c00;font:12px sans-serif'; document.body.prepend(label);});
