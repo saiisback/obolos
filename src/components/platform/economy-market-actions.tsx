@@ -2,8 +2,9 @@
 
 import {useEffect, useState, type FormEvent} from 'react';
 import Link from 'next/link';
-import {decodeFunctionResult, encodeFunctionData, formatUnits, keccak256, parseAbi, toHex, type Hex} from 'viem';
-import {createServiceDefinition, serviceRequestSchema, validateServiceDefinition, validateServiceRequest, type ServiceDefinition, type ServiceRequest} from '@/lib/economy/service-contract';
+import {decodeFunctionResult, encodeFunctionData, formatUnits, keccak256, parseAbi, parseUnits, toHex, type Hex} from 'viem';
+import {createServiceDefinition, normalizedUnits, serviceRequestSchema, validateServiceDefinition, validateServiceRequest, type ServiceDefinition, type ServiceRequest} from '@/lib/economy/service-contract';
+import {validateServiceProfile} from '@/lib/economy/service-profile';
 import {resourceCategories} from '@/lib/economy/model';
 import {api, errorMessage, type Agent, type User} from './api';
 import {EconomyRecovery} from './economy-recovery';
@@ -26,11 +27,14 @@ function ReceiptLink({hash}: {hash: string}) {
   return /^0x[\da-f]{64}$/i.test(hash) ? <a href={`https://testnet.arcscan.app/tx/${hash}`} target="_blank" rel="noopener noreferrer">View transaction {short(hash)}</a> : null;
 }
 
-export function EconomyServicePublishing({deployment, reserveBps, reviewBps}: {deployment: Deployment; reserveBps: string | number; reviewBps: string | number}) {
+export function EconomyServicePublishing({deployment, reserveBps, reviewBps, sellerDesk = false}: {deployment: Deployment; reserveBps: string | number; reviewBps: string | number; sellerDesk?: boolean}) {
   const wallets = useBrowserWallets();
   const [walletId, setWalletId] = useState('');
+  const [category, setCategory] = useState<(typeof resourceCategories)[number]>('inference');
   const [source, setSource] = useState(serviceTemplate);
   const [definition, setDefinition] = useState<ServiceDefinition | null>(null);
+  const [profile, setProfile] = useState<{title: string; description: string; tags: string[]; examples: unknown[]} | null>(null);
+  const [publishedHash, setPublishedHash] = useState('');
   const [services, setServices] = useState<ServiceDefinition[]>([]);
   const [sellerAddress, setSellerAddress] = useState('');
   const [retireHash, setRetireHash] = useState('');
@@ -55,14 +59,18 @@ export function EconomyServicePublishing({deployment, reserveBps, reviewBps}: {d
     catch (caught) {setError(errorMessage(caught));} finally {setBusy('');}
   }
 
-  async function prepare(event: FormEvent) {
-    event.preventDefault(); setBusy('review'); setError(''); setMessage('');
+  async function prepare(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); const formData = new FormData(event.currentTarget); setBusy('review'); setError(''); setMessage('');
     try {
       const account = await api<{user: User | null}>('/api/account');
       if (!account.user) throw Error('Sign in with the seller wallet before publishing.');
-      const input = JSON.parse(source);
+      const input = sellerDesk ? {endpoint: String(formData.get('endpoint')).trim(), category: String(formData.get('category')), unit: String(formData.get('unit')).trim(), quantity: String(formData.get('quantity')).trim(), unitPriceAtomic: (() => {const price = String(formData.get('price')); if (!/^\d+(?:\.\d{1,6})?$/.test(price)) throw Error('Enter a price with up to 6 decimal places.'); return parseUnits(price, 6).toString();})(), inputSchema: JSON.parse(String(formData.get('inputSchema'))), outputSchema: JSON.parse(String(formData.get('outputSchema')))} : JSON.parse(source);
+      const metadata = sellerDesk ? {title: String(formData.get('title')).trim(), description: String(formData.get('description')).trim(), tags: String(formData.get('tags')).split(',').map(tag => tag.trim()).filter(Boolean), examples: JSON.parse(String(formData.get('examples')) || '[]')} : null;
+      if (metadata && !Array.isArray(metadata.examples)) throw Error('Example inputs must be a JSON array.');
+      setProfile(metadata);
       const value = input.serviceHash ? validateServiceDefinition(input) : createServiceDefinition({...input, chainId: 5042002, settlementAddress: deployment.settlement, ledgerAddress: deployment.ledger, seller: account.user.address});
       if (value.seller !== account.user.address.toLowerCase() || value.settlementAddress !== deployment.settlement.toLowerCase() || value.ledgerAddress !== deployment.ledger.toLowerCase()) throw Error('The definition must use your signed-in seller wallet and the current deployment.');
+      if (metadata) validateServiceProfile(value, metadata);
       const endpoint = new URL(value.endpoint);
       if (endpoint.protocol !== 'https:' || endpoint.username || endpoint.password || endpoint.search || endpoint.hash || (endpoint.port && endpoint.port !== '443')) throw Error('Use a public HTTPS endpoint without credentials, query parameters, fragments, or a custom port.');
       const pending = window.sessionStorage.getItem(`economy-registration:${value.serviceHash}`);
@@ -101,8 +109,15 @@ export function EconomyServicePublishing({deployment, reserveBps, reviewBps}: {d
     if (!definition || busy) return;
     setBusy('publish'); setError(''); setMessage('');
     try {
-      await api('/api/economy/services', {method: 'POST', body: JSON.stringify(definition)});
-      setMessage('Service published. Buyers can discover its immutable definition from the public services API.');
+      if (publishedHash !== definition.serviceHash) {
+        await api('/api/economy/services', {method: 'POST', body: JSON.stringify(definition)});
+        setPublishedHash(definition.serviceHash);
+      }
+      if (profile) {
+        try {await api(`/api/economy/services/${definition.serviceHash}/profile`, {method: 'PUT', body: JSON.stringify(profile)});}
+        catch (caught) {setError(`Service terms are published, but its description could not be saved: ${errorMessage(caught)} Retry publication to save the profile; no wallet transaction will be sent.`); await loadCatalog(); return;}
+      }
+      setMessage('Service published. Buyers can discover its capabilities and immutable terms in the marketplace.');
       await loadCatalog();
     } catch (caught) {setError(`${errorMessage(caught)} If registration is still pending, wait for finality and retry publication only.`);}
     finally {setBusy('');}
@@ -113,11 +128,19 @@ export function EconomyServicePublishing({deployment, reserveBps, reviewBps}: {d
   const review = principal * BigInt(reviewBps) / 10000n;
   return <section className={e.section}>
     <h2>Publish your service</h2><p>Register immutable terms with your seller wallet, then publish the endpoint’s input and output schemas. You need an Arc testnet wallet with gas; publishing does not fund or enroll a buyer agent.</p>
-    <details className={e.details}><summary>Open advanced service publication</summary><div className={e.actionPanel}>
+    <details className={e.details} open={sellerDesk}><summary>{sellerDesk ? 'New digital service' : 'Open advanced service publication'}</summary><div className={e.actionPanel}>
       <p>Use <code>obolos.service.v1</code>. Replace the empty endpoint and adapt the example schemas to your API. Prices are integer micro-USDC; 10,000 = 0.01 USDC. <a href={protocolDocs} target="_blank" rel="noopener noreferrer">Provider protocol</a></p>
-      <form onSubmit={prepare}><label htmlFor="economy-service-json">Service terms JSON</label><textarea id="economy-service-json" value={source} onChange={event => {setSource(event.target.value); setDefinition(null); setError(''); setMessage('');}} rows={14} spellCheck={false} maxLength={120000} disabled={!!busy}/><button className={s.secondary} disabled={!!busy}>{busy === 'review' ? 'Validating…' : 'Review service terms'}</button></form>
+      <form onSubmit={prepare} onChange={() => {setDefinition(null); setError(''); setMessage('');}}>{sellerDesk ? <><div className={s.formGrid}>
+        <label>Service title<input name="title" maxLength={100} placeholder="What can your service do?" required disabled={!!busy}/></label>
+        <label>Price per unit · test USDC<input name="price" inputMode="decimal" defaultValue="0.01" required disabled={!!busy}/></label>
+        <label className={s.fullWidth}>Service description<textarea name="description" maxLength={2000} rows={3} placeholder="Describe the result, required inputs, and any limits." required disabled={!!busy}/></label>
+        <label className={s.fullWidth}>Service endpoint<input name="endpoint" type="url" placeholder="https://your-service.example/execute" required disabled={!!busy}/><small>Your endpoint must implement the paid provider protocol linked above.</small></label>
+        <label>Accounting category<select name="category" value={category} onChange={event => setCategory(event.target.value as typeof category)} disabled={!!busy}>{resourceCategories.map(category => <option value={category} key={category}>{category}</option>)}</select><small>Classifies the resource used. Your service can address any supported task.</small></label>
+        <label>Tags<input name="tags" placeholder="writing, translation" maxLength={400} disabled={!!busy}/><small>Separate tags with commas.</small></label>
+        <label>Billing unit<select key={category} name="unit" disabled={!!busy}>{normalizedUnits[category].map(unit => <option value={unit} key={unit}>{unit}</option>)}</select></label><label>Units per order<input name="quantity" defaultValue="1" inputMode="numeric" required disabled={!!busy}/></label>
+        </div><details className={e.details}><summary>Input and output schemas</summary><p>Define the exact JSON objects your endpoint accepts and returns. Adapt these schemas to your actual service.</p><label>Input schema JSON<textarea aria-label="Input schema JSON" name="inputSchema" rows={9} spellCheck={false} maxLength={50000} defaultValue={JSON.stringify(JSON.parse(serviceTemplate).inputSchema, null, 2)} required disabled={!!busy}/></label><label>Output schema JSON<textarea aria-label="Output schema JSON" name="outputSchema" rows={9} spellCheck={false} maxLength={50000} defaultValue={JSON.stringify(JSON.parse(serviceTemplate).outputSchema, null, 2)} required disabled={!!busy}/></label><label>Example inputs JSON<textarea aria-label="Example inputs JSON" name="examples" rows={3} spellCheck={false} maxLength={16000} defaultValue="[]" disabled={!!busy}/><small>Up to 3 example inputs in a JSON array, matching your input schema.</small></label></details></> : <><label htmlFor="economy-service-json">Service terms JSON</label><textarea id="economy-service-json" value={source} onChange={event => setSource(event.target.value)} rows={14} spellCheck={false} maxLength={120000} disabled={!!busy}/></>}<button className={s.secondary} disabled={!!busy}>{busy === 'review' ? 'Validating…' : 'Review service terms'}</button></form>
       {definition && <div className={e.serviceReview}>
-        <h3>Review before wallet signing</h3><dl><div><dt>Seller</dt><dd><code>{definition.seller}</code></dd></div><div><dt>Endpoint</dt><dd>{definition.endpoint}</dd></div><div><dt>Category / unit</dt><dd>{definition.category} / {definition.unit}</dd></div><div><dt>Unit price × quantity</dt><dd>{amount(definition.unitPriceAtomic)} × {definition.quantity}</dd></div><div><dt>Order principal</dt><dd>{amount(principal)}</dd></div><div><dt>Seller allocation · {formatUnits(10000n - BigInt(reserveBps) - BigInt(reviewBps), 2)}%</dt><dd>{amount(principal - reserve - review)}</dd></div><div><dt>Reserve / review pool</dt><dd>{amount(reserve)} / {amount(review)}</dd></div><div><dt>Service hash</dt><dd><code>{definition.serviceHash}</code></dd></div></dl>
+        <h3>Review before wallet signing</h3>{profile && <><h4>{profile.title}</h4><p>{profile.description}</p><p>{profile.tags.join(', ')}</p></>}<dl><div><dt>Seller</dt><dd><code>{definition.seller}</code></dd></div><div><dt>Endpoint</dt><dd>{definition.endpoint}</dd></div><div><dt>Category / unit</dt><dd>{definition.category} / {definition.unit}</dd></div><div><dt>Unit price × quantity</dt><dd>{amount(definition.unitPriceAtomic)} × {definition.quantity}</dd></div><div><dt>Order principal</dt><dd>{amount(principal)}</dd></div><div><dt>Seller allocation · {formatUnits(10000n - BigInt(reserveBps) - BigInt(reviewBps), 2)}%</dt><dd>{amount(principal - reserve - review)}</dd></div><div><dt>Reserve / review pool</dt><dd>{amount(reserve)} / {amount(review)}</dd></div><div><dt>Service hash</dt><dd><code>{definition.serviceHash}</code></dd></div></dl>
         <p>Allocation uses the indexed fee policy and includes seller rounding dust. Actual future orders must use the policy in force at settlement. This transaction only registers the service; it does not collect an order payment.</p>
         {wallets.length ? <label htmlFor="economy-wallet">Seller browser wallet<select id="economy-wallet" value={wallet?.info.uuid ?? ''} onChange={event => setWalletId(event.target.value)} disabled={!!busy}>{wallets.map(item => <option key={item.info.uuid} value={item.info.uuid}>{item.info.name}</option>)}</select></label> : <p>No browser wallet detected. Open this workspace in a browser with your wallet extension to register, or publish already-registered terms below.</p>}
         <div className={e.formActions}><button className={s.secondary} type="button" onClick={() => void register()} disabled={!!busy || !wallet || registrationAttempted}>{busy === 'register' ? 'Check your wallet…' : registrationAttempted ? 'Registration submitted or found' : 'Register service in wallet'}</button><button className={s.primary} type="button" onClick={() => void publish()} disabled={!!busy}>{busy === 'publish' ? 'Checking finalized registration…' : 'Publish registered service'}</button></div>

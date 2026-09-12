@@ -17,19 +17,22 @@ const receiptUrl = (hash: string) => `https://testnet.arcscan.app/tx/${hash}`;
 
 export function ResourceMarketplace() {
   const [services, setServices] = useState<ServiceDefinition[]>([]);
+  const [profiles, setProfiles] = useState<{serviceHash:string;title:string;description:string;tags:string[];examples:unknown[]}[]>([]);
   const [health, setHealth] = useState<ProviderHealth | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [category, setCategory] = useState('all');
   const load = useCallback(async () => {
     setLoading(true); setError(''); setHealth(null);
-    const [catalog, provider] = await Promise.allSettled([
+    const [catalog, provider, metadata] = await Promise.allSettled([
       api<{services: ServiceDefinition[]}>('/api/economy/services'),
       api<ProviderHealth>('/api/economy/provider/status'),
+      api<{profiles:{serviceHash:string;title:string;description:string;tags:string[];examples:unknown[]}[]}>('/api/economy/service-profiles'),
     ]);
     if (catalog.status === 'fulfilled') setServices(catalog.value.services ?? []);
     else {setServices([]); setError(errorMessage(catalog.reason));}
     if (provider.status === 'fulfilled') setHealth(provider.value);
+    setProfiles(metadata.status === 'fulfilled' ? metadata.value.profiles ?? [] : []);
     setLoading(false);
   }, []);
   useEffect(() => {void load();}, [load]);
@@ -38,12 +41,13 @@ export function ResourceMarketplace() {
     <div className={m.catalogHeading}><div><h2 id="resource-catalog-heading">Resource services <span className={s.count}>{loading ? '—' : services.length}</span></h2><p>Published data, compute, inference, verification, and storage offers. Review the exact terms before execution.</p></div><button className={s.secondary} disabled={loading} onClick={() => void load()}>Refresh resources</button></div>
     <div className={m.resourceIntro}><details className={m.executionGuide}><summary>How resource purchases work</summary><p>Resource purchases use an owner-authorized, funded private executor. Circle execution runs locally; this catalog does not initiate payments.</p><Link href="/app/developers#selling">Resource execution guide</Link></details><label>Resource category<select value={category} onChange={event => setCategory(event.target.value)}><option value="all">All categories</option>{Object.entries(categoryNames).map(([key, name]) => <option key={key} value={key}>{name}</option>)}</select></label></div>
     {error ? <p role="alert" className={s.error}>{error}</p> : loading ? <p role="status">Loading published resources…</p> : !visible.length ? <p className={s.empty}>No published resource services in this category.</p> : <div className={`${m.grid} ${m.resourceGrid}`}>{visible.map(service => {
+      const profile = profiles.find(item => item.serviceHash === service.serviceHash);
       const bound = health?.seller?.toLowerCase() === service.seller.toLowerCase() && health?.endpoints?.includes(service.endpoint);
       const status = bound && health?.status === 'online' ? 'Provider online' : bound && health?.status === 'unavailable' ? 'Provider unavailable' : 'Provider status unknown';
       return <article className={m.card} key={service.serviceHash}>
-        <div className={m.serviceInfo}><div className={m.serviceType}><WorkspaceGlyph kind={service.category} compact/><span>{status}</span></div><div className={m.resourceTitle}><div><h3>{categoryNames[service.category]}</h3><p className={m.resourceUnit}>{service.unit.replaceAll("-", " ")}</p></div><div className={m.inlinePrice}><strong>{usdc(BigInt(service.quantity)*BigInt(service.unitPriceAtomic))}</strong><span>test USDC / order</span></div></div><dl><div><dt>Seller</dt><dd><a href={`https://testnet.arcscan.app/address/${service.seller}`} title={service.seller}>{service.seller.slice(0, 8)}…{service.seller.slice(-6)}</a></dd></div><div><dt>Quantity</dt><dd>{service.quantity} {service.unit}</dd></div><div><dt>Unit price</dt><dd>{usdc(service.unitPriceAtomic)} test USDC</dd></div></dl><p className={m.endpointLabel}><span>Provider endpoint</span><code>{service.endpoint}</code></p>
+        <div className={m.serviceInfo}><div className={m.serviceType}><WorkspaceGlyph kind={service.category} compact/><span>{status}</span></div><div className={m.resourceTitle}><div><h3>{profile?.title ?? categoryNames[service.category]}</h3><p className={m.resourceUnit}>{service.unit.replaceAll("-", " ")}</p></div><div className={m.inlinePrice}><strong>{usdc(BigInt(service.quantity)*BigInt(service.unitPriceAtomic))}</strong><span>test USDC / order</span></div></div>{profile && <p>{profile.description}</p>}<dl><div><dt>Seller</dt><dd><a href={`https://testnet.arcscan.app/address/${service.seller}`} title={service.seller}>{service.seller.slice(0, 8)}…{service.seller.slice(-6)}</a></dd></div><div><dt>Quantity</dt><dd>{service.quantity} {service.unit}</dd></div><div><dt>Unit price</dt><dd>{usdc(service.unitPriceAtomic)} test USDC</dd></div></dl><p className={m.endpointLabel}><span>Provider endpoint</span><code>{service.endpoint}</code></p>
           <details className={m.resourceTerms}><summary>Exact service terms</summary><p>Service hash</p><code>{service.serviceHash}</code><pre>{JSON.stringify(service, null, 2)}</pre><a href={`/api/economy/services/${service.serviceHash}`} target="_blank" rel="noreferrer">Published source definition</a></details>
-        </div><div className={m.purchase}><p>Per order · {service.quantity} {service.unit}</p><small>{status === 'Provider online' ? 'Recent provider heartbeat. Delivery still requires a paid, accepted request.' : status === 'Provider unavailable' ? 'Provider heartbeat is missing or stale. Restore the provider before new work.' : 'Availability has not been verified for this endpoint.'}</small></div>
+        </div><div className={m.purchase}><Link className={s.primary} href={`/app?taskService=${encodeURIComponent(service.serviceHash)}`}>Use in a task</Link><p>Per order · {service.quantity} {service.unit}</p><small>{status === 'Provider online' ? 'Recent provider heartbeat. Delivery still requires a paid, accepted request.' : status === 'Provider unavailable' ? 'Provider heartbeat is missing or stale. Restore the provider before new work.' : 'Availability has not been verified for this endpoint.'}</small></div>
       </article>;
     })}</div>}
   </section>;

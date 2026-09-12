@@ -17,6 +17,10 @@ async function fixture(page: Page, initialAuth = true) {
     if(path === '/api/auth/logout') { authed = false; return json({ok:true}); }
     if(path === '/api/agents') return json({agents:[first, second]});
     if(path.endsWith('/economy') && path.startsWith('/api/agents/')) return json({agentId:'0x'+'1'.repeat(64),policy:{status:'not_registered'},orders:[],indexedAt:null});
+    if(path === '/api/economy') return json({snapshot:null,status:'awaiting_index'});
+    if(path === '/api/tasks') return json({tasks:[]});
+    if(path === '/api/economy/service-profiles') return json({profiles:[]});
+    if(path === '/api/economy/earnings') return json({orders:[],totals:null,indexedAt:null});
     if(path === '/api/economy/services') return json({services:[]});
     if(path === '/api/economy/purchases') return json({orders:[]});
     if(path === '/api/economy/provider/status') return json({status:'unavailable',endpoints:[],lastSeen:null});
@@ -114,12 +118,12 @@ test('task views keep setup, execution, selling, and integration separate', asyn
   await page.getByRole('button',{name:'2. Authorize spending',exact:false}).click();
   await expect(page.getByLabel('Allowed repositories')).toHaveValue('fixture/repository');
   await page.goto(origin+'/app/marketplace');
-  await expect(page.getByRole('heading',{name:'Repository-verifier seller desk',exact:true})).not.toBeVisible();
+  await expect(page.getByRole('heading',{name:'Your seller desk',exact:true})).not.toBeVisible();
   await page.getByRole('navigation',{name:'Marketplace sections'}).getByRole('link',{name:'Your seller desk'}).click();
-  await expect(page.getByRole('heading',{name:'Repository-verifier seller desk',exact:true})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Your seller desk',exact:true})).toBeVisible();
   await expect(page.getByRole('heading',{name:'Repository verifiers',exact:false})).not.toBeVisible();
   await expect(page.getByRole('heading',{name:'New hosted verifier listing'})).not.toBeVisible();
-  await page.getByRole('button',{name:'Publish a service',exact:true}).click();
+  await page.getByRole('button',{name:'Publish a repository verifier',exact:true}).click();
   await expect(page.getByRole('heading',{name:'New hosted verifier listing'})).toBeVisible();
   await page.goto(origin+'/app/developers#runner');
   await expect(page.getByRole('heading',{name:'Runner prerequisites'})).toBeVisible();
@@ -158,7 +162,7 @@ test('seller endpoint publishing and delivery-only recovery use distinct actions
   await page.route('**/api/market/purchases',route=>route.fulfill({json:{orders:[{id:orderId,jobId:'job',serviceId:'service',serviceName:'External provider',agentName:'First agent',amountAtomic:50000,status:delivered?'fulfilled':'paid',createdAt:'2026-09-10T00:00:00Z',chainConfirmed:true,transactionHash:`0x${'a'.repeat(64)}`} ]}}));
   await page.route(`**/api/market/orders/${orderId}/delivery`,route=>{calls.push({path:new URL(route.request().url()).pathname,body:route.request().postDataJSON()});delivered=true;return route.fulfill({json:{order:{id:orderId,status:'fulfilled'}}});});
   await page.goto(origin+'/app/marketplace#seller-heading');
-  await page.getByRole('button',{name:'Publish a service',exact:true}).click();
+  await page.getByRole('button',{name:'Publish a repository verifier',exact:true}).click();
   await page.getByLabel('Service execution').selectOption('external-repo-verifier');
   await page.getByLabel('Public HTTPS endpoint',{exact:false}).fill('https://provider.obolos.app/verify');
   await page.getByLabel('Publishing identity',{exact:false}).selectOption(first.id);

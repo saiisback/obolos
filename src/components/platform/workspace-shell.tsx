@@ -37,7 +37,7 @@ export function WorkspaceShell({children}: {children: ReactNode}) {
     catch (caught) { setError(errorMessage(caught)); setSigningOut(false); }
   }
 
-  return <div className={`${s.shell} ${w.shell}`}>
+  return <div className={w.shell}>
     <a className={s.skip} href="#main">Skip to content</a>
     <aside className={w.sidebar}>
       <Link className={s.brand} href="/app" aria-label="Obolos workspace"><img src="/brand/obolos-symbol-white.png" width={32} height={32} alt="" />obolos</Link>
