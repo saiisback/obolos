@@ -1,3 +1,4 @@
+import {validateProductionValuation} from './production-valuation';
 import {readEventHistory} from './event-history';
 import {verifyMessage,type Hex} from 'viem';
 import {z} from 'zod';
@@ -15,7 +16,7 @@ const second=z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
 const base={protocol:z.literal('obolos.evidence.v1'),chainId:z.literal(5042002),policy:address,ledger:address,settlement:address,asset:z.literal('USDC'),windowStart:second,windowEnd:second,issuedAt:second,signer:address,sourceReference:z.string().min(1).max(512),sourceHash:hash};
 export const basketComponentSchema=z.object({id:z.string().min(1).max(80),category:z.enum(resourceCategories),unit:hash,baselineAtomic:positive,weightBps:positive,baselineServiceHash:hash,quoteServiceHash:hash}).strict();
 export const evidenceSchema=z.discriminatedUnion('kind',[
- z.object({...base,kind:z.literal('order'),orderId:hash,agentId:hash,payer:address,seller:address,inputHash:hash,outputHash:hash,transactionHash:hash,finalOutputAtomic:atomic,intermediateInputAtomic:atomic,resourceCostAtomic:atomic,
+ z.object({...base,kind:z.literal('order'),orderId:hash,agentId:hash,payer:address,seller:address,inputHash:hash,outputHash:hash,transactionHash:hash,finalOutputAtomic:atomic,intermediateInputAtomic:atomic,resourceCostAtomic:atomic,productionAccountHash:hash.optional(),valuationMethod:z.string().min(20).max(2000).optional(),
   // Explicit exhaustive accounting, including conversions, is a signed claim, never inferred from the payment.
   costBreakdown:z.object({paymentAtomic:atomic,gasAtomic:atomic,inferenceAtomic:atomic,otherAtomic:atomic,conversionReference:z.string().min(1).max(512),allResourcesIncluded:z.literal(true)}).strict()}).strict(),
  z.object({...base,kind:z.literal('window'),capitalAtomic:atomic,activeAgentIds:z.array(hash).max(256),anchorBlock:atomic,anchorBlockHash:hash}).strict(),
@@ -42,6 +43,7 @@ export async function authenticateEvidence(input:unknown,deployment:EconomyDeplo
  }
  if(payload.kind==='order'){
   const c=payload.costBreakdown;
+  if(payload.productionAccountHash&&!payload.valuationMethod)fail('Describe the independent valuation method and its evidence.');
   if([payload.seller,payload.payer].includes(payload.signer))fail('An order participant cannot independently verify its own valuation.',403);
   if([c.paymentAtomic,c.gasAtomic,c.inferenceAtomic,c.otherAtomic].reduce((a,v)=>a+BigInt(v),0n)!==BigInt(payload.resourceCostAtomic))fail('Full resource cost differs from its signed breakdown.');
  }
@@ -74,7 +76,12 @@ export async function ingestEvidence(db:pg.Client,input:unknown,deployment:Econo
   if(p.kind==='order'){
    const paid=events.find(e=>e.event_name==='OrderPaid'&&e.contract_address===p.ledger&&e.payload.orderId===p.orderId),settled=events.find(e=>e.event_name==='OrderSettled'&&e.contract_address===p.settlement&&e.payload.orderId===p.orderId);
    const delivery=events.find(e=>e.event_name==='DeliveryAttested'&&e.contract_address===p.ledger&&e.payload.orderId===p.orderId),ack=events.find(e=>e.event_name==='BuyerAcknowledged'&&e.contract_address===p.ledger&&e.payload.orderId===p.orderId);
-   if(!paid||!settled||!delivery||!ack||paid.transaction_hash!==p.transactionHash||settled.transaction_hash!==p.transactionHash||paid.payload.agentId!==p.agentId||paid.payload.inputHash!==p.inputHash||paid.payload.seller.toLowerCase()!==p.seller||settled.payload.payer.toLowerCase()!==p.payer||delivery.payload.outputHash!==p.outputHash||ack.payload.outputHash!==p.outputHash||BigInt(p.costBreakdown.paymentAtomic)!==BigInt(paid.payload.amount))fail('Order evidence does not match finalized payment, delivery and acknowledgment.');
+   if(!paid||!settled||!delivery||!ack||paid.transaction_hash!==p.transactionHash||settled.transaction_hash!==p.transactionHash||paid.payload.agentId!==p.agentId||paid.payload.inputHash!==p.inputHash||paid.payload.seller.toLowerCase()!==p.seller||settled.payload.payer.toLowerCase()!==p.payer||delivery.payload.outputHash!==p.outputHash||ack.payload.outputHash!==p.outputHash||!p.productionAccountHash&&BigInt(p.costBreakdown.paymentAtomic)!==BigInt(paid.payload.amount))fail('Order evidence does not match finalized payment, delivery and acknowledgment.');
+   if(p.productionAccountHash){
+    const account=(await db.query('SELECT payload,evidence_hash FROM economy_production_accounts WHERE order_id=$1',[p.orderId])).rows[0];
+    if(!account)fail('Record complete seller production accounting before output valuation.');
+    try{validateProductionValuation({...p,productionAccountHash:p.productionAccountHash},{payload:account.payload,evidenceHash:account.evidence_hash});}catch(error){fail(error instanceof Error?error.message:'Invalid production account.');}
+   }
    if(Number(paid!.block_timestamp)<p.windowStart||[paid!,settled!,delivery!,ack!].some(e=>Number(e.block_timestamp)>=p.windowEnd))fail('Order evidence crosses the signed window.');
    const agent=events.find(e=>e.event_name==='AgentRegistered'&&e.contract_address===p.policy&&e.payload.agentId===p.agentId);
    if(!agent||[agent.payload.owner,agent.payload.executor,p.payer,p.seller].some(a=>sameKnownController(a,p.signer,bindings)))fail('Agent owner or executor cannot independently verify its valuation.',403);

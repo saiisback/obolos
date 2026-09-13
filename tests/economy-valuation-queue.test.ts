@@ -1,0 +1,20 @@
+import {describe,it,expect,vi,beforeEach,afterEach} from 'vitest';
+import {NextRequest} from 'next/server';
+import {getAddress} from 'viem';
+import {canonicalJsonHash} from '../src/lib/economy/service-contract';
+const f=vi.hoisted(()=>({rows:[] as any[],orders:[] as any[],signer:'0x'+ '8'.repeat(40),queries:[] as unknown[][]}));
+vi.mock('../src/lib/platform/auth',()=>({requireUser:async()=>({id:'reviewer',address:f.signer})}));
+vi.mock('../src/lib/platform/db',()=>({sql:()=>async(strings:TemplateStringsArray,...values:unknown[])=>{f.queries.push(values);return strings.join('').includes('economy_index_state')?[{snapshot:{orders:f.orders}}]:f.rows;}}));
+import {GET} from '../src/app/api/economy/valuations/route';
+import {economyDeployment} from '../src/lib/economy/chain';
+import {evidenceSchema} from '../src/lib/economy/evidence';
+const d=economyDeployment()!,h=(v:string)=>`0x${v.repeat(64)}`,a=(v:string)=>`0x${v.repeat(40)}`;
+const output={text:'Actual fixture output'},outputHash=canonicalJsonHash(output),start=Math.floor(Date.now()/86400000)*86400-86400;
+beforeEach(()=>{vi.stubEnv('ECONOMY_EVIDENCE_SIGNERS',JSON.stringify({[f.signer]:['order']}));f.queries=[];const payload={protocol:'obolos.production-account.v1',chainId:5042002,settlement:d.settlement,ledger:d.ledger,orderId:h('a'),transactionHash:h('b'),outputHash,seller:a('c'),issuedAt:start+90,inputs:[],externalIntermediateAtomic:'20',gasAtomic:'5',inferenceAtomic:'0',otherResourceAtomic:'0',allIntermediateInputsIncluded:true,allResourcesIncluded:true,sourceReference:'https://fixture.test/costs',sourceHash:h('c')};f.rows=[{order_id:h('a'),output,definition:{category:'compute'},payload,evidence_hash:canonicalJsonHash(payload)}];f.orders=[{orderId:h('a'),agentId:h('c'),inputHash:h('d'),outputHash,transactionHash:h('b'),payer:getAddress(a('b')),seller:getAddress(a('c')),owner:getAddress(a('d')),timestamp:start+10,deliveredAt:start+20,acknowledgedAt:start+30,delivered:true,buyerAcknowledged:true}];});
+afterEach(()=>vi.unstubAllEnvs());
+describe('authenticated independent valuation queue',()=>{
+ it('normalizes real checksummed event addresses into schema-valid signed templates',async()=>{const r=await GET(new NextRequest('https://obolos.app/api/economy/valuations'));expect(r.status).toBe(200);const result=await r.json();expect(result.candidates).toHaveLength(1);const p=result.candidates[0].template;expect(p.payer).toBe(a('b'));expect(p.seller).toBe(a('c'));expect(evidenceSchema.safeParse({...p,finalOutputAtomic:'100',sourceReference:'https://fixture.test/value',sourceHash:h('d'),valuationMethod:'Fixture independent assessment method'}).success).toBe(true);});
+ it('returns a cursor even when all records on the page are ineligible',async()=>{f.orders[0].timestamp=start+86400+10;f.rows=Array.from({length:25},()=>f.rows[0]);const result=await (await GET(new NextRequest('https://obolos.app/api/economy/valuations'))).json();expect(result.candidates).toEqual([]);expect(result.nextCursor).toBe(h('a'));await GET(new NextRequest('https://obolos.app/api/economy/valuations?cursor='+h('a')));expect(f.queries.flat()).toContain(h('a'));});
+ it('does not return private outputs to an untrusted signer',async()=>{vi.stubEnv('ECONOMY_EVIDENCE_SIGNERS','{}');const result=await (await GET(new NextRequest('https://obolos.app/api/economy/valuations'))).json();expect(result).toMatchObject({trusted:false,candidates:[]});expect(f.queries).toHaveLength(0);});
+ it('excludes checksummed participant addresses and corrupted output',async()=>{f.orders[0].seller=getAddress(f.signer);expect((await (await GET(new NextRequest('https://obolos.app/api/economy/valuations'))).json()).candidates).toEqual([]);f.orders[0].seller=getAddress(a('c'));f.rows[0].output={text:'changed'};expect((await (await GET(new NextRequest('https://obolos.app/api/economy/valuations'))).json()).candidates).toEqual([]);});
+});

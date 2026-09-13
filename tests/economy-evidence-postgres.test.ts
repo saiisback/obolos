@@ -47,6 +47,25 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)('PostgreSQL signed economic evid
   }
   expect((await db.query('SELECT * FROM economy_signed_evidence')).rows).toHaveLength(0);
  });
+ it('projects GAP and productivity from a real stored producer account and a separately signed valuation',{timeout:30000},async()=>{
+  const ownerId=randomUUID(),agentId=randomUUID();
+  await db.query('INSERT INTO platform_users(id,address) VALUES($1,$2)',[ownerId,address('e')]);
+  await db.query("INSERT INTO platform_agents(id,user_id,name,data_budget_atomic,verification_budget_atomic) VALUES($1,$2,'Accounting workflow fixture',0,1000)",[agentId,ownerId]);
+  await db.query('INSERT INTO economy_services(service_hash,user_id,definition) VALUES($1,$2,$3)',[hash('2'),ownerId,{seller:order.seller}]);
+  const request={payer:order.payer,settlement:{chainId:5042002,address:deployment.settlement,ledgerAddress:deployment.ledger}};
+  await db.query("INSERT INTO economy_orders(order_id,user_id,platform_agent_id,service_hash,request_hash,request,definition,transaction_hash,receipt,state,output,output_hash) VALUES($1,$2,$3,$4,$5,$6,$7,$8,'{}','fulfilled','{}',$9)",[order.orderId,ownerId,agentId,hash('2'),order.inputHash,request,{seller:order.seller},order.transactionHash,order.outputHash]);
+  const producer={protocol:'obolos.production-account.v1',chainId:5042002,settlement:deployment.settlement,ledger:deployment.ledger,orderId:order.orderId,transactionHash:order.transactionHash,outputHash:order.outputHash,seller:order.seller,issuedAt:172800,inputs:[],externalIntermediateAtomic:'20',gasAtomic:'5',inferenceAtomic:'5',otherResourceAtomic:'0',allIntermediateInputsIncluded:true,allResourcesIncluded:true,sourceReference:'https://fixture.test/invoice',sourceHash:hash('9')};
+  const accountHash=canonicalJsonHash(producer);
+  await db.query('INSERT INTO economy_production_accounts(order_id,evidence_hash,seller,payload,signature) VALUES($1,$2,$3,$4,$5)',[order.orderId,accountHash,order.seller,producer,'test-only stored producer signature']);
+  const assessment={...order,productionAccountHash:accountHash,valuationMethod:'Test-only independent replacement-cost assessment',resourceCostAtomic:'30',costBreakdown:{...order.costBreakdown,paymentAtomic:'20'}};
+  await expect(ingestEvidence(db,await signed({...assessment,resourceCostAtomic:'110',costBreakdown:order.costBreakdown}),deployment,chain,trust,172802)).rejects.toThrow('costs differ');
+  await expect(ingestEvidence(db,await signed({...assessment,productionAccountHash:hash('8')}),deployment,chain,trust,172802)).rejects.toThrow('exact signed');
+  await ingestEvidence(db,await signed(assessment),deployment,chain,trust,172802);
+  await indexEconomy(db,deployment,chain);
+  expect((await db.query('SELECT snapshot FROM economy_index_state')).rows[0].snapshot.metrics).toMatchObject({gapAtomic:'70',surplusAtomic:'60',productivityBps:'100000'});
+  // Reset only this isolated fixture; subsequent cases cover the legacy format.
+  await db.query('TRUNCATE economy_signed_evidence,economy_production_accounts,economy_production_input_allocations,economy_orders,economy_observations CASCADE');
+ });
  it('preserves exact replay, rejects conflicting attestations, and blocks evidence mutation',{timeout:30000},async()=>{
   expect(await ingestEvidence(db,await signed(order),deployment,chain,trust,172802)).toMatchObject({replayed:false});
   expect(await ingestEvidence(db,await signed(order),deployment,chain,trust,172802)).toMatchObject({replayed:true});

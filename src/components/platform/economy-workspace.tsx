@@ -7,6 +7,7 @@ import {formatUnits, keccak256, toHex} from 'viem';
 import type {EconomyMeasurements} from '@/lib/economy/measurements';
 import {EconomyMeasurementsView} from './economy-measurements';
 import {WorkspaceGlyph} from './workspace-glyph';
+import {EconomyValuation} from './economy-valuation';
 import {EconomyAccounting} from './economy-accounting';
 import type {EconomyMetrics} from '@/lib/economy/model';
 import {api, errorMessage} from './api';
@@ -72,6 +73,7 @@ function Prices({snapshot}: {snapshot: Snapshot}) {
     <DataTable label="Production accounting metrics"><thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Formula and source</th></tr></thead><tbody>{rows.map(([label,value,detail])=><tr key={label}><th scope="row">{label}</th><td className={e.value}>{value}</td><td className={e.explanation}>{detail}</td></tr>)}</tbody></DataTable>
     <p className={e.caption}>Independent output assessments and economic-capital attestations are recorded after a UTC day closes. Their completed results appear under Previous closed UTC day below.</p>
     <EconomyAccounting/>
+    <EconomyValuation/>
     </section>
     <details className={e.details}><summary>Previous closed UTC day</summary><p>{date(snapshot.metrics.start)} to {date(snapshot.metrics.end)} (end exclusive). Today's transactions are outside this window. This is the latest indexed accounting projection as of finalized block {snapshot.blockNumber}; later evidence can revise it. Seller allocations and accounting results are before separate refund adjustments.</p><dl className={e.addresses}><div><dt>Gross payments</dt><dd>{money(snapshot.metrics.grossPaymentsAtomic)}</dd></div><div><dt>Seller allocations</dt><dd>{money(snapshot.metrics.sellerRevenueAtomic)}</dd></div><div><dt>Settlements</dt><dd>{snapshot.metrics.settlementCount}</dd></div><div><dt>Eligible orders</dt><dd>{snapshot.metrics.settlementCount-snapshot.metrics.excludedSelfPayments}</dd></div><div><dt>Assessed outputs</dt><dd>{snapshot.metrics.valuedSettlementCount}</dd></div></dl><p>Methodology: {snapshot.metrics.methodology}. Values require complete evidence for this closed day.</p><DataTable label="Closed-day economics"><thead><tr><th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Formula and source</th></tr></thead><tbody>{accountingRows(snapshot.metrics).map(([label,value,detail])=><tr key={label}><th scope="row">{label}</th><td className={e.value}>{value}</td><td className={e.explanation}>{detail}</td></tr>)}</tbody></DataTable>{snapshot.metrics.limitations.length>0&&<ul>{snapshot.metrics.limitations.map((limitation,index)=><li key={index}>{limitation}</li>)}</ul>}</details>
     <details className={e.details}><summary>Measurement limitations</summary><p>Settlement, seller delivery claims and buyer acknowledgments are separate evidence. None independently proves useful output or excludes collusion.</p>{m.limitations.length > 0 && <ul>{m.limitations.map((limitation, index) => <li key={index}>{limitation}</li>)}</ul>}</details>
