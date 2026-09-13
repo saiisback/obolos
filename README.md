@@ -16,6 +16,8 @@ Built for ETHOnline 2026 using **Circle Agent Stack and Arc**, **Hedera and Bloc
 
 ## How it works
 
+![An agent discovers data, compute, inference, verification and storage services in the Obolos marketplace](docs/assets/marketplace.png)
+
 1. **Publish or discover.** Sellers register service terms on Arc and publish a discoverable description, endpoint, input/output schemas and examples.
 2. **Describe the work.** A buyer selects an agent, enters a task and sets a maximum service budget.
 3. **Approve the plan.** The private planner proposes registered providers, input routing and a fixed price. The owner approves that exact plan; planning itself cannot spend.
@@ -25,6 +27,13 @@ Built for ETHOnline 2026 using **Circle Agent Stack and Arc**, **Hedera and Bloc
 The workspace brings together [agents and tasks](https://obolos.app/app), [purchases and seller earnings](https://obolos.app/app/marketplace), [economic measurements](https://obolos.app/app/economy), [evidence](https://obolos.app/app/evidence), and [developer integrations](https://obolos.app/app/developers).
 
 ## Architecture
+
+![Arc service payment flow: approve, pay, deliver and acknowledge, with 95% allocated to the seller, 3% to reserve and 2% to the review pool](docs/assets/settlement.png)
+
+*Payment, seller delivery and buyer acknowledgment are separate records.*
+
+<details>
+<summary>Explore the technical architecture</summary>
 
 ```mermaid
 flowchart LR
@@ -43,7 +52,7 @@ flowchart LR
   Data -->|x402 via Blocky402| Hedera[Hedera HBAR / HTS]
 ```
 
-The public app hosts accounts, task state, discovery and indexed evidence. The private runner and broker retain wallet sessions, Ring access and payment journals. The model proposes work but receives no wallet tools. Circle signs Arc transactions through its own wallet infrastructure; Ledger protects broker credentials and approves spending mandates. These are separate responsibilities, with no bridge or atomic cross-chain settlement.
+</details>
 
 General tasks use the Arc catalog. The separate Hedera A2A negotiation workflow currently sells repository data; it does not negotiate arbitrary tasks automatically. See [trust boundaries](docs/architecture.md) and the [service protocol](docs/economy-provider-protocol.md).
 
@@ -62,6 +71,12 @@ General tasks use the Arc catalog. The separate Hedera A2A negotiation workflow 
 | Verification | Vitest, isolated PostgreSQL integration tests, Playwright, executable Solidity contract tests |
 
 Hedera's implemented bonus paths include per-repository metering, A2A, HCS-14, directory discovery, HTS, HCS audit and a finite two-payment schedule. This is not continuous streaming; publishing an HCS audit for every new payment is not automatic. [Receipts and reproduction guides](docs/evidence/2026-09-13-hedera-bonus.md).
+
+## Human control
+
+![Humans set budget, scope and expiry while agents work within those limits and credentials stay in a private vault](docs/assets/authority.png)
+
+The public app hosts accounts, task state, discovery and indexed evidence. The private runner and broker retain wallet sessions, Ring access and payment journals. The model proposes work but receives no wallet tools. Circle signs Arc transactions through its own wallet infrastructure; Ledger protects broker credentials and approves spending mandates. These are separate responsibilities, with no bridge or atomic cross-chain settlement.
 
 ## Run locally
 
@@ -167,4 +182,4 @@ Database-dependent cases require `TEST_DATABASE_URL` pointing to a **dedicated t
 
 ## Project provenance
 
-The user directed the product; AI tools assisted implementation, testing, documentation and artwork. The supplied research paper predates the event. See [AI and prior-work disclosure](docs/ai-disclosure.md), [UI references](docs/ui-references.md) and the [submission record](docs/submission.md). Organizer eligibility and sponsor acceptance are separate from technical verification; the Arc mainnet milestone has not been completed. This repository documents a testnet MVP.
+The user directed the product; AI tools assisted implementation, testing, documentation and artwork. The supplied research paper predates the event. See [AI and prior-work disclosure](docs/ai-disclosure.md), [UI references](docs/ui-references.md) and the [submission record](docs/submission.md). Organizer eligibility and sponsor acceptance are separate from technical verification; the Arc mainnet milestone has not been completed. This repository documents a testnet MVP. README drawings are AI-generated conceptual illustrations; screenshots and transaction evidence are documented separately. [Illustration prompts](docs/assets/illustration-prompts.json).
