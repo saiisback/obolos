@@ -78,6 +78,109 @@ Hedera's implemented bonus paths include per-repository metering, A2A, HCS-14, d
 
 The public app hosts accounts, task state, discovery and indexed evidence. The private runner and broker retain wallet sessions, Ring access and payment journals. The model proposes work but receives no wallet tools. Circle signs Arc transactions through its own wallet infrastructure; Ledger protects broker credentials and approves spending mandates. These are separate responsibilities, with no bridge or atomic cross-chain settlement.
 
+<!-- BEGIN:generated-workflow-diagrams -->
+## Workflow diagrams
+
+Follow the boxes and arrows from discovery to execution, settlement and measurement. The task flow is shown below; expand a workflow for its actors, approval gates and recovery paths. Open any diagram to read it at full size.
+
+![General task workflow: the private planner uses the published catalog, the owner approves a fixed plan, and the executor routes actual output from service 1 into service 2](docs/assets/workflows/03-general-task.png)
+
+The runner checks current authority before each payment. Unsupported capabilities stop before spending. [Planning, approval and execution details](docs/task-runner.md).
+
+<details>
+<summary>Account setup, private runner and spending authority</summary>
+
+![Account setup separates owner sign-in, scoped API credentials, private runner configuration, Ledger-approved limits and a funded Circle wallet](docs/assets/workflows/01-access-and-authority.png)
+
+Identity sign-in and API access do not authorize spending. Circle transaction signing and Ledger credential protection are separate responsibilities. [General runner setup](docs/task-runner.md) · [Arc policy and authority](docs/economy-architecture.md).
+
+</details>
+
+<details>
+<summary>Seller publishing, public discovery and service retirement</summary>
+
+![A seller builds an HTTPS API, registers payment terms and publishes capabilities; external agents browse without login, inspect schemas and select a service](docs/assets/workflows/02-publish-and-discover.png)
+
+External agents can read [service profiles](https://obolos.app/api/economy/service-profiles) and [service definitions](https://obolos.app/api/economy/services) without credentials. Publishing requires seller authorization; retired definitions remain available for existing paid orders. [Service protocol](docs/economy-provider-protocol.md).
+
+</details>
+
+<details>
+<summary>Arc settlement, seller delivery and buyer acknowledgment</summary>
+
+![An Arc order passes policy checks and durable journaling, settles through Circle with the 95/3/2 allocation, then reaches provider receipt verification, output production, seller attestation and buyer acknowledgment](docs/assets/workflows/04-arc-settlement.png)
+
+The provider independently verifies the exact paid receipt. The buyer checks the returned output and matching seller attestation before acknowledgment. [Executor](docs/economy/executor.md) · [Paid-service protocol](docs/economy-provider-protocol.md).
+
+</details>
+
+<details>
+<summary>Uncertain payments, delivery recovery, disputes and refunds</summary>
+
+![Separate paths for reconciling an uncertain original payment, retrying delivery under the same paid order and verifying a voluntary seller refund](docs/assets/workflows/05-recovery-and-refunds.png)
+
+Recovery retains the original transaction and order identity. A refund is a separate, finalized seller-to-payer transfer; a dispute or review-pool allocation does not automatically move funds. [Recovery and refunds](docs/economy/live-provider.md).
+
+</details>
+
+<details>
+<summary>Hedera A2A negotiation and HBAR or HTS x402 payments</summary>
+
+![Independent HBAR A2A and HTS quote paths converge at Blocky402 settlement, exact transfer verification and metered repository delivery](docs/assets/workflows/06-hedera-commerce.png)
+
+A2A negotiates the HBAR repository-data path. HTS uses a separate token quote and asset checks; neither path silently falls back to another asset. [A2A buyer](docs/hedera-a2a.md) · [HTS buyer](docs/hedera-token-buyer.md).
+
+</details>
+
+<details>
+<summary>HCS-14 identity, payment audit and public evidence</summary>
+
+![Canonical agent data becomes a verified HCS identity anchor, while an already completed payment is separately verified and anchored by an operator as a public audit](docs/assets/workflows/07-hcs-evidence.png)
+
+HCS audit publication is an explicit operator action. Public anchors contain hashes and transaction references; private reports, credentials and signed journals stay private. [Identity and audit workflow](docs/hedera-identity-audit.md).
+
+</details>
+
+<details>
+<summary>Finite Hedera Scheduled Transactions and delivery recovery</summary>
+
+![An owner-approved plan creates two native schedules; each waits for execution, verifies its transfer and unlocks its exact delivery, with recovery using the original schedule and receipt](docs/assets/workflows/08-scheduled-access.png)
+
+Each round uses a native scheduled transfer and its own verified delivery. The demonstrated plan has two rounds, with no continuous subscription or replacement payment during cached recovery. [Executed schedules and receipts](docs/evidence/2026-09-13-hedera-bonus.md).
+
+</details>
+
+<details>
+<summary>Seller production accounts and independent output valuations</summary>
+
+![A seller loads observed gas, completes actual costs and signs an immutable account; an independent evaluator reviews the output and signs a valuation bound to that account before server validation](docs/assets/workflows/11-accounting-evidence.png)
+
+Measured gas is a draft input. Sellers must supply complete input and resource evidence; the independent-review queue requires eligible outputs with complete positive costs. GAP can use complete production accounts without an independent output valuation. [Accounting and reviewer workflow](docs/production-accounting.md).
+
+</details>
+
+<details>
+<summary>Activity, GAP, surplus, productivity, inflation and velocity</summary>
+
+![Receipt indexing supplies payment activity; revenue and intermediate inputs determine GAP, complete resource costs determine surplus, independent output value determines productivity, and price baskets and capital support inflation and velocity](docs/assets/workflows/09-economic-accounting.png)
+
+Every aggregate requires its eligible-period evidence. The current live GAP and productivity limitations remain as documented below; these diagrams do not supply missing observations. [Measurement methodology](docs/evidence/2026-09-11-measured-economy.md) · [Current accounting evidence](docs/evidence/2026-09-13-accounting-workflow.md).
+
+</details>
+
+<details>
+<summary>Optional repository research runner</summary>
+
+![The optional repository runner validates an owner mandate, buys data on Hedera and verification on Arc, then persists its report and receipts; out-of-scope and uncertain work stops on separate branches](docs/assets/workflows/10-repository-runner.png)
+
+This older, optional workflow has its own runner pairing and repository mandate. General digital tasks use the task flow above. Its workspace receipts are runner-confirmed; independent chain verification is documented separately. [Repository runner setup](docs/self-service-setup.md).
+
+</details>
+
+These flat, hand-drawn-style diagrams were generated with the built-in image tool and reviewed against the linked implementation guides. They explain workflows; live execution evidence remains in the audit records. [Diagram files and generation prompts](docs/assets/workflows/prompts.json).
+
+<!-- END:generated-workflow-diagrams -->
+
 ## Run locally
 
 Use **Node.js 22.12+** and npm. Wallet CLI is installed by the repository; native USB dependencies may require platform build tools.
