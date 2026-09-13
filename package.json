@@ -75,5 +75,11 @@
     "axios": "1.20.0",
     "ws": "8.21.3",
     "toml": "4.2.0"
+  },
+  "description": "An open marketplace where agents discover and buy digital services within human-approved spending limits.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saiisback/obolos.git"
   }
 }

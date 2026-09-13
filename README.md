@@ -10,7 +10,7 @@ Describe a task, review the proposed providers and exact cost, and approve execu
 
 Obolos supports general digital work through its registered services, including writing, translation, coding assistance, data retrieval, text analysis and storage. A task can compose up to five service calls. Available providers determine what it can do; unsupported work is blocked before payment.
 
-Built for ETHOnline 2026 using **Circle Agent Stack and Arc**, **Hedera and Blocky402**, and **Ledger Key Ring**.
+Built with **Circle Agent Stack and Arc**, **Hedera and Blocky402**, and **Ledger Key Ring**.
 
 > **Live testnet application.** Service execution and payments are real. Only the Ledger device uses the disclosed Speculos emulator. New simulated runs are disabled. Execution requires a configured private runner and funded testnet wallets.
 
@@ -70,7 +70,7 @@ General tasks use the Arc catalog. The separate Hedera A2A negotiation workflow 
 | Credential protection | Ledger `wallet-cli ring`, LedgerJS mandate signing, explicit Speculos development mode |
 | Verification | Vitest, isolated PostgreSQL integration tests, Playwright, executable Solidity contract tests |
 
-Hedera's implemented bonus paths include per-repository metering, A2A, HCS-14, directory discovery, HTS, HCS audit and a finite two-payment schedule. This is not continuous streaming; publishing an HCS audit for every new payment is not automatic. [Receipts and reproduction guides](docs/evidence/2026-09-13-hedera-bonus.md).
+Hedera integrations include per-repository metering, A2A, HCS-14, directory discovery, HTS, HCS audit and a finite two-payment schedule. This is not continuous streaming; publishing an HCS audit for every new payment is not automatic. [Receipts and reproduction guides](docs/evidence/2026-09-13-hedera-integrations.md).
 
 ## Human control
 
@@ -127,7 +127,7 @@ HCS audit publication is an explicit operator action. Public anchors contain has
 
 ![An owner-approved plan creates two native schedules; each waits for execution, verifies its transfer and unlocks its exact delivery, with recovery using the original schedule and receipt](docs/assets/workflows/08-scheduled-access.png)
 
-Each round uses a native scheduled transfer and its own verified delivery. The demonstrated plan has two rounds, with no continuous subscription or replacement payment during cached recovery. [Executed schedules and receipts](docs/evidence/2026-09-13-hedera-bonus.md).
+Each round uses a native scheduled transfer and its own verified delivery. The demonstrated plan has two rounds, with no continuous subscription or replacement payment during cached recovery. [Executed schedules and receipts](docs/evidence/2026-09-13-hedera-integrations.md).
 
 ### Seller production accounts and independent output valuations
 
@@ -251,8 +251,16 @@ Database-dependent cases require `TEST_DATABASE_URL` pointing to a **dedicated t
 | `services/agent-runner.ts` | Optional repository research workflow |
 | `tests/`, `docs/evidence/` | Regression coverage and recorded live proof |
 
-[Deployment and credentials](docs/live-setup.md) · [Hedera setup](docs/hedera-setup.md) · [A2A](docs/hedera-a2a.md) · [HTS](docs/hedera-token-buyer.md) · [Identity and audit](docs/hedera-identity-audit.md) · [Demo walkthrough](docs/demo-script.md) · [Submission checklist](docs/submission.md)
+[Deployment and credentials](docs/live-setup.md) · [Hedera setup](docs/hedera-setup.md) · [A2A](docs/hedera-a2a.md) · [HTS](docs/hedera-token-buyer.md) · [Identity and audit](docs/hedera-identity-audit.md) · [Demo walkthrough](docs/demo-script.md) · [Documentation](docs/README.md) · [Contributing](CONTRIBUTING.md)
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, validation and contribution guidelines, and [SECURITY.md](SECURITY.md) for reporting vulnerabilities. The [documentation index](docs/README.md) links the setup guides, API protocols and recorded verification evidence.
 
 ## Project provenance
 
-The user directed the product; AI tools assisted implementation, testing, documentation and artwork. The supplied research paper predates the event. See [AI and prior-work disclosure](docs/ai-disclosure.md), [UI references](docs/ui-references.md) and the [submission record](docs/submission.md). Organizer eligibility and sponsor acceptance are separate from technical verification; the Arc mainnet milestone has not been completed. This repository documents a testnet MVP. README drawings are AI-generated conceptual illustrations; screenshots and transaction evidence are documented separately. [Illustration prompts](docs/assets/illustration-prompts.json).
+Obolos was developed with human direction and AI assistance for implementation, testing, documentation and artwork. Its economic model draws on a research paper dated September 3, 2026; implementation began September 7, 2026. See [AI and prior-work disclosure](docs/ai-disclosure.md), [design references](docs/ui-references.md) and the commit history. README illustrations and diagrams are generated conceptual artwork; app screenshots and transaction evidence are recorded separately.
+
+## License
+
+Original Obolos code and documentation are licensed under [Apache-2.0](LICENSE), except where a file or directory specifies another license. The Solidity contracts retain their existing [MIT license](contracts/LICENSE). Bundled third-party code, binaries and fonts retain their own licenses; see [third-party notices](THIRD_PARTY_NOTICES.md).

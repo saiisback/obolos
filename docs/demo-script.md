@@ -8,7 +8,7 @@ Use the current signed-in workspace at **https://obolos.app/app**. Lead with gen
 - For a fresh paid take, check the payer balance, remaining agent allowance, approved sellers/categories and policy expiry. Previously tested agents have already spent some or all of their caps. A balance is not spending authority.
 - Start the bounded runner using the [task runner guide](task-runner.md). It must remain active after you approve the plan. Preserve its original worker identity and all payment journals.
 - Prepare the marketplace, a completed general task with expanded outputs and receipts, Economy, and Developers → Hedera integrations. Use **Since deployment** for cumulative activity; a new UTC day may have little or no activity.
-- Keep wallet secrets, API credentials, OTPs and private environment files out of the recording. Use your own narration. The old synthetic-narration preview is an internal artifact, not the final submission video; consult the [recording guide](presentation.md) and current event upload instructions.
+- Keep wallet secrets, API credentials, OTPs and private environment files out of the recording. Keep recordings and narration exports in the ignored `output/` directory. Use the actual app and receipts when demonstrating a flow.
 
 ## Suggested four-minute walkthrough
 

@@ -38,6 +38,10 @@
   "exclude": [
     "node_modules",
     "tools/ledger-speculos",
-    "data"
+    "data",
+    "tmp",
+    "output",
+    ".venv",
+    "venv"
   ]
 }

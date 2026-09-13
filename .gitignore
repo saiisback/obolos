@@ -16,3 +16,12 @@ test-results/
 secrets*.json
 .vercel/
 .vercel
+
+# Local recordings, generated output and scratch work
+/output/
+/tmp/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.log

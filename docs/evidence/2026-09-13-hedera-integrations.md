@@ -2,9 +2,9 @@
 
 These are real Hedera testnet executions against the deployed Obolos service. Only Ledger hardware is emulated through the accepted Speculos setup. HBAR, HTS, Blocky402, HCS, GitHub data and native Scheduled Transactions used their actual network services. The two agent identities represent separately defined buyer/service roles operated by the same authorized testnet operator; this exercise does not claim independent operators or market demand.
 
-## Live bonus evidence
+## Live integration evidence
 
-| Hedera extra-credit direction | Implemented path and observed outcome |
+| Hedera capability | Implemented path and observed outcome |
 | --- | --- |
 | Metered data | Price scales by repository count. One A2A repository cost 100,000 tinybar; two repositories cost two OTEST credits. |
 | Multi-agent negotiation via A2A | Public A2A 0.3.0 Agent Card and JSON-RPC `message/send` proposal/offer/acceptance bind payer, exact resource, quantity, price cap and expiry. The private buyer accepted and paid through native HBAR x402/Blocky402. An insufficient-budget proposal returned a counteroffer without a payment. |
@@ -40,7 +40,7 @@ See [A2A setup](../hedera-a2a.md), [HTS buyer](../hedera-token-buyer.md), [HCS i
 
 Public integration evidence is served by [`/api/hedera/evidence`](https://obolos.app/api/hedera/evidence) and the signed-in [Developers → Hedera integrations](https://obolos.app/app/developers#hedera) screen. Publication verifies the chain proof and the actual service delivery association, then writes only sanitized metadata. Raw credential bundles, offer tokens and signed transaction bytes never enter that response.
 
-Arc still uses actual Circle Agent Stack wallets, canonical test USDC and the existing verified payment/delivery workflow. Ledger retains the real Key Ring integration and Speculos-emulated device. [Selected-track assessment](../reviews/2026-09-12-prize-fit.md). The Arc mainnet-by-September-30 payout condition is separate from this testnet release.
+Arc still uses actual Circle Agent Stack wallets, canonical test USDC and the existing verified payment/delivery workflow. Ledger retains the real Key Ring integration and Speculos-emulated device.
 
 ## Release verification
 

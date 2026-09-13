@@ -1,13 +1,13 @@
-# AI assistance and prior work
+# AI assistance and project provenance
 
-The human participant supplied a pre-event research paper, selected the three sponsor tracks, approved the six-stage managed research flow, chose Next.js/TypeScript, requested delegated coding and review, and directed a Mobbin-only black-and-white interface with colorful buttons. They explicitly excluded Mercury, requested a flat 2D illustration without shadows, and subsequently selected Foundation on Mobbin as the visual reference.
+Obolos was developed with human product direction and AI assistance in research, architecture, code, tests, integration review, documentation and artwork. Human contributors selected the requirements and integrations, configured the execution environment and reviewed the results.
 
-AI assistance includes research notes, architecture/implementation plans, TypeScript/React code, tests, integration review, documentation and a generated illustration. Subagents implemented the dashboard, Hedera data service and Ledger/Circle broker; the parent agent integrated, reviewed and tested the code. See the checked-in plans, references and incremental commit history for the work performed.
+The economic model draws on a research paper dated September 3, 2026 that contains project-specific architectural concepts. Implementation began September 7, 2026. These dates distinguish prior conceptual work from the implementation; they are not a claim of third-party certification or event eligibility.
 
-The pre-event paper is dated September 3, 2026 and contains project-specific architectural concepts. Do not describe those concepts as first conceived during the event. Implementation began September 7, 2026. Whether the earlier paper makes this a Continuity rather than Classic submission is an organizer decision, and may affect the selected Ledger track. Renaming the app or writing fresh code does not resolve that question automatically.
+The commit history retains the development sequence, including earlier implementation plans and review artifacts. Operational guides and dated execution evidence remain in the [documentation index](README.md).
 
-UI inspiration was retrieved using the connected Mobbin tool; exact sources and inferred font treatment are in `docs/ui-references.md`. The source screenshots and proprietary font binaries are not redistributed. The illustration is original AI-generated raster artwork using the built-in image generator; it is not copied from a reference app.
+UI inspiration and attribution are recorded in [design references](ui-references.md) and [landing asset provenance](../public/landing/ASSET-PROVENANCE.md). Proprietary reference screenshots and font binaries were not added to this repository.
 
-Illustration prompt: “Playful funky 2D editorial illustration of three friendly agent characters collaborating, holding a research sheet, passing a payment token and checking a checklist. Pure black and white, consistent bold outlines, white flat fills, plain white background. No shadows, shading, gradients, texture, 3D, text, logos or watermark.” File: `public/illustrations/agent-workforce.png`.
+README illustrations and workflow diagrams were generated with an image-generation tool and reviewed against the implementation. Their prompts are retained in [illustration prompts](assets/illustration-prompts.json) and [workflow prompts](assets/workflows/prompts.json). These are explanatory drawings. App captures and on-chain evidence are separate records of actual execution.
 
-The participant must review the software, direct the demo, configure their own accounts and hardware, and accurately document their contributions. AI did not complete external account authentication or record a human demo.
+Automated regression fixtures are distinct from real testnet runs. The Ledger device is emulated with Speculos; this does not provide a physical secure element. Runtime limitations and evidence requirements are described in the README and dated audit records.

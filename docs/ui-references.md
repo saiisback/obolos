@@ -27,7 +27,7 @@ Foundation's screenshots show bold, tightly spaced neutral grotesque headings an
 
 ## Validation scope
 
-This is a presentation update to the existing Next.js/TypeScript application. Review checks cover desktop/mobile navigation, readable forms, the complete rehearsal flow, and production CSS compilation. Sponsor setup and live qualification gates are unchanged; see `docs/submission.md`.
+This is a presentation update to the existing Next.js/TypeScript application. Review checks cover desktop/mobile navigation, readable forms, the complete rehearsal flow, and production CSS compilation. Integration setup and trust boundaries are documented in the [setup and protocol guides](README.md).
 
 ## Foundation restyle verification — September 7
 

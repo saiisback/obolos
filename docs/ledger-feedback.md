@@ -1,6 +1,6 @@
-# Ledger Agent Stack developer feedback
+# Ledger Key Ring integration notes
 
-Prepared September 8, 2026 for the Obolos ETHOnline submission. This records actual local development and staging execution. It is a draft for operator review; no message has been sent to Ledger or the event organizers.
+Recorded September 8, 2026. These notes describe the exercised staging integration, source adapter and development experience. They complement the [Speculos setup guide](speculos-setup.md).
 
 ## Environment and implementation
 
@@ -33,15 +33,3 @@ Evidence: [Ring execution](../tools/ledger-speculos/ring-evidence.json), [Ethere
 | A dependency helper in the SDK tree referred to an unavailable version during setup. | The adapter required a pinned dependency override for the unused helper while preserving the actual SDK. | Add a clean-install CI check for the documented emulator example and publish a known compatible lockfile. See the adapter lockfile and setup notes for our concrete dependency selection. |
 | Resetting an emulator seed changes the enrolled identity. | We implemented private seed creation once, reuse, permission checks and refusal to silently replace corrupt state. | Make identity persistence and recovery/reset consequences explicit in the quickstart; distinguish emulator seed from real wallet recovery material. |
 | Long application mandates require careful message review. | The app retains the exact message, both mandate versions, nonce, expiry, signer and signature; emulator provenance is disclosed inside the message. | Offer a reference for readable structured approval of provider, price ceiling, currency budgets and expiry. Physical-device readability remains untested in this project. |
-
-## Exact sponsor question — ready to send
-
-> We are building Obolos for ETHOnline's AI Agents x Ledger track. Our required Ring integration uses a disclosed source adaptation of `wallet-cli ring` from LedgerHQ/ledger-live commit `08be88be108394bf64ed0108dff9a53b8ffb14df`, with the real Ledger Key Ring SDK and staging trustchain service (application ID17). Official Ledger Sync and Ethereum apps run in Speculos. We have executed enrollment, encryption/decryption, negative checks, and a real Hedera/Arc testnet workflow using the Ring-encrypted broker bundle. The demo clearly labels software emulation; we do not claim physical-device security. Does this Speculos + source-adapter implementation qualify for the bounty's Ledger Agent Stack / `wallet-cli ring` requirement, or must we also demonstrate the unmodified CLI and/or a physical Ledger device? If an official supported emulator setup is preferred, please point us to it. Our repo and reproducible evidence: https://github.com/saiisback/obolos.
-
-Send through the [official Ledger ETHGlobal support channel](https://t.me/LedgerETHGlobal) only after operator approval. Record the actual response and its date before changing eligibility status. Silence, functional tests, and a successful signature are not sponsor approval.
-
-## Separate organizer question
-
-> We disclosed a September 3, 2026 concept paper, before the event began, and built the submitted Obolos implementation during ETHOnline. Can you confirm whether the disclosed prior conceptual work is consistent with the event's “start something new” eligibility rule? We can provide the original paper, implementation history and AI-assistance disclosure.
-
-The team must obtain an organizer determination; this document does not infer eligibility from code completion.

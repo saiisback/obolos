@@ -182,7 +182,7 @@ Inspect actual receipts and source timestamps in `/app/evidence` and `/app/econo
 
 ## 9. Finish the external submission package
 
-The [public repository](https://github.com/saiisback/obolos) is published. The public service URL, actual paid Hedera and Arc receipts, physical device demonstration, developer-experience feedback and narrated video are still external completion gates. Follow the [submission matrix](submission.md), [demo script](demo-script.md) and [presentation outline](presentation.md). Configuration is not qualification.
+For a complete installation, verify service reachability, runner configuration and funded testnet payment rails using the [setup guides](README.md) and [recorded end-to-end checks](evidence/2026-09-13-full-end-to-end.md). Historical receipts document earlier runs; verify your own deployment before accepting work.
 
 Settlement occurs on Hedera and Arc. The model, deterministic orchestration, broker, facilitator, Circle infrastructure and local audit store remain off-chain/trusted dependencies. No fully decentralized agent runtime, bridge, atomic cross-chain settlement or tamper-proof local history is claimed.
 
