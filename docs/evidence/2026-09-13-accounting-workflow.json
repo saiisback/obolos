@@ -1,0 +1,183 @@
+{
+  "checkedAt": "2026-09-13T05:55:05.663Z",
+  "observations": [
+    {
+      "category": "data",
+      "evidence": {
+        "protocol": "obolos.cost-observation.v1",
+        "chainId": 5042002,
+        "settlement": "0xb1c8370f42c1349c82b421576458b5251aaf5e36",
+        "ledger": "0xfb5cc06a6bf8a3ff0d37043cd64fcd7ae7bbdb5e",
+        "orderId": "0x0b577ecd578a906f5a5279390eeb5d42b16be9c0ac24c1b4d6cb75f7d2b36101",
+        "transactionHash": "0x033644e062ed09b6593a8267cf31e70282c8d4549f5ea37bd3d50416d34dfdf1",
+        "outputHash": "0xcc77d67145435ec79c7ceb8ee5a81814db1452c799008dc062b394f44235ff70",
+        "seller": "0xd2137e6d65165400641aff0e34781d09a0215858",
+        "sellerDeliveryGas": {
+          "transactionHash": "0x84219ec92c2b06e004cb60265c2520fb7649ef6832dd6719447c9b0a1f52d223",
+          "gasUsed": "53785",
+          "effectiveGasPrice": "21000000000",
+          "nativeAtomic": "1129485000000000",
+          "nativeDecimals": 18,
+          "amountAtomic": "1130",
+          "asset": "USDC",
+          "decimals": 6,
+          "rounding": "ceil-to-micro-USDC"
+        },
+        "inferenceUsage": null,
+        "complete": false,
+        "missing": [
+          "Producer confirmation and allocation of consumed marketplace inputs",
+          "External input invoices and currency conversion",
+          "Hosting, energy, storage and other resource allocation"
+        ]
+      },
+      "evidenceHash": "0x2990d08669e5d1fbad23a53dcec0651bc3520145589a520174a4a31582ac0901"
+    },
+    {
+      "category": "compute",
+      "evidence": {
+        "protocol": "obolos.cost-observation.v1",
+        "chainId": 5042002,
+        "settlement": "0xb1c8370f42c1349c82b421576458b5251aaf5e36",
+        "ledger": "0xfb5cc06a6bf8a3ff0d37043cd64fcd7ae7bbdb5e",
+        "orderId": "0x10f873c5c78770fff5e030bbbe9dec4d9280ca1797adb10a9730920bfb99106a",
+        "transactionHash": "0xb416e5b792e19a1a7cea64244e7c0820e8b450bf92cc0f3a9a90614db6a2e4e3",
+        "outputHash": "0x73993d4570dfde1448bae06b8028c88721f5c5831003676fc9e3b04ee5f0944a",
+        "seller": "0xd2137e6d65165400641aff0e34781d09a0215858",
+        "sellerDeliveryGas": {
+          "transactionHash": "0x35a9eb6a89a9d017816b2f8b1e39c380f09d22ae682fc2dc8fec2e9863ee29ea",
+          "gasUsed": "53797",
+          "effectiveGasPrice": "21000000000",
+          "nativeAtomic": "1129737000000000",
+          "nativeDecimals": 18,
+          "amountAtomic": "1130",
+          "asset": "USDC",
+          "decimals": 6,
+          "rounding": "ceil-to-micro-USDC"
+        },
+        "inferenceUsage": null,
+        "complete": false,
+        "missing": [
+          "Producer confirmation and allocation of consumed marketplace inputs",
+          "External input invoices and currency conversion",
+          "Hosting, energy, storage and other resource allocation"
+        ]
+      },
+      "evidenceHash": "0xddd4f0b97bc4970e4f3c11e4c1aa227852f55d4aab824f40b862928ca77cfa90"
+    },
+    {
+      "category": "inference",
+      "evidence": {
+        "protocol": "obolos.cost-observation.v1",
+        "chainId": 5042002,
+        "settlement": "0xb1c8370f42c1349c82b421576458b5251aaf5e36",
+        "ledger": "0xfb5cc06a6bf8a3ff0d37043cd64fcd7ae7bbdb5e",
+        "orderId": "0x4c86d4453a43787b7780e66fc7038d91e859b5d7d6035fffa2ffce6ade5f65ea",
+        "transactionHash": "0x618109b7992e61a50ace48b5bea49b266e84d6f8ea93bcac2a2d0ecb61e3ff67",
+        "outputHash": "0x9cfebc2f4f2b9d4de5c4870c65d3e90dd022a4d4c4c5277d5e5a00a82cbd8821",
+        "seller": "0xd2137e6d65165400641aff0e34781d09a0215858",
+        "sellerDeliveryGas": {
+          "transactionHash": "0x2bd5eec541655e0723ae221b0e4b2fbeb6bde7246e6b7d16e6e4062f12dc9214",
+          "gasUsed": "53785",
+          "effectiveGasPrice": "21000000000",
+          "nativeAtomic": "1129485000000000",
+          "nativeDecimals": 18,
+          "amountAtomic": "1130",
+          "asset": "USDC",
+          "decimals": 6,
+          "rounding": "ceil-to-micro-USDC"
+        },
+        "inferenceUsage": {
+          "model": "gpt-5-nano-2025-08-07",
+          "promptTokens": 197,
+          "completionTokens": 179,
+          "requestId": "chatcmpl-ENOpt54V7bRzOnlVFoREHLSi2slOt",
+          "cachedPromptTokens": null,
+          "costAtomic": null
+        },
+        "complete": false,
+        "missing": [
+          "Producer confirmation and allocation of consumed marketplace inputs",
+          "External input invoices and currency conversion",
+          "Hosting, energy, storage and other resource allocation",
+          "Inference billing evidence; retained token counts alone do not establish the billed amount"
+        ]
+      },
+      "evidenceHash": "0x014757863f9c54f9543033e499c09a54e6ba2ea44d11ae8bdd55962940b96135"
+    },
+    {
+      "category": "verification",
+      "evidence": {
+        "protocol": "obolos.cost-observation.v1",
+        "chainId": 5042002,
+        "settlement": "0xb1c8370f42c1349c82b421576458b5251aaf5e36",
+        "ledger": "0xfb5cc06a6bf8a3ff0d37043cd64fcd7ae7bbdb5e",
+        "orderId": "0xee3270c05655aa732e2e19378c1a70bfc4ff4634b7ff6c5c0b59304a71a11ff3",
+        "transactionHash": "0x409f8507852ec72e4925c8ca859bf06d567d3ecd6d3c913b3426baec0164f00e",
+        "outputHash": "0x95caaaa4029036e9d6126a827fbcba4885683941cff991ad581f928ebb2204ae",
+        "seller": "0xd2137e6d65165400641aff0e34781d09a0215858",
+        "sellerDeliveryGas": {
+          "transactionHash": "0xc0b8fb6e03ca313df44b289f197e1ffcbb8e5bb6fae2efc62aea0639f9c395d3",
+          "gasUsed": "53797",
+          "effectiveGasPrice": "21000000000",
+          "nativeAtomic": "1129737000000000",
+          "nativeDecimals": 18,
+          "amountAtomic": "1130",
+          "asset": "USDC",
+          "decimals": 6,
+          "rounding": "ceil-to-micro-USDC"
+        },
+        "inferenceUsage": null,
+        "complete": false,
+        "missing": [
+          "Producer confirmation and allocation of consumed marketplace inputs",
+          "External input invoices and currency conversion",
+          "Hosting, energy, storage and other resource allocation"
+        ]
+      },
+      "evidenceHash": "0x9aea6bda7da210c0fa25817b5462f76cf673d08c7fc5226654ffbd0fea926082"
+    },
+    {
+      "category": "storage",
+      "evidence": {
+        "protocol": "obolos.cost-observation.v1",
+        "chainId": 5042002,
+        "settlement": "0xb1c8370f42c1349c82b421576458b5251aaf5e36",
+        "ledger": "0xfb5cc06a6bf8a3ff0d37043cd64fcd7ae7bbdb5e",
+        "orderId": "0xc97742122eaf24d30425577e3cd49b4c98afe84db95a981b96afd3ce767bd6b5",
+        "transactionHash": "0x83ad18e4ce32b8512e9326a1e026e048b642ad21f2780d709e254bf0502274fe",
+        "outputHash": "0xb1d00f354f768c25c03c048ff2de8e1637ec4f0dfc103d14398c8e520c293ad5",
+        "seller": "0xd2137e6d65165400641aff0e34781d09a0215858",
+        "sellerDeliveryGas": {
+          "transactionHash": "0x41bdc0642286011562677e5a396977642db8fd5e709dda0925014ac2d8805b25",
+          "gasUsed": "53797",
+          "effectiveGasPrice": "21000000000",
+          "nativeAtomic": "1129737000000000",
+          "nativeDecimals": 18,
+          "amountAtomic": "1130",
+          "asset": "USDC",
+          "decimals": 6,
+          "rounding": "ceil-to-micro-USDC"
+        },
+        "inferenceUsage": null,
+        "complete": false,
+        "missing": [
+          "Producer confirmation and allocation of consumed marketplace inputs",
+          "External input invoices and currency conversion",
+          "Hosting, energy, storage and other resource allocation"
+        ]
+      },
+      "evidenceHash": "0x7fad5fe24220b3252192569dd2d75f059c039aa6027f8ac19421d98b96fe225f"
+    }
+  ],
+  "reviewer": {
+    "trusted": false,
+    "candidates": 0
+  },
+  "unauthenticatedStatus": 401,
+  "pageErrors": [],
+  "walletCalls": [
+    "eth_requestAccounts",
+    "personal_sign"
+  ]
+}
