@@ -1,210 +1,170 @@
+![Obolos — Agents that work. Payments that prove it.](docs/assets/banner.png)
+
 # Obolos
 
-**Work, within limits.** Agents buy evidence and pay for verification. Humans control their spending authority.
+**A marketplace where agents buy digital services within human-approved spending limits.**
 
-[Public app](https://obolos.app) · [Product](https://obolos.app/marketplace) · [Payment evidence](https://obolos.app/evidence) · [Developers](https://obolos.app/developers) · [Live workspace](https://obolos.app/app) · [Source code](https://github.com/saiisback/obolos) · [Live setup](docs/live-setup.md) · [Speculos setup](docs/speculos-setup.md) · [Architecture](docs/architecture.md) · [Submission checklist](docs/submission.md) · [Video footage — human narration required](docs/presentation/obolos-human-narration-visual-bed.mp4) · [Presentation PDF](docs/presentation/obolos-presentation.pdf) · [Demo script](docs/demo-script.md)
+[Open app](https://obolos.app/app) · [Browse marketplace](https://obolos.app/marketplace) · [Payment evidence](docs/evidence/2026-09-13-full-end-to-end.md) · [Architecture](docs/economy-architecture.md) · [Demo walkthrough](docs/demo-script.md)
 
-![Three robot coworkers exchanging a payment token and a research report](public/illustrations/agent-workforce.png)
+Describe a task, review the proposed providers and exact cost, and approve execution. A private runner buys the selected services, passes real outputs between steps, and returns results with payment receipts. Sellers publish HTTPS APIs with their own capabilities, schemas and prices.
 
-A marketplace for digital work: describe a task, review its service plan and price, and let a private agent buy the services and return paid results. Sellers publish HTTPS APIs with their own input/output schemas and prices. Wallet accounts, scoped API access and signed spending limits bind who can spend. User-owned runners execute through private local brokers; the former `/demo` URL redirects to the live workspace. Built for the **Ledger AI Agents x Ledger**, **Hedera AI & Agentic Payments**, and **Arc Best Agentic Economy Application with Circle Agent Stack** tracks at ETHOnline 2026.
+Obolos supports general digital work through its registered services, including writing, translation, coding assistance, data retrieval, text analysis and storage. A task can compose up to five service calls. Available providers determine what it can do; unsupported work is blocked before payment.
 
-Signed-in navigation stays inside the workspace:
+Built for ETHOnline 2026 using **Circle Agent Stack and Arc**, **Hedera and Blocky402**, and **Ledger Key Ring**.
 
-- `/app`: general tasks, exact-plan approval, paid results, owned agents and spending setup.
-- `/app/marketplace`: separate **Browse services**, **Your purchases**, and **Your seller desk** views; publishing opens on demand beside listings and earnings.
-- `/app/evidence`: the selected owned agent’s latest 100 runs, reports, receipts and checks.
-- `/app/developers`: agent-scoped credentials, API examples, and verified Hedera integrations at `#hedera`.
+> **Live testnet application.** Service execution and payments are real. Only the Ledger device uses the disclosed Speculos emulator. New simulated runs are disabled. Execution requires a configured private runner and funded testnet wallets.
 
-The primary task flow is **Describe task → Review service plan → Approve exact cost → Receive results and receipts**. A task can compose up to five registered services, including writing, translation and text processing; additional capabilities come from seller-published services. Unsupported work is blocked with an explanation. The earlier repository research workflow remains optional, with its existing history in Evidence. See [private general task runner setup](docs/task-runner.md). Developers separates **API credentials**, **API examples**, **Runner setup**, **Sell an API**, and **Hedera integrations**, with shareable section anchors. Switching developer sections or agents hides unsaved one-time credentials.
+## How it works
 
-The public `/marketplace`, `/evidence` and `/developers` pages remain separate; public evidence is a captured release record. Workspace sessions are checked before rendering account sections; every private API independently enforces ownership. Sign-in return destinations are restricted to the four workspace routes and a validated service selection.
+1. **Publish or discover.** Sellers register service terms on Arc and publish a discoverable description, endpoint, input/output schemas and examples.
+2. **Describe the work.** A buyer selects an agent, enters a task and sets a maximum service budget.
+3. **Approve the plan.** The private planner proposes registered providers, input routing and a fixed price. The owner approves that exact plan; planning itself cannot spend.
+4. **Execute within limits.** The runner checks current policy and service terms, pays through Circle Agent Stack, and calls each provider with its actual inputs.
+5. **Inspect the result.** The app shows outputs, finalized settlement, seller delivery and buyer acknowledgment. Durable order IDs allow interrupted delivery to resume without a second payment.
 
-To check workspace navigation and credential UI against isolated browser fixtures, run `npm run build`, `npm run start -- --port 3100`, then `npx playwright test --config tests/browser/playwright.config.ts`. These browser tests intercept API requests and do not issue real credentials or make payments.
+The workspace brings together [agents and tasks](https://obolos.app/app), [purchases and seller earnings](https://obolos.app/app/marketplace), [economic measurements](https://obolos.app/app/economy), [evidence](https://obolos.app/app/evidence), and [developer integrations](https://obolos.app/app/developers).
 
-**Verified self-service testnet run:** the deployed account, agent, signed-mandate and isolated-runner path purchased one repository record for **0.001 HBAR**, generated a report and paid **0.05 USDC** for verification. Both payments were independently checked on chain. The bounded test used a generated EOA owner and an explicitly authorized funded broker with Speculos credential retrieval. See [run evidence](docs/evidence/2026-09-09-self-service-testnet.md), [self-service setup](docs/self-service-setup.md) and [private runner setup](docs/runner-setup.md).
+## Architecture
 
-**Historical operator evidence:** a complete testnet run bought three records for **0.003 HBAR**, generated a report with GPT-5 nano and paid **0.05 USDC** for verification on Arc. A separate public HTTPS purchase settled **0.001 HBAR**. A real chat-approved Speculos mandate increase also settled **0.008 HBAR**, and its older Arc intent was recovered under explicit user authorization and settled for **0.05 USDC**. See the [evidence matrix](docs/submission.md) and [reconciliation record](docs/evidence/2026-09-08-arc-reconciliation.md).
+```mermaid
+flowchart LR
+  Owner[Human owner] -->|Task, budget and exact-plan approval| App[Next.js workspace]
+  Sellers[Service sellers] -->|Schemas, prices and capabilities| Catalog[Registered service catalog]
+  Catalog --> Runner[Private task runner]
+  App <-->|Tasks and verified results| Runner
+  App --> DB[(Neon PostgreSQL)]
+  Ring[Ledger Key Ring] -->|Credential access| Planner[Bounded model planner]
+  Runner <--> Planner
+  Runner -->|Policy-checked payment| Circle[Circle Agent Stack]
+  Circle --> Arc[Arc USDC settlement]
+  Arc -->|95% seller / 3% reserve / 2% review pool| Sellers
+  Runner <-->|Paid request and actual output| API[Seller HTTPS API]
+  HederaBuyer[Hedera A2A buyer] -->|Discover and negotiate| Data[Metered repository service]
+  Data -->|x402 via Blocky402| Hedera[Hedera HBAR / HTS]
+```
 
-**Submission video correction (September 9, 2026):** ETHGlobal prohibits synthetic/AI voiceovers and speeding up footage. The earlier narrated MP4 is an internal preview and **must not be submitted**. The [visual bed and human recording guide](docs/presentation.md) require the team’s own voice before upload. See the [official video rules](https://ethglobal.com/events/ethonline2026/info/details).
+The public app hosts accounts, task state, discovery and indexed evidence. The private runner and broker retain wallet sessions, Ring access and payment journals. The model proposes work but receives no wallet tools. Circle signs Arc transactions through its own wallet infrastructure; Ledger protects broker credentials and approves spending mandates. These are separate responsibilities, with no bridge or atomic cross-chain settlement.
 
-The application and x402 service support native Vercel hosting with Neon. Paid execution still requires the owner’s local runner and funded broker to be online. A wallet signature does not prove physical Ledger use; Speculos is emulated development signing. The device remains disclosed as emulated; paid API requests and settlement use real testnet services.
+General tasks use the Arc catalog. The separate Hedera A2A negotiation workflow currently sells repository data; it does not negotiate arbitrary tasks automatically. See [trust boundaries](docs/architecture.md) and the [service protocol](docs/economy-provider-protocol.md).
 
-**General service marketplace:** sellers choose a title, description, examples, HTTPS endpoint, resource category, fixed unit price and strict input/output schemas. The platform validates examples against the actual service contract. Seller payments come from finalized on-chain allocation events and are shown before refunds; they are not inferred profit. Public descriptions cannot change the registered seller or payment terms. General task execution currently uses Arc test USDC, while the separate Hedera x402 workflows below remain available.
+## Integrations and stack
 
-**Earlier research marketplace:** sellers can register their own repository-verification HTTPS endpoints, attribute listings to owned agents, and receive Arc test USDC. The v3 mandate binds the exact endpoint and terms; payment is persisted before delivery, and paid delivery can be retried without another transfer. See [the endpoint contract](docs/external-services.md) and [revision history](docs/marketplace-revisions.md). A real 0.001-HBAR + 0.05-USDC run completed through the external HTTPS reference provider with eight passing checks: [paid endpoint evidence](docs/evidence/2026-09-11-external-marketplace.md). Token issuance/inflation rules are still unspecified.
+| Layer | Implementation |
+| --- | --- |
+| Application | Next.js 16.3.4, React 19, TypeScript, Lucide icons |
+| Persistence and hosting | Neon PostgreSQL, versioned SQL migrations, Vercel |
+| Planning and execution | Private Node.js/TypeScript runner, GPT-5 nano, bounded service plans, durable payment journals |
+| Arc payments | Circle Agent Stack CLI, test USDC, Solidity settlement and policy contracts, viem |
+| Hedera commerce | Hiero SDK, x402, Blocky402 facilitator, metered HBAR and HTS service payments |
+| Agent discovery and evidence | Service directory, A2A negotiation, HCS-14 identity anchors, HCS payment audit |
+| Scheduled payments | Finite native Hedera Scheduled Transactions with verified deliveries |
+| Credential protection | Ledger `wallet-cli ring`, LedgerJS mandate signing, explicit Speculos development mode |
+| Verification | Vitest, isolated PostgreSQL integration tests, Playwright, executable Solidity contract tests |
 
-**Marketplace release:** signed-in sellers can publish hosted metric-verification services and receive Arc test USDC directly. Buyers select a seller in a v2 spending mandate; orders bind the purchased evidence, report, recipient and price. The public service verifies settlement, and the workspace checks both payment proofs before showing chain-confirmed results. [Open the marketplace](https://obolos.app/marketplace) · [Setup and API flow](docs/marketplace-setup.md). **Paid release verified:** a separately signed-in buyer selected a seller, bought fresh evidence and completed a 0.05 test-USDC order with all seven report checks passing. [Receipts and validation](docs/evidence/2026-09-10-marketplace-testnet.md).
+Hedera's implemented bonus paths include per-repository metering, A2A, HCS-14, directory discovery, HTS, HCS audit and a finite two-payment schedule. This is not continuous streaming; publishing an HCS audit for every new payment is not automatic. [Receipts and reproduction guides](docs/evidence/2026-09-13-hedera-bonus.md).
 
-## One workflow, three tracks
+## Run locally
 
-A user asks: *Compare these three developer tools using current repository activity and produce a checked report.* Obolos discovers approved service quotes, buys repository evidence, generates a report and pays for source checks. A quote above the mandate pauses execution until a human authorizes the increase.
-
-| Target track | Integration in Obolos | Evidence still needed |
-|---|---|---|
-| Ledger — AI Agents x Ledger | `wallet-cli ring` integration plus explicit Speculos development support using upstream commands, real Sync/Ethereum apps and Ledger staging; signed mandate increases | Accepted Speculos setup and retained signature verified; tooling feedback saved in the submission form |
-| Hedera — AI & Agentic Payments | Per-repository HBAR/HTS pricing, Blocky402, A2A negotiation, HCS-14 identity, HCS audits and finite native schedules | Real paid bonus workflows recorded below; retain the narrated demo and service availability |
-| Circle — Best Agentic Economy Application with Circle Agent Stack | Circle Agent Wallet pays the verification capability in USDC on Arc testnet | Fresh self-service USDC payment verified; historical intent also reconciled and settled |
-
-The frontend and backend use **Next.js, React and TypeScript**. Separate Node services implement the metered API and private capability broker. The application interface uses the user-selected Foundation reference on Mobbin, black-and-white surfaces, orange actions and an original flat illustration. The landing page, Product catalog, Evidence page and Developer guide use the later supplied video and dot-matrix design brief. Product and documentation pages scroll to keep forms, receipts and code examples accessible.
-
-## Phase 2 · Obolos open economy
-
-The Arc testnet Phase 2 contracts are deployed and recorded in [deployment metadata](src/lib/economy/deployment.json). They separate human-owned agent limits, Circle wallet execution, canonical-USDC settlement, delivery evidence, and conservative economic measurements. The generic `obolos.service.v1` market supports data, compute, inference, verification, and storage providers with finalized receipt checks and delivery-only retries.
-
-**Paid production-path testnet execution verified:** a scoped agent API delivered a real compute request after a Circle Agent Stack payment of 0.001 test USDC. Contract transfers split 95% to the seller, 3% to reserve, and 2% to the review pool. Seller delivery and buyer acknowledgment are separate on-chain records. A Ledger Speculos-approved cap blocked a higher quote before payment; two selected-quote ARPI observations are recorded on chain. [Transaction evidence and limitations](docs/evidence/2026-09-11-economy-release.md). No new token is issued; resource-price inflation is measured, not minted. See the [implemented design](docs/superpowers/specs/2026-09-11-agentgdp-open-market-design.md), [architecture and operator commands](docs/economy-architecture.md), and [provider protocol](docs/economy-provider-protocol.md).
-
-## Hedera agent commerce
-
-The live Developers **Hedera integrations** section connects the discoverable A2A service to its HCS-14 identities, payment audit, HTS resource endpoint and finite native schedules. Public proof metadata is available at [`/api/hedera/evidence`](https://obolos.app/api/hedera/evidence); private keys, offer tokens and signed transaction journals stay in the operator environment.
-
-The September 13 verification purchased one repository for **0.001 HBAR** through A2A negotiation and Blocky402, purchased two repositories for **2 OTEST** through native HTS x402 settlement, anchored the payment audit on HCS, and delivered two separately scheduled repository purchases. OTEST is a fixed-supply testnet service credit with no monetary value. The schedule is a finite two-payment plan, not an indefinitely running subscription. [Exact receipts and edge-case checks](docs/evidence/2026-09-13-hedera-bonus.md).
-
-Setup and reproduction: [A2A buyer](docs/hedera-a2a.md), [HTS buyer](docs/hedera-token-buyer.md), [identity and HCS audit](docs/hedera-identity-audit.md), [verified evidence publication](docs/hedera-evidence-publication.md). The operator-only `scripts/hedera-commerce.ts` provisions test credits and creates/delivers bounded native schedules. Apply migrations through `016_hedera_commerce.sql` before enabling these endpoints. Never restart an uncertain paid operation with a new identity; reconcile its saved transaction first.
-
-## Run the application
-
-Use Node.js 22.12+ and npm. The project pins Wallet CLI 2.1.0 locally, so a global installation is not required. Native Ledger HID dependencies may need platform USB build tools; private broker deployments install their own dependencies.
+Use **Node.js 22.12+** and npm. Wallet CLI is installed by the repository; native USB dependencies may require platform build tools.
 
 ```sh
 git clone https://github.com/saiisback/obolos.git
 cd obolos
 npm ci
+cp .env.example .env.local
+```
+
+For a fresh checkout, edit `.env.local`: configure a PostgreSQL `DATABASE_URL`, the exact browser `APP_ORIGIN`, and independent random session/operator secrets. Keep existing configuration when upgrading. Database credentials must remain server-side.
+
+```sh
+npm run db:migrate
 npm run dev
 ```
 
-Open http://127.0.0.1:3000 for the landing page and `/app` for the live workspace. All new jobs require actual configured providers and funded testnet wallets. Only the Ledger device may be emulated with Speculos. Historical rehearsal records remain readable/exportable; new rehearsal creation, advancement and simulated approval are rejected server-side. `/demo` redirects to `/app`. If you set `APP_ORIGIN`, use that exact origin in your browser.
+Open **http://127.0.0.1:3000**. Sign in with an injected EVM wallet or a mobile wallet browser. Identity sign-in does not authorize spending. WalletConnect QR and contract-wallet sign-in are not implemented.
 
-The [live-only audit](docs/evidence/2026-09-11-live-only-audit.md) explains actual providers, the Ledger emulation boundary and remaining external evidence requirements. The [five-service release evidence](docs/evidence/2026-09-11-live-only-release.md) records real paid delivery, buyer acknowledgment, authenticated storage retrieval and a proof-verified refund.
+This starts the application. Paid work additionally needs an enrolled agent, a scoped API credential, an active on-chain spending mandate and a private runner. Follow [general task runner setup](docs/task-runner.md), [economy setup](docs/economy-architecture.md) and [Ledger/Speculos setup](docs/speculos-setup.md). The [account setup guide](docs/self-service-setup.md) also documents the older, optional repository runner; use the general task runner for new digital tasks.
 
-Follow [account setup](docs/self-service-setup.md), pair your private runner, sign bounded spending authority and queue real work. A quote above that authority stops payment until a fresh valid authorization is supplied. Inspect actual source timestamps and chain receipts in Evidence. The read-only smoke checks authorization and rehearsal rejection; it does not buy work.
+After configuring the private environment and preserving its existing payment journals, run a bounded polling session:
 
-## Architecture and payment flow
-
-See [general-task release verification](docs/evidence/2026-09-13-general-tasks.md) for actual paid translation and writing-to-analysis runs, finalized allocations, replay checks, and known output-quality limits.
-
-The subsequent [live end-to-end audit](docs/evidence/2026-09-13-full-end-to-end.md) covers browser-driven coding tasks, all five paid resource APIs, fresh Hedera A2A settlement, delivery recovery, a real refund, and before/after economy reconciliation.
-
-General digital tasks:
-
-```mermaid
-flowchart LR
-  Owner[Owner] -->|Task and maximum budget| App[Workspace and task API]
-  Sellers[Sellers] -->|Endpoint, schemas, price and profile| Catalog[Service catalog]
-  Runner[Private task runner] -->|Read task and catalog| App
-  Catalog --> Runner
-  Ring[Ledger Key Ring] -->|Private inference credential| Planner[Bounded model planner]
-  Runner --> Planner
-  Planner -->|Proposed service calls and output routing| App
-  Owner -->|Approve exact plan and price| App
-  App -->|Immutable approved plan| Runner
-  Runner -->|Policy checks and durable order IDs| Circle[Circle Agent Stack executor]
-  Circle -->|Test USDC payment| Arc[Arc settlement and allocation]
-  Arc -->|Seller payment| Sellers
-  Runner -->|Paid request| Service[Seller HTTPS service]
-  Service -->|Actual output| Runner
-  Runner -->|Verified result and receipts| App
-  App --> Neon[Neon tasks, orders and indexed payments]
+```sh
+npx tsx --env-file=.env.broker --env-file=/absolute/private/task.env \
+  services/task-runner.ts --polls 60 --interval-ms 10000 --execute-testnet
 ```
 
-The optional repository workflow keeps its separate Hedera x402 data purchase and verifier integration:
+The runner plans queued work and waits for owner approval before paid execution. Service budgets exclude network fees and the private planner's API charges. Keep the execution host online while work runs. Never delete journals or change an order's identity to retry an uncertain payment.
 
-```mermaid
-flowchart LR
-  Owner[Owner wallet] -->|Identity and separate spending signatures| UI[Next.js workspace]
-  UI --> Platform[Agent and job API]
-  Platform --> Neon[Neon accounts, mandates and jobs]
-  Runner[User-owned isolated runner] -->|Claim jobs and upload results| Platform
-  Runner -->|Verify signed scope and journal execution| Engine[Local policy engine]
-  Engine --> Broker[Private loopback broker]
-  Ring[Local Ledger Key Ring] --> Broker
-  Broker -->|Signed x402 purchase| Data[Public metered repository API]
-  Data -->|Verify and settle through Blocky402| Hedera[Hedera testnet HBAR]
-  Data --> GitHub[Public GitHub evidence]
-  Broker --> Model[Fixed inference provider]
-  Broker --> Circle[Local Circle Agent Stack CLI]
-  Circle --> Arc[Arc testnet USDC to selected seller]
-  Seller[Seller wallet] -->|Publish price and recipient| Market[Hosted verifier marketplace]
-  UI -->|Signed service revision and price| Market
-  Broker -->|Evidence-bound order and receipt| Market
-  Market -->|Verify canonical transfer| Arc
-  Market -->|Persist orders and confirmed earnings| Neon
-  Broker -->|Evidence, receipts and checks| Engine
-```
+### Publish a service
 
-The on-chain part is payment settlement on Hedera and Arc. The model, planner, broker, facilitator, Circle infrastructure and local journal remain off-chain/trusted dependencies; this is not a fully decentralized agent runtime. The marketplace verifier checks model metric claims against purchased evidence, sources, timestamps and coverage. It does not certify free-text recommendations. New v2 marketplace results are checked independently against Hedera settlement and fulfilled Arc orders; legacy v1 receipts retain their runner-confirmed label.
+Open **Marketplace → Your seller desk**, describe the capability, provide its HTTPS endpoint and schemas, then register and publish the service terms. An arbitrary URL alone is insufficient: the provider must implement the [paid-service protocol](docs/economy-provider-protocol.md), validate settlement and return a schema-valid output. Discovery metadata cannot override signed payment terms.
 
-The data service charges **per repository**, so one repository costs one unit and three cost three units. The planner selects the cheapest permitted quote. Price increases can trigger rerouting or require a new mandate. Verification is a separate job paid in Arc USDC at the selected seller’s signed price. Network fees are **not included** in purchase allowances.
+The five reference resource categories are data, compute, inference, verification and storage. Their current implementations fetch public repository data, calculate text statistics, call a real model, verify a content hash, and store an object with an authenticated one-hour lease. Content-hash verification proves integrity, not semantic correctness or code safety.
 
-See [architecture and trust boundaries](docs/architecture.md), [Hedera setup](docs/hedera-setup.md) and [broker, Circle and Ledger setup](docs/broker-setup.md).
+## Economic measurements
 
-The [first paid testnet run](docs/evidence/2026-09-08-first-paid-run.md) completed on September 8, 2026: three repository records purchased for 0.003 HBAR through Blocky402, GPT-5 nano report generation, and verification settled for 0.05 USDC on Arc. Transaction links and the application export are included.
+The dashboard distinguishes payment activity from productive value. Gross payments, seller allocations, deliveries, acknowledgments and recorded refunds come from actual records. ARPI uses a fixed resource-price basket; more purchases do not change inflation when prices stay the same.
 
-## Live setup
+| Measure | Required evidence |
+| --- | --- |
+| GAP — Gross Agent Product | Observed seller revenue minus complete intermediate production inputs |
+| Agent surplus | Observed seller revenue minus complete resource costs |
+| Productivity | Independently valued output divided by complete resource costs |
+| Economic money velocity | GAP divided by separately measured capital |
+| Period inflation | Comparable resource-price indices for consecutive complete periods |
 
-Without hardware, follow [Speculos development setup](docs/speculos-setup.md). Real staging authentication, password-protected Ring enrollment, encryption/decryption and emulator message signing have been verified. [Execution evidence](tools/ledger-speculos/ring-evidence.json) includes rejection of altered ciphertext, wrong domains and wrong passwords. This does not establish physical-device security or bounty eligibility.
+**GAP currently needs production-input accounts; productivity also needs independent output valuations.** Seller-signed production accounting is implemented, but the audited live orders do not yet have complete input accounts. GAP does not require an independent output valuation. The research paper supplies the formulas, not these observations; missing inputs remain unavailable rather than becoming fabricated zeros. See [measurement methodology](docs/evidence/2026-09-11-measured-economy.md).
 
-Follow the [step-by-step credential and wallet guide](docs/live-setup.md). It distinguishes public addresses from private credentials and keeps setup actions with the operator.
+Known common-owner activity is excluded from value-added calculations. Demo buyer and seller accounts were operated by the same team: these runs demonstrate working commerce, not independent market demand. Buyer acknowledgment does not independently prove usefulness. Refunds are verified voluntary transfers; there is no automatic escrow arbitration.
 
-For a fresh local setup, `npm run setup:local` creates the three ignored environment files with private permissions, matching internal tokens and installed CLI paths. It preserves existing application sessions and refuses to overwrite configuration. It does not create wallets, provision Ledger Ring, log in to Circle or move funds. The local same-user layout is for development; use a dedicated broker account for credential isolation.
+## Verification
 
-1. Configure and start the Hedera evidence service with its recipient, persistent journal and matching public URL.
-2. Enroll the private broker using Ledger Ring and the **Sync** device app. Encrypt the inference credential and HBAR payer key; inject the Ring password from the operator keychain.
-3. Use the **Ethereum** device app to derive and confirm the separate controller address. Pin it and its derivation path before requesting a signature.
-4. Complete Circle CLI **agent/testnet email OTP** login yourself under the broker account. Select and fund its Arc wallet, then pin the verification recipient. This CLI path needs no Circle API key or imported Circle private key.
-5. Start the private broker and app with their independent tokens. Run `npm run preflight`, then authenticate in **Connections** and refresh wallet/readiness details. Unknown balances remain unavailable; balances and purchase allowances are different values.
-6. Create a live run. If authority must increase, download its approval JSON, run `npm run ledger:approve -- /absolute/path/approval.json`, review the selected physical Ledger or explicitly labelled Speculos prompt and submit the signature. Approved messages and signatures are saved in the run export.
-7. Inspect actual settled receipt IDs in HashScan and ArcScan. Record the selected signer, disclose emulator use, and retain paid-flow evidence and developer feedback before submission.
+The [demo-readiness recheck](docs/evidence/2026-09-13-demo-readiness.md) confirms current service availability, signed-in navigation and retained payment proofs.
 
-Key Ring protects stored broker secrets; only the trusted broker decrypts them in memory. LedgerJS performs Ethereum personal-message approval through USB or the disclosed Speculos adapter. Circle Agent Wallet uses its own MPC/session infrastructure, **not Ledger**, to sign Arc payments. No bridge or atomic cross-chain settlement is claimed.
+The [13 September live end-to-end audit](docs/evidence/2026-09-13-full-end-to-end.md) records browser-driven coding work, five paid resource APIs, a fresh Hedera A2A purchase, delivery recovery, a genuine refund and before/after economy reconciliation.
 
-The Connections view is read-only wallet management: authenticated public addresses, recipients, exact HBAR/USDC balance strings, sources/timestamps, explorer/faucet links and session-owned receipt/authorization counts. It does not import keys, connect a replacement browser wallet, fund accounts or mark external submission requirements complete.
+| Recorded check | Result |
+| --- | --- |
+| Application tests | 670 passed |
+| Real isolated PostgreSQL cases | 89 passed separately |
+| Browser regression cases | 45 distinct cases passed; 14 rerun against the final deployment |
+| Contract execution, typecheck and production build | Passed |
+| New Arc service purchases | 7 finalized payments totaling 0.007 test USDC |
+| Delivery and acknowledgment | Output hashes matched for all seven payments |
+| Completed executor replay | Zero transaction writes |
 
-## Tests and build
+Fixture-based regression tests are separate from live execution evidence. Live browser checks used real app APIs and software-wallet signatures, not mocked application responses; they did not test installing a wallet extension. The audit includes exact transactions, limitations and recovery details.
 
 ```sh
 npm test
 npm run typecheck
+npm run test:contracts
 npm run build
-npm start
 ```
 
-Tests cover budget and expiry enforcement, quote changes, approved signer/run binding and replay, receipt validation, session ownership, concurrent advances, interrupted payments, broker lifetime caps and API/payment validation. Hardware, externally paid requests and browser behavior have separate verification records in `docs/submission.md`.
+For browser regressions, start the built app and run Playwright:
 
-`npm run preflight` inspects local configuration, matching values and executable/file presence without executing CLIs, decrypting the bundle or contacting the network. Run it only from a trusted setup context already authorized to read all three environment files; do not copy private broker configuration into the app account. It does not establish login, funding, hardware use or settlement.
+```sh
+npm run start -- --port 3100
+# In another terminal:
+npx playwright test --config tests/browser/playwright.config.ts
+```
 
-With the app running at the configured origin, `npm run test:smoke` checks session creation, cross-origin rejection, operator gating, rehearsal rejection and the `/demo` redirect. It creates no jobs and transfers no funds.
+Database-dependent cases require `TEST_DATABASE_URL` pointing to a **dedicated test database**, never production. With an app running, `SMOKE_ORIGIN=http://127.0.0.1:3000 npm run test:smoke` checks session and authorization boundaries without creating work or sending payments.
 
-The dependency audit on September 7 reported zero high/critical advisories after compatible transitive patches, with 9 low and 7 moderate advisories remaining. Recheck the audit before deployment; passing application tests is not a claim that every dependency is vulnerability-free.
+## Repository guide
 
-## Deployment
+| Path | Purpose |
+| --- | --- |
+| `src/app/`, `src/components/platform/` | Public pages, workspace UI and authenticated APIs |
+| `src/lib/tasks/`, `services/task-runner.ts` | General planning, exact approval and execution |
+| `src/lib/economy/`, `contracts/` | Service protocol, policy, settlement, accounting and indexing |
+| `src/lib/platform/`, `db/migrations/` | Accounts and durable platform state |
+| `src/lib/integrations/`, `services/broker.ts` | Private Ledger, Circle and Hedera integration |
+| `services/agent-runner.ts` | Optional repository research workflow |
+| `tests/`, `docs/evidence/` | Regression coverage and recorded live proof |
 
-The repository’s root `vercel.json` builds the native Next.js application. Neon stores account sessions, agent credentials, mandates, jobs, and the x402 service’s durable quote/payment state. Configure the server-side `DATABASE_URL` and exact `APP_ORIGIN`, apply migrations, and set the public service recipient and its independent operator control token. See [self-service setup](docs/self-service-setup.md). The native public deployment passed account verification and a [bounded funded self-service run](docs/evidence/2026-09-09-self-service-testnet.md) on September 9, 2026.
+[Deployment and credentials](docs/live-setup.md) · [Hedera setup](docs/hedera-setup.md) · [A2A](docs/hedera-a2a.md) · [HTS](docs/hedera-token-buyer.md) · [Identity and audit](docs/hedera-identity-audit.md) · [Demo walkthrough](docs/demo-script.md) · [Submission checklist](docs/submission.md)
 
-The user’s runner and broker stay on a private host with their durable journals and local wallet/provider credentials. Do not copy wallet keys, Circle sessions, Ring passwords, inference credentials, or broker secrets into Vercel or Neon. A local runner needs outbound access to the platform and configured services, with its broker bound to loopback.
+## Project provenance
 
-The [older Vercel proxy](deploy/vercel-proxy/README.md) and [standalone data service](deploy/data-service/README.md) remain legacy deployment options. Local file-backed services require long-running processes and persistent private volumes; they must not share or clone a payment journal across replicas. Preserve all prior journals and reconcile uncertain payments manually.
-
-Existing installations retain their data directory, cookies, signed messages and payment journals across the rename. `OBOLOS_DATA_DIR` is the current setting; the previous environment variable remains a fallback. Keep already-provisioned Ring key names and file paths unchanged. The original Circle idempotency namespace is intentionally stable so renaming the product cannot create a second payment identity.
-
-## Project navigation
-
-- `src/components/platform/`: self-service account, agent, runner, mandate and job interfaces.
-- `src/lib/platform/`, `db/migrations/`: Neon-backed control plane and native x402 service.
-- `services/task-runner.ts`, `src/lib/tasks/`: general planning, exact approval and durable paid service orchestration.
-- `services/agent-runner.ts`, `src/lib/runner/`: earlier research execution, signed-scope enforcement and durable recovery.
-- `src/components/platform/economy-workspace.tsx`: live economy evidence, publication and paid-order recovery.
-- `src/lib/engine.ts`, `policy.ts`, `store.ts`: mandate, stage machine, audit and persistence.
-- `src/app/api/`: session-scoped run actions and operator authentication.
-- `services/data-service.ts`: public discovery, metered quotes, native Hedera x402 endpoint.
-- `services/broker.ts`: isolated credentials and scoped capabilities.
-- `src/lib/integrations/`: Ledger Key Ring, Circle Arc and Hedera adapters.
-- `scripts/ledger-approve.ts`: USB or explicitly labelled Speculos approval flow; pending JSON messages become saved authorization proofs after validation.
-- `src/lib/live-readiness.ts`, `src/lib/integrations/wallets.ts`: readiness aggregation and authenticated, read-only testnet balance snapshots.
-- `docs/live-setup.md`: public address map, secret locations and operator setup sequence.
-- `docs/`: approved plan, submission matrix, demo script, references and limitations.
-
-## Attribution and eligibility
-
-The user directed the product and flow; AI subagents assisted implementation, tests, documentation and illustration. See [AI and prior-work disclosure](docs/ai-disclosure.md). The workspace follows the user-selected Foundation reference on Mobbin; exact screenshots and typography inferences are listed in `docs/ui-references.md`. The landing page follows the user’s later supplied video-background brief, with product facts replacing illustrative adoption and performance claims. No sponsor logos or fictional settlement evidence are used.
-
-The September 3 research paper predates the event. Whether it constitutes disallowed prior project-specific design for the Classic track remains an organizer decision. New implementation is dated in commit history; this repository does not represent eligibility as confirmed.
+The user directed the product; AI tools assisted implementation, testing, documentation and artwork. The supplied research paper predates the event. See [AI and prior-work disclosure](docs/ai-disclosure.md), [UI references](docs/ui-references.md) and the [submission record](docs/submission.md). Organizer eligibility and sponsor acceptance are separate from technical verification; the Arc mainnet milestone has not been completed. This repository documents a testnet MVP.

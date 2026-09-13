@@ -1,35 +1,40 @@
-# Historical four-minute demo script
+# Recording the Obolos demo
 
-This records the earlier operator-dashboard recording plan. That dashboard and its Connections panel are retired; use the current wallet-owned workspace and [live-only audit](evidence/2026-09-11-live-only-audit.md) for new recordings. The earlier escalation was subsequently [reconciled with chain evidence](evidence/2026-09-08-arc-reconciliation.md); preserve its original uncertain stage and later recovery as separate events. The [first paid run](evidence/2026-09-08-first-paid-run.md) already has real testnet receipts; record the separate price-increase flow and its actual approval. This build uses Speculos: show the emulator and disclose development mode rather than claiming physical Ledger footage. Use only real live execution in new recordings. Historical rehearsal records are export-only. Aim for 3:50 with human narration at 720p or higher; the intended event upload is 2–4 minutes.
-
-| Time | Screen / action | Narration |
-|---|---|---|
-| 0:00–0:20 | Foundation-referenced overview; create a repository comparison | “Obolos lets agents buy research inputs and pay for source checks within a human-controlled mandate.” |
-| 0:20–0:40 | Connections: public wallet addresses, separate HBAR/USDC balances, sources and readiness | “These are read-only testnet snapshots. A balance is not an allowance, and setup readiness is not payment proof.” |
-| 0:40–1:00 | Mandate editor and discovered live quotes | “The human chooses the providers, price ceiling, budgets and expiry. The worker model has no signing keys or wallet tools.” |
-| 1:00–1:20 | Change your own service's quote before purchase; advance to blocked request | “The planner reads actual service prices. Both allowed quotes now exceed this mandate, so spending stops for a human decision.” |
-| 1:20–1:55 | Download approval JSON; show exact message and Speculos Ethereum-app approval | “The controller address is pinned to this disclosed Speculos emulator. This run-bound authorization expires and changes only the spending mandate. The signed message and both mandate versions are saved.” |
-| 1:55–2:25 | Resume; inspect settled Hedera receipt and HashScan | “The broker validates an HTTP 402 challenge, signs the permitted HBAR payment, and requires Blocky402 settlement plus matching mirror-node evidence.” |
-| 2:25–2:50 | Worker output; Circle Arc payment receipt and ArcScan | “The worker writes from purchased evidence. A separate USDC payment through Circle Agent Wallet on Arc pays the broker's verification capability.” |
-| 2:50–3:15 | Source checks, saved authorization history, JSON export, Connections evidence counts | “We retain source timestamps, settled receipts and the approval proof. These checks cover source integrity and structure; they do not certify every model statement.” |
-| 3:15–3:50 | Architecture diagram, short Ring provisioning clip and trust boundary | “Ledger Sync enrolls the Ring. The trusted broker decrypts stored secrets in memory. Ethereum signs mandate approvals. Circle has separate MPC custody. Payments settle on-chain; the model, orchestration and service infrastructure remain off-chain.” |
-
-## Required video correction
-
-The previous synthetic-narration preview must not be submitted. ETHOnline prohibits TTS/AI voiceover and speeding up video, requires 2–4 minutes, and requires at least 720p. Editing out waiting is permitted. [Official event rules](https://ethglobal.com/events/ethonline2026/info/details).
-
-Use the [original-speed silent visual bed](presentation/obolos-human-narration-visual-bed.mp4) and [timed human script with Mac recording steps](presentation/demo-transcript.md). Record your own voice. The silent bed and internal TTS preview are both incomplete submission artifacts until compliant human narration is added.
+Use the current signed-in workspace at **https://obolos.app/app**. Lead with general digital tasks, then show the payment and authority behind the result. The earlier operator dashboard and Connections panel are retired.
 
 ## Before recording
 
-Complete [live setup](live-setup.md) yourself: funded testnet payer and recipients, Circle email-OTP session, Ring enrollment, an emulator-confirmed controller address in explicit Speculos mode, the inference credential and real service deployment. Run read-only preflight and inspect Connections, then separately prove live payments. Do not record private files, OTPs, the Ring password, recovery phrases or tokens.
+- Sign in and choose an agent with a configured private task runner. Confirm the provider is available and the private host is awake. Agent creation alone does not configure execution.
+- For a fresh paid take, check the payer balance, remaining agent allowance, approved sellers/categories and policy expiry. Previously tested agents have already spent some or all of their caps. A balance is not spending authority.
+- Start the bounded runner using the [task runner guide](task-runner.md). It must remain active after you approve the plan. Preserve its original worker identity and all payment journals.
+- Prepare the marketplace, a completed general task with expanded outputs and receipts, Economy, and Developers → Hedera integrations. Use **Since deployment** for cumulative activity; a new UTC day may have little or no activity.
+- Keep wallet secrets, API credentials, OTPs and private environment files out of the recording. Use your own narration. The old synthetic-narration preview is an internal artifact, not the final submission video; consult the [recording guide](presentation.md) and current event upload instructions.
 
-Prepare three public repositories, fresh prices, a view of the Speculos Ethereum emulator, the signing script and explorer tabs. The live price-change action requires the app's matching `DATA_SERVICE_OPERATOR_TOKEN` for your own evidence service. A one-provider increase can demonstrate rerouting; increasing both above the ceiling demonstrates escalation. Use the shortest route that proves the behavior clearly.
+## Suggested four-minute walkthrough
 
-Reset quotes through the authenticated service control between takes. Never delete payment journals, change request IDs or create a new state directory to bypass an uncertain transfer. Edit waiting time in the video while preserving the visible order of authorization, payment and evidence.
+| Time | Screen and action | What to explain |
+| --- | --- | --- |
+| 0:00–0:20 | Open the marketplace and browse real service listings. | “Obolos is a market for digital work. Sellers publish APIs with capabilities and prices; agents discover what they need.” |
+| 0:20–0:55 | Open Agents, describe a small supported task, and show the proposed plan. | “The planner selects registered services. The human reviews the providers, input routing and exact price before approving.” |
+| 0:55–1:40 | Approve a fresh plan if the configured runner and allowance are ready; inspect actual outputs and payment links when complete. Alternatively, open the previously completed coding task and explicitly describe it as a completed run. | “This task buys source code, then passes the returned source to a text-analysis service. These are actual responses and separate test-USDC payments.” |
+| 1:40–2:05 | Open purchase details, settlement, delivery and buyer acknowledgment. | “Payment, seller delivery and buyer acknowledgment are separate records. The allocation is 95% seller, 3% reserve and 2% review pool. Delivery can be recovered using the original order.” |
+| 2:05–2:45 | Developers → Hedera integrations: open the A2A, HTS, HCS and schedule proof links. | “The separate repository-data service supports discovery and A2A negotiation, metered x402 payments through Blocky402, HCS identity and audit, HTS payments and a finite native schedule.” |
+| 2:45–3:15 | Economy → Refresh data → Since deployment; show payments, seller allocations and refunds. | “Activity updates from actual records. GAP needs complete production inputs; productivity additionally needs independent output valuations. Those are still pending. Unchanged prices correctly leave the price index flat.” |
+| 3:15–3:45 | Show the architecture and existing Ledger approval evidence; disclose the Speculos device. | “Ledger Key Ring protects private broker credentials and the controller approves spending limits. Only the Ledger device is emulated. Circle uses its own wallet infrastructure for real Arc testnet settlement.” |
+| 3:45–4:00 | Return to the completed task and app URL. | “Agents buy services within human-approved limits, with outputs and payment evidence you can inspect.” |
 
-## Evidence to retain
+These timings are a recording outline, not a claim about service latency. A fresh model plan can fail validation or return imperfect work. Show an actual blocked state or recovery if it occurs; do not represent an existing receipt as a new purchase.
 
-Save the live export with `receipts`, `authorizations`, source timestamps and audit events; the public HashScan/ArcScan links; device footage of Ring enrollment and mandate approval; and actual tooling feedback. The ECDSA signature alone does not prove the hardware was used. Show missing evidence honestly if recording before these steps are complete.
+## A small task to demonstrate
 
-The public repository, public HTTPS service, real paid requests and accepted Speculos mandate now have execution evidence in the submission matrix. The second Arc intent has a separate reconciliation record; its earlier uncertainty must remain visible in the historical evidence. Keep the final video, continuing host availability, delivered developer feedback and external eligibility decisions distinct from these verified results. Preserve the September 3 prior-paper disclosure and seek the organizer's eligibility decision.
+The verified coding run asked for a JavaScript function named `uniqueSortedNumbers(values)` that returns sorted unique numbers without changing the input, followed by text statistics on the returned source. Its two service calls cost **0.002 test USDC**, excluding network fees and private planning inference charges. A new plan can differ: review its real providers and price before approval.
+
+The service returns source text. It does not execute arbitrary code or guarantee correctness. The recorded output was separately inspected and tested, as documented in the [live audit](evidence/2026-09-13-full-end-to-end.md).
+
+## What the demo can accurately claim
+
+The audit records seven real Arc service payments, matching delivery/acknowledgment hashes, a fresh Hedera A2A paid request and a real refund. HCS, HTS and both Scheduled Transactions have independently checked evidence. Buyer and seller were operated by the same team. This proves working flows, not independent market adoption.
+
+General tasks use the Arc service catalog; the Hedera A2A endpoint currently negotiates repository data. The schedule is finite, not continuous streaming. GAP and productivity remain unavailable until the required accounting evidence exists. The only runtime emulation is the Ledger device; isolated automated tests use fixtures and are documented separately.
+
+If a payment's outcome is uncertain, keep the original order and private journal, then reconcile or retry delivery through the documented recovery flow. Do not clear state, renew an expired storage lease or submit another payment just to make a recording look continuous.
